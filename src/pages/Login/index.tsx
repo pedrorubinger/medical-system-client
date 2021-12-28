@@ -129,7 +129,8 @@ export const Login = (): JSX.Element => {
             <Col span={24}>
               <ButtonContainer>
                 <Button
-                  disabled={user?.loading}
+                  // disabled={user?.loading}
+                  disabled
                   width="100%"
                   type="submit"
                   title="Clique para iniciar sessão">

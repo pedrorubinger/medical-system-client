@@ -25,4 +25,8 @@ export const StyledButton = styled.button<IStyledButtonProps>`
     opacity: 0.6;
     cursor: default;
   }
+
+  &:disabled:hover {
+    background-color: ${({ color }) => Theme.buttons[color].color};
+  }
 `
