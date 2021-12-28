@@ -21,7 +21,7 @@ export const UserTypes = {
   USER_SIGN_IN_CLEAR: 'USER/USER_SIGN_IN_CLEAR',
 }
 
-const initialState = {
+const initialState: IState = {
   loading: false,
   data: null,
   error: null,

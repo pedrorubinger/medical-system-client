@@ -39,6 +39,7 @@ export const Login = (): JSX.Element => {
   const {
     control,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<IFormValues>({
     resolver: yupResolver(signInSchema),
@@ -51,8 +52,14 @@ export const Login = (): JSX.Element => {
 
   useEffect(() => {
     if (user.error) {
-      console.log('USER ERROR>', user.error)
-      notification.error({ message: 'Algo deu errado!' })
+      notification.error({ message: user.error.message })
+
+      if (user.error.status === 400) {
+        const message = 'Verifique suas credenciais!'
+
+        setError('email', { type: 'manual', message })
+        setError('password', { type: 'manual', message })
+      }
     }
 
     if (user.data) {
@@ -129,8 +136,7 @@ export const Login = (): JSX.Element => {
             <Col span={24}>
               <ButtonContainer>
                 <Button
-                  // disabled={user?.loading}
-                  disabled
+                  disabled={user?.loading}
                   width="100%"
                   type="submit"
                   title="Clique para iniciar sessão">

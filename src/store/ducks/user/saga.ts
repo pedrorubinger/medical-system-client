@@ -6,6 +6,7 @@ import { api } from '../../../services/api'
 import { IUser } from '../../../interfaces/user'
 import { UserTypes, Creators } from './reducer'
 import { setToken } from '../../../utils/helpers/token'
+import { handleError } from '../../../utils/helpers/errors'
 
 interface ISignInResponse {
   user: IUser
@@ -23,16 +24,16 @@ function* userSignIn(action: AnyAction) {
     yield put(Creators.signInSuccess(response.data.user))
     yield setToken(response.data.token)
   } catch (err: any) {
-    /** TO DO: Implement an error handling... */
-    yield put(
-      Creators.signInFailure({
-        message:
-          err?.response?.message ||
-          err?.message ||
-          'Desculpe. Um erro interno ocorreu.',
-        status: err?.response?.status || err?.status || 500,
-      })
-    )
+    if (err?.data?.status === 400) {
+      yield put(
+        Creators.signInFailure({
+          message: 'Email ou senha inválidos!',
+          status: 400,
+        })
+      )
+    } else {
+      yield put(Creators.signInFailure(handleError(err)))
+    }
   }
 }
 
