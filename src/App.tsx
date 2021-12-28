@@ -1,5 +1,7 @@
+import { Router } from './router'
+
 const App = (): JSX.Element => {
-  return <div>App Page</div>
+  return <Router />
 }
 
 export default App
