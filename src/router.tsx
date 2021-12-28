@@ -1,11 +1,13 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+
 import { TRole } from './interfaces/roles'
 import { GetAccount } from './pages/GetAccount'
-
 import { Help } from './pages/Help'
 import { Home } from './pages/Home'
 import { Login } from './pages/Login'
 import { RecoverPassword } from './pages/RecoverPassword'
+import { RootState } from './store'
 
 type TPermission = TRole | '*'
 
@@ -15,7 +17,8 @@ interface IPrivateRoute {
 }
 
 export const Router = () => {
-  const isAuthenticated = false
+  const user = useSelector((state: RootState) => state.UserReducer)
+  const isAuthenticated = !!user?.data
   const publicRoutes = [
     <Route key="login" path="/login" element={<Login />} />,
     <Route
@@ -28,7 +31,7 @@ export const Router = () => {
   const privateRoutes: IPrivateRoute[] = [
     {
       permissions: ['*'],
-      route: <Route path="/" element={<Home />} />,
+      route: <Route key="root" path="/" element={<Home />} />,
     },
     {
       permissions: ['*'],
@@ -36,8 +39,15 @@ export const Router = () => {
     },
   ]
 
-  /** TO DO: Implement the method to check permissions */
-  const hasPermission = (permissions: TPermission[] = []) => true
+  const hasPermission = (permissions: TPermission[] = []) => {
+    if (!user.data) {
+      return false
+    }
+
+    if (permissions.includes('*' || user.data.role)) {
+      return true
+    }
+  }
 
   return (
     <BrowserRouter>

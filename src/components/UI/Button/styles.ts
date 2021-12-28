@@ -20,4 +20,9 @@ export const StyledButton = styled.button<IStyledButtonProps>`
   &:hover {
     background-color: ${({ color }) => Theme.buttons[color].border};
   }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
 `

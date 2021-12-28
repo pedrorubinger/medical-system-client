@@ -17,6 +17,7 @@ export const LogoText = styled.h1`
   align-self: center;
   transition: 0.6s;
   font-family: 'Antic Slab', serif;
+  cursor: default;
 
   &:hover {
     text-shadow: 1px 1px 1px #fff;

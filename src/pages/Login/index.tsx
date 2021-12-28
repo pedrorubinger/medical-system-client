@@ -1,5 +1,8 @@
+import { useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { Col, Row } from 'antd'
+import { Col, notification, Row } from 'antd'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
 
@@ -14,6 +17,8 @@ import {
 import { Input } from '../../components/UI/Input'
 import { TopBar } from '../../components/UI/TopBar'
 import { Button } from '../../components/UI/Button'
+import { RootState } from '../../store'
+import { Creators } from '../../store/ducks/user/reducer'
 
 interface IFormValues {
   email: string
@@ -28,6 +33,9 @@ const signInSchema = Yup.object().shape({
 })
 
 export const Login = (): JSX.Element => {
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const user = useSelector((state: RootState) => state.UserReducer)
   const {
     control,
     handleSubmit,
@@ -38,12 +46,19 @@ export const Login = (): JSX.Element => {
   })
 
   const onSubmit = async (values: IFormValues) => {
-    try {
-      console.log('SUBMITED:', values)
-    } catch (err) {
-      console.log('err:', err)
-    }
+    dispatch(Creators.signIn(values))
   }
+
+  useEffect(() => {
+    if (user.error) {
+      console.log('USER ERROR>', user.error)
+      notification.error({ message: 'Algo deu errado!' })
+    }
+
+    if (user.data) {
+      navigate('/')
+    }
+  }, [user])
 
   return (
     <Container>
@@ -57,6 +72,7 @@ export const Login = (): JSX.Element => {
               <Controller
                 name="email"
                 control={control}
+                defaultValue=""
                 render={({ field }) => (
                   <Input
                     label="E-mail"
@@ -76,6 +92,7 @@ export const Login = (): JSX.Element => {
               <Controller
                 name="password"
                 control={control}
+                defaultValue=""
                 render={({ field }) => (
                   <Input
                     type="password"
@@ -112,10 +129,11 @@ export const Login = (): JSX.Element => {
             <Col span={24}>
               <ButtonContainer>
                 <Button
+                  disabled={user?.loading}
                   width="100%"
                   type="submit"
                   title="Clique para iniciar sessão">
-                  Entrar
+                  {user?.loading ? 'Autenticando...' : 'Entrar'}
                 </Button>
               </ButtonContainer>
             </Col>
