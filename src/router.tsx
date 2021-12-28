@@ -1,9 +1,11 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { TRole } from './interfaces/roles'
+import { GetAccount } from './pages/GetAccount'
 
 import { Help } from './pages/Help'
 import { Home } from './pages/Home'
 import { Login } from './pages/Login'
+import { RecoverPassword } from './pages/RecoverPassword'
 
 type TPermission = TRole | '*'
 
@@ -13,8 +15,16 @@ interface IPrivateRoute {
 }
 
 export const Router = () => {
-  const isAuthenticated = true
-  const publicRoutes = [<Route key="login" path="/login" element={<Login />} />]
+  const isAuthenticated = false
+  const publicRoutes = [
+    <Route key="login" path="/login" element={<Login />} />,
+    <Route
+      key="recover-password"
+      path="/recover-password"
+      element={<RecoverPassword />}
+    />,
+    <Route key="get-account" path="/get-account" element={<GetAccount />} />,
+  ]
   const privateRoutes: IPrivateRoute[] = [
     {
       permissions: ['*'],
@@ -39,7 +49,9 @@ export const Router = () => {
           )}
 
         {/* UNAUTHORIZED ACCESS: Redirect to default pages */}
-        {!isAuthenticated && <Route path="*" element={<Navigate to="/login" />} />}
+        {!isAuthenticated && (
+          <Route path="*" element={<Navigate to="/login" />} />
+        )}
         {isAuthenticated && <Route path="*" element={<Navigate to="/" />} />}
       </Routes>
     </BrowserRouter>
