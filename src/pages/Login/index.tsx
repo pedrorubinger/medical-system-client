@@ -14,11 +14,11 @@ import {
   StyledLink,
   SignInCard,
 } from './styles'
-import { Input } from '../../components/UI/Input'
-import { TopBar } from '../../components/UI/TopBar'
 import { Button } from '../../components/UI/Button'
-import { RootState } from '../../store'
 import { Creators } from '../../store/ducks/user/reducer'
+import { Input } from '../../components/UI/Input'
+import { RootState } from '../../store'
+import { TopBar } from '../../components/UI/TopBar'
 
 interface IFormValues {
   email: string

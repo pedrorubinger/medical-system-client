@@ -8,14 +8,18 @@ import { UserTypes, Creators } from './reducer'
 import { setToken } from '../../../utils/helpers/token'
 import { handleError } from '../../../utils/helpers/errors'
 
-interface ISignInResponse {
+interface ISignInResponseData {
   user: IUser
   token: string
 }
 
+interface IValidateTokenResponseData {
+  user: IUser
+}
+
 function* userSignIn(action: AnyAction) {
   try {
-    const response: AxiosResponse<ISignInResponse> = yield call(
+    const response: AxiosResponse<ISignInResponseData> = yield call(
       api.post,
       '/session',
       action.payload
@@ -37,12 +41,29 @@ function* userSignIn(action: AnyAction) {
   }
 }
 
+function* validateToken() {
+  try {
+    const response: AxiosResponse<IValidateTokenResponseData> = yield call(
+      api.get,
+      '/session/validate'
+    )
+
+    yield put(Creators.validateTokenSuccess(response.data.user))
+  } catch (err: any) {
+    yield put(Creators.signInFailure(handleError(err)))
+  }
+}
+
 export function* watchSignInUser() {
   yield takeLatest(UserTypes.USER_SIGN_IN_REQUEST, userSignIn)
 }
 
+export function* watchValidateToken() {
+  yield takeLatest(UserTypes.USER_VALIDATE_TOKEN_REQUEST, validateToken)
+}
+
 function* UserSaga() {
-  yield all([fork(watchSignInUser)])
+  yield all([fork(watchSignInUser), fork(watchValidateToken)])
 }
 
 export default UserSaga

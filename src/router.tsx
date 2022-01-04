@@ -1,6 +1,9 @@
+import { useEffect, useState } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
+import { getToken } from './utils/helpers/token'
+import { Creators } from './store/ducks/user/reducer'
 import { TRole } from './interfaces/roles'
 import { GetAccount } from './pages/GetAccount'
 import { Help } from './pages/Help'
@@ -8,17 +11,21 @@ import { Home } from './pages/Home'
 import { Login } from './pages/Login'
 import { RecoverPassword } from './pages/RecoverPassword'
 import { RootState } from './store'
+import { ProgressBar } from './components/UI/ProgressBar'
 
 type TPermission = TRole | '*'
 
 interface IPrivateRoute {
   permissions: TPermission[]
+  path: string
   route: React.ReactElement | null
 }
 
 export const Router = () => {
+  const dispatch = useDispatch()
   const user = useSelector((state: RootState) => state.UserReducer)
-  const isAuthenticated = !!user?.data
+  const [isMounted, setIsMounted] = useState<boolean>(false)
+  const isAuthenticated = user?.isAuthorized
   const publicRoutes = [
     <Route key="login" path="/login" element={<Login />} />,
     <Route
@@ -31,10 +38,12 @@ export const Router = () => {
   const privateRoutes: IPrivateRoute[] = [
     {
       permissions: ['*'],
+      path: '/',
       route: <Route key="root" path="/" element={<Home />} />,
     },
     {
       permissions: ['*'],
+      path: '/help',
       route: <Route key="help" path="/help" element={<Help />} />,
     },
   ]
@@ -47,6 +56,18 @@ export const Router = () => {
     if (permissions.includes('*' || user.data.role)) {
       return true
     }
+  }
+
+  useEffect(() => {
+    if (getToken() && !user?.isAuthorized && !user?.validating) {
+      dispatch(Creators.validateToken())
+    }
+
+    setIsMounted(true)
+  }, [])
+
+  if (!isMounted || user?.loading || user?.validating) {
+    return <ProgressBar />
   }
 
   return (
