@@ -62,7 +62,7 @@ export const Login = (): JSX.Element => {
       }
     }
 
-    if (user.data) {
+    if (user.isAuthorized) {
       navigate('/')
     }
   }, [user])

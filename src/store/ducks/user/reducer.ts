@@ -46,12 +46,14 @@ export default function reducer(
         validating: false,
         data: null,
         error: null,
+        isAuthorized: false,
       }
     case UserTypes.USER_SIGN_IN_SUCCESS:
       return {
         ...state,
         loading: false,
         validating: false,
+        isAuthorized: true,
         data: action.payload,
         error: null,
       }
@@ -61,6 +63,7 @@ export default function reducer(
         loading: false,
         validating: false,
         data: null,
+        isAuthorized: false,
         error: action.payload,
       }
     case UserTypes.USER_VALIDATE_TOKEN_REQUEST:

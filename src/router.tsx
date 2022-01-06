@@ -66,7 +66,7 @@ export const Router = () => {
     setIsMounted(true)
   }, [])
 
-  if (!isMounted || user?.loading || user?.validating) {
+  if (!isMounted || user?.validating) {
     return <ProgressBar />
   }
 
