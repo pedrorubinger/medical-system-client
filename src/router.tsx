@@ -12,6 +12,7 @@ import { Login } from './pages/Login'
 import { RecoverPassword } from './pages/RecoverPassword'
 import { RootState } from './store'
 import { ProgressBar } from './components/UI/ProgressBar'
+import { PrivateRouteWrapper } from './components/PrivateRouteWrapper'
 
 type TPermission = TRole | '*'
 
@@ -39,12 +40,32 @@ export const Router = () => {
     {
       permissions: ['*'],
       path: '/',
-      route: <Route key="root" path="/" element={<Home />} />,
+      route: (
+        <Route
+          key="root"
+          path="/"
+          element={
+            <PrivateRouteWrapper>
+              <Home />
+            </PrivateRouteWrapper>
+          }
+        />
+      ),
     },
     {
       permissions: ['*'],
       path: '/help',
-      route: <Route key="help" path="/help" element={<Help />} />,
+      route: (
+        <Route
+          key="help"
+          path="/help"
+          element={
+            <PrivateRouteWrapper>
+              <Help />
+            </PrivateRouteWrapper>
+          }
+        />
+      ),
     },
   ]
 
