@@ -3,7 +3,7 @@ import React from 'react'
 import { useWindowDimensions } from '../../hooks/useWindowDimensions'
 import { ProfileActionsControl } from './ProfileActionsControl'
 import { SearchBar } from '../UI/SearchBar'
-import { mobileLimitWidth, SideMenu } from '../UI/SideMenu'
+import { mobileLimitWidth, Menu } from '../UI/Menu'
 import {
   Container,
   PageContainer,
@@ -23,7 +23,7 @@ export const PrivateRouteWrapper = ({
 
   return (
     <Container useHamburgerMenu={useHamburgerMenu}>
-      <SideMenu />
+      <Menu />
       <PageContainer>
         {!useHamburgerMenu && (
           <TopBarContainer>

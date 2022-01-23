@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { GiHamburgerMenu } from 'react-icons/gi'
 
 import { useWindowDimensions } from '../../../hooks/useWindowDimensions'
 import { useHasPermission } from '../../../hooks/useHasPermissions'
@@ -16,7 +17,7 @@ import {
 
 export const mobileLimitWidth = 1100
 
-export const SideMenu = () => {
+export const Menu = () => {
   const navigate = useNavigate()
   const { hasPermission } = useHasPermission()
   const { width } = useWindowDimensions()
@@ -44,5 +45,14 @@ export const SideMenu = () => {
     )
   }
 
-  return <TopBar />
+  return (
+    <TopBar>
+      <GiHamburgerMenu
+        color="#fff"
+        size={25}
+        cursor="pointer"
+        onClick={() => console.log('hamburger menu > clicked')}
+      />
+    </TopBar>
+  )
 }

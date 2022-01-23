@@ -18,6 +18,7 @@ export const TopBar = styled.div`
   background-color: #3d405b;
   width: 100%;
   height: 50px;
+  padding: 10px;
 `
 
 export const LogoText = styled.h1`
