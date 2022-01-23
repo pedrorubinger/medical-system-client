@@ -10,7 +10,7 @@ export const Container = styled.div`
 export const UserName = styled.h3`
   color: grey;
   font-size: 14px;
-  margin-right: 8px;
+  margin-right: 4px;
   font-weight: 300;
 `
 
@@ -22,4 +22,5 @@ export const AvatarImage = styled.img`
 /** This component is necessary to avoid the warning: "findDOMNode is deprecated in StrictMode" */
 export const DropdownIconContainer = styled.div`
   cursor: pointer;
+  margin-top: 2px;
 `

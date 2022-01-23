@@ -40,8 +40,8 @@ export const ProfileActionsControl = () => {
 
   return (
     <Container>
-      <UserName>{name}</UserName>
       <AvatarImage src={avatar} width={40} height={40} />
+      <UserName>{name}</UserName>
       <Dropdown overlay={DropdownMenu} align={{ offset: [0, 10] }}>
         <DropdownIconContainer>
           <BiChevronDown />

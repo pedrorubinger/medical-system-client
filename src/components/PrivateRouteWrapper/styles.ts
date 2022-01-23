@@ -7,7 +7,7 @@ interface IContainerProps {
 export const Container = styled.div`
   width: 100%;
   height: 100vh;
-  background: #f5f5f5;
+  background: #f3f4f7;
   display: flex;
   flex-direction: ${({ useHamburgerMenu }: IContainerProps) =>
     useHamburgerMenu ? 'column' : 'row'};
