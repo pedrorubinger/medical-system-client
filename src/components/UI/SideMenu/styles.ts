@@ -1,16 +1,15 @@
 import styled from 'styled-components'
 
 export const Container = styled.div`
-  background-color: #0e3d59;
-  width: 300px;
+  background-color: #3d405b;
+  width: 20%;
+  min-width: 270px;
   height: 100vh;
-  box-shadow: 1px 1px 1px black;
-  border-top-right-radius: 3px;
   border-bottom-right-radius: 3px;
 `
 
 export const TopBar = styled.div`
-  background-color: #0e3d59;
+  background-color: #3d405b;
   width: 100%;
   height: 50px;
 `

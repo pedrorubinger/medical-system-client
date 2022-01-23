@@ -4,7 +4,12 @@ import { useWindowDimensions } from '../../hooks/useWindowDimensions'
 import { ProfileActionsControl } from './ProfileActionsControl'
 import { SearchBar } from '../UI/SearchBar'
 import { mobileLimitWidth, SideMenu } from '../UI/SideMenu'
-import { Container, PageContainer, TopBarContainer } from './styles'
+import {
+  Container,
+  PageContainer,
+  PageContent,
+  TopBarContainer,
+} from './styles'
 
 interface IPrivateRouteWrapperProps {
   children: React.ReactNode
@@ -22,12 +27,9 @@ export const PrivateRouteWrapper = ({
   return (
     <Container useHamburgerMenu={useHamburgerMenu}>
       <SideMenu />
-      <PageContainer showSearchBar={showSearchBar}>
-        <TopBarContainer>
-          {!!showSearchBar && <SearchBar />}
-          <ProfileActionsControl />
-        </TopBarContainer>
-        {children}
+      <PageContainer>
+        {!useHamburgerMenu && <TopBarContainer />}
+        <PageContent>{children}</PageContent>
       </PageContainer>
     </Container>
   )
