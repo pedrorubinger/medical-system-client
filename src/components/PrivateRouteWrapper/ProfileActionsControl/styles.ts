@@ -4,11 +4,12 @@ export const Container = styled.div`
   height: 50px;
   display: flex;
   align-items: center;
+  margin: auto 0;
 `
 
 export const UserName = styled.h3`
-  color: #132860;
-  font-size: 15px;
+  color: grey;
+  font-size: 14px;
   margin-right: 8px;
   font-weight: 300;
 `

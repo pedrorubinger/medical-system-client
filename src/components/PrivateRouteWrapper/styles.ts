@@ -6,11 +6,12 @@ interface IContainerProps {
 
 export const Container = styled.div`
   width: 100%;
-  height: 100vh;
+  height: 100%;
   background: #f5f5f5;
   display: flex;
   flex-direction: ${({ useHamburgerMenu }: IContainerProps) =>
     useHamburgerMenu ? 'column' : 'row'};
+  overflow: auto;
 `
 
 export const TopBarContainer = styled.div`
@@ -22,15 +23,20 @@ export const TopBarContainer = styled.div`
   display: flex;
   justify-content: space-between;
   padding: 0 20px;
+  /* position: fixed; */
 `
 
 export const PageContainer = styled.div`
   width: 100%;
+  height: 100%;
   padding: 0;
   margin: 0;
+  /* background: red; */
 `
 
 export const PageContent = styled.div`
   width: 100%;
+  height: 100%;
   padding: 30px 20px;
+  /* margin-top: 70px; */
 `

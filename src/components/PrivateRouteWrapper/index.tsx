@@ -28,7 +28,7 @@ export const PrivateRouteWrapper = ({
         {!useHamburgerMenu && (
           <TopBarContainer>
             <SearchBar />
-            {/* <ProfileActionsControl /> */}
+            <ProfileActionsControl />
           </TopBarContainer>
         )}
         <PageContent>{children}</PageContent>

@@ -10,7 +10,7 @@ export const SideMenu = () => {
     return <Container />
   }
 
-  if (width > mobileLimitWidth) {
+  if (width >= mobileLimitWidth) {
     return <Container />
   }
 
