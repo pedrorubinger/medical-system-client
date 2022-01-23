@@ -1,9 +1,7 @@
-import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import { useWindowDimensions } from '../../../hooks/useWindowDimensions'
-import { RootState } from '../../../store'
-import { hasPermission } from '../../../utils/helpers/permissions'
+import { useHasPermission } from '../../../hooks/useHasPermissions'
 import {
   IPrivateRoute,
   PrivateRoutes,
@@ -20,10 +18,10 @@ export const mobileLimitWidth = 1100
 
 export const SideMenu = () => {
   const navigate = useNavigate()
+  const { hasPermission } = useHasPermission()
   const { width } = useWindowDimensions()
-  const user = useSelector((state: RootState) => state.UserReducer)
   const filteredItems = PrivateRoutes.filter(
-    (item) => item.show && hasPermission(item.permissions, user?.data?.role)
+    (item) => item.show && hasPermission(item.permissions)
   )
 
   if (!width || width >= mobileLimitWidth) {

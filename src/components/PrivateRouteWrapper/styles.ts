@@ -34,6 +34,6 @@ export const PageContainer = styled.div`
 export const PageContent = styled.div`
   width: 100%;
   height: calc(100vh - 70px);
-  padding: 30px 20px;
+  padding: 25px 20px;
   overflow: auto;
 `

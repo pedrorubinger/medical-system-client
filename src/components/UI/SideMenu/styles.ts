@@ -27,9 +27,9 @@ export const LogoText = styled.h1`
   text-align: center;
   transition: 0.8s;
   font-family: 'Antic Slab', serif;
-  cursor: default;
   padding-bottom: 20px;
   border-bottom: 1px solid #6b6c6d;
+  cursor: default;
 
   &:hover {
     text-shadow: 0px 1px 0px #f8f8f8;
@@ -48,7 +48,7 @@ export const MenuItem = styled.li<IMenuItemProps>`
   border-left: ${({ isActive = false }) =>
     isActive ? '4px solid #272a42' : '0px solid #3d405b'};
   padding: 12px;
-  margin: 4px 0;
+  margin: 3px 0;
   display: flex;
   align-items: center;
   transition: 0.3s;

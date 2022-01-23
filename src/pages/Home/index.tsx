@@ -12,7 +12,7 @@ export const Home = (): JSX.Element => {
     <PageContent>
       <Title>Seja bem-vindo, {name}</Title>
       <Message>
-        Navegue através do menu ao lado para começar a utilizar o sistema.
+        Navegue por meio do menu para começar a utilizar o sistema.
       </Message>
     </PageContent>
   )

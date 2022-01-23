@@ -3,6 +3,7 @@ import {
   FiBriefcase,
   FiCalendar,
   FiClipboard,
+  FiHome,
   FiScissors,
   FiUser,
   FiUsers,
@@ -30,7 +31,8 @@ export const PrivateRoutes: IPrivateRoute[] = [
     name: 'Home',
     permissions: ['*'],
     path: '/',
-    show: false,
+    show: true,
+    icon: <FiHome />,
     route: (
       <Route
         key="root"

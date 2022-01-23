@@ -13,10 +13,11 @@ import {
   IPrivateRoute,
   PrivateRoutes,
 } from './components/PrivateRouteWrapper/PrivateRoutes'
-import { hasPermission } from './utils/helpers/permissions'
+import { useHasPermission } from './hooks/useHasPermissions'
 
 export const Router = () => {
   const dispatch = useDispatch()
+  const { hasPermission } = useHasPermission()
   const user = useSelector((state: RootState) => state.UserReducer)
   const [isMounted, setIsMounted] = useState<boolean>(false)
   const isAuthenticated = user?.isAuthorized
@@ -48,9 +49,7 @@ export const Router = () => {
         {!isAuthenticated && publicRoutes?.map((route) => route)}
         {isAuthenticated &&
           PrivateRoutes?.map((route: IPrivateRoute) =>
-            hasPermission(route.permissions, user.data.role)
-              ? route.route
-              : null
+            hasPermission(route.permissions) ? route.route : null
           )}
 
         {/* UNAUTHORIZED ACCESS: Redirect to default pages */}
