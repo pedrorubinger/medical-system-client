@@ -18,13 +18,19 @@ export const SearchBarContainer = styled.div`
 
 export const SearchButton = styled.button`
   background: #6bbaef;
-  border: none;
+  border: 1px solid #59aae0;
+  border-left: none;
   color: #fff;
   padding: 8px 10px;
   height: 36.5px;
   border-top-right-radius: 3px;
   border-bottom-right-radius: 3px;
   cursor: pointer;
+  transition: 0.7s;
+
+  &:hover {
+    background: #4fa0d6;
+  }
 `
 
 export const SearchPatientInput = styled(Input)`
