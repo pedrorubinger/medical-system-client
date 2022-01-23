@@ -1,22 +1,19 @@
-// import { FiSearch } from 'react-icons/fi'
+import { FiSearch } from 'react-icons/fi'
 
-import { Container } from './styles'
-import { Input } from '../Input'
-// import { Button } from '../Button'
+import { SearchBarContainer, SearchButton, SearchPatientInput } from './styles'
 
 export const SearchBar = () => {
   return (
-    <Container>
-      <Input
+    <SearchBarContainer>
+      <SearchPatientInput
         name="searchPatient"
-        style={{ padding: 10, borderRadius: 20, paddingLeft: 20 }}
-        placeholder="Pesquisar paciente..."
+        placeholder="Buscar paciente..."
       />
-      {/* <SearchButtonContainer>
-        <Button style={{ borderRadius: '50%' }}>
-          <FiSearch color="white" />
-        </Button>
-      </SearchButtonContainer> */}
-    </Container>
+      <SearchButton
+        type="button"
+        title="Clique para buscar um paciente pelo seu nome">
+        <FiSearch />
+      </SearchButton>
+    </SearchBarContainer>
   )
 }

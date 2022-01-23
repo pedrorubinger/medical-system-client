@@ -13,13 +13,10 @@ import {
 
 interface IPrivateRouteWrapperProps {
   children: React.ReactNode
-  /** @default true */
-  showSearchBar?: boolean
 }
 
 export const PrivateRouteWrapper = ({
   children,
-  showSearchBar = true,
 }: IPrivateRouteWrapperProps) => {
   const { width } = useWindowDimensions()
   const useHamburgerMenu = !!(width && width < mobileLimitWidth)
@@ -28,7 +25,12 @@ export const PrivateRouteWrapper = ({
     <Container useHamburgerMenu={useHamburgerMenu}>
       <SideMenu />
       <PageContainer>
-        {!useHamburgerMenu && <TopBarContainer />}
+        {!useHamburgerMenu && (
+          <TopBarContainer>
+            <SearchBar />
+            {/* <ProfileActionsControl /> */}
+          </TopBarContainer>
+        )}
         <PageContent>{children}</PageContent>
       </PageContainer>
     </Container>

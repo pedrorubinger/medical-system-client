@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { Input } from '../Input'
 
 export const Container = styled.div`
   width: 25%;
@@ -10,7 +11,49 @@ export const Container = styled.div`
   align-items: center;
 `
 
-export const SearchButtonContainer = styled.div`
-  padding: 10px;
-  margin-top: 2px;
+export const SearchBarContainer = styled.div`
+  display: flex;
+  align-items: center;
+`
+
+export const SearchButton = styled.button`
+  background: #6bbaef;
+  border: none;
+  color: #fff;
+  padding: 8px 10px;
+  height: 36.5px;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+  cursor: pointer;
+`
+
+export const SearchPatientInput = styled(Input)`
+  box-shadow: none;
+  padding: 8px;
+  padding-left: 12px;
+  border-radius: 0;
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+  background: #f8f8f8;
+  border-color: #f2f2f2;
+  color: grey;
+  height: 36.5px;
+
+  ::placeholder {
+    /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: #3d3d3d;
+    font-size: 13px;
+  }
+
+  :-ms-input-placeholder {
+    /* Internet Explorer 10-11 */
+    color: #3d3d3d;
+    font-size: 13px;
+  }
+
+  ::-ms-input-placeholder {
+    /* Microsoft Edge */
+    color: #3d3d3d;
+    font-size: 13px;
+  }
 `

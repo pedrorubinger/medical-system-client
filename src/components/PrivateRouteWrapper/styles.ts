@@ -16,9 +16,12 @@ export const Container = styled.div`
 export const TopBarContainer = styled.div`
   background: #fff;
   width: 100%;
-  height: 60px;
+  height: 70px;
   box-shadow: 0px 6px 22px -15px #c4c4c4;
   border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
 `
 
 export const PageContainer = styled.div`
