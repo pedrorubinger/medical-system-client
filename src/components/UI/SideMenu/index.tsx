@@ -6,12 +6,8 @@ export const mobileLimitWidth = 1100
 export const SideMenu = () => {
   const { width } = useWindowDimensions()
 
-  if (!width) {
-    return <Container />
-  }
-
-  if (width >= mobileLimitWidth) {
-    return <Container />
+  if (!width || width >= mobileLimitWidth) {
+    return <Container>hey</Container>
   }
 
   return <TopBar />
