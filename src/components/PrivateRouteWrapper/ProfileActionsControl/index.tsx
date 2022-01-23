@@ -1,5 +1,3 @@
-// interface IProfileActionsControlProps {}
-
 import { BiChevronDown } from 'react-icons/bi'
 import { Dropdown, Menu } from 'antd'
 import { Link } from 'react-router-dom'
@@ -9,6 +7,9 @@ import {
   AvatarImage,
   Container,
   DropdownIconContainer,
+  InfoContainer,
+  NameContainer,
+  Role,
   UserName,
 } from './styles'
 import avatar from '../../../assets/images/avatar.jpg'
@@ -17,6 +18,19 @@ import { RootState } from '../../../store'
 export const ProfileActionsControl = () => {
   const { data } = useSelector((state: RootState) => state.UserReducer)
   const name = (data?.name || 'Usuário').split(' ')[0]
+
+  const getRole = () => {
+    switch (data?.role) {
+      case 'manager':
+        return 'secretário(a)'
+      case 'doctor':
+        return 'médico(a)'
+      case 'admin':
+        return ''
+      default:
+        return ''
+    }
+  }
 
   const DropdownMenu = (
     <Menu>
@@ -34,19 +48,27 @@ export const ProfileActionsControl = () => {
 
       <Menu.Divider />
 
-      <Menu.Item key="3">Sair</Menu.Item>
+      <Menu.Item key="2">Sair</Menu.Item>
     </Menu>
   )
 
   return (
     <Container>
       <AvatarImage src={avatar} width={40} height={40} />
-      <UserName>{name}</UserName>
-      <Dropdown overlay={DropdownMenu} align={{ offset: [0, 10] }}>
-        <DropdownIconContainer>
-          <BiChevronDown />
-        </DropdownIconContainer>
-      </Dropdown>
+
+      <InfoContainer>
+        <NameContainer>
+          <UserName>{name}</UserName>
+
+          <Dropdown overlay={DropdownMenu} align={{ offset: [0, -3] }}>
+            <DropdownIconContainer>
+              <BiChevronDown />
+            </DropdownIconContainer>
+          </Dropdown>
+        </NameContainer>
+
+        <Role>{getRole()}</Role>
+      </InfoContainer>
     </Container>
   )
 }
