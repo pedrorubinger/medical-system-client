@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { Button } from '../Button'
 
 interface IStyledInputProps {
   hasError?: boolean
@@ -20,6 +21,7 @@ export const StyledInput = styled.input<IStyledInputProps>`
   transition: 0.6s;
   background: #fff;
   color: #636363;
+  box-shadow: 1px 1px 1px #c9c9c9;
 
   &:focus {
     border-color: ${({ hasError }) => (hasError ? 'red' : '#4e7de5')};

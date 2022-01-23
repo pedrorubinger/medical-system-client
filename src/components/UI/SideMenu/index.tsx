@@ -1,5 +1,18 @@
-import { Container } from './styles'
+import { useWindowDimensions } from '../../../hooks/useWindowDimensions'
+import { Container, TopBar } from './styles'
+
+export const mobileLimitWidth = 1100
 
 export const SideMenu = () => {
-  return <Container />
+  const { width } = useWindowDimensions()
+
+  if (!width) {
+    return <Container />
+  }
+
+  if (width > mobileLimitWidth) {
+    return <Container />
+  }
+
+  return <TopBar />
 }

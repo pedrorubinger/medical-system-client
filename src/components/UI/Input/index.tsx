@@ -1,7 +1,7 @@
 import React from 'react'
-import Select from 'react-select'
-import { Label } from '../Label'
+import Select, { GroupBase, StylesConfig } from 'react-select'
 
+import { Label } from '../Label'
 import { Container, ErrorMessage, StyledInput } from './styles'
 
 interface ISelectOptions {
@@ -22,6 +22,10 @@ interface IInputProps {
   required?: boolean | undefined
   placeholder?: string | undefined
   error?: string | undefined
+  style?: React.CSSProperties | undefined
+  selectStyles?:
+    | StylesConfig<ISelectOptions, false, GroupBase<ISelectOptions>>
+    | undefined
   onChange?: React.ChangeEventHandler<HTMLInputElement> | undefined
 }
 
@@ -37,6 +41,8 @@ export const Input = React.forwardRef(
       error,
       autoFocus,
       type = 'text',
+      style,
+      selectStyles,
       onChange,
       ...rest
     }: IInputProps,
@@ -53,7 +59,12 @@ export const Input = React.forwardRef(
         <Container>
           {LabelElement}
           {/* TO DO: IMPROVE AND TEST... */}
-          <Select options={options} placeholder={placeholder} name={name} />
+          <Select
+            options={options}
+            styles={selectStyles}
+            placeholder={placeholder}
+            name={name}
+          />
         </Container>
       )
     }
@@ -68,6 +79,7 @@ export const Input = React.forwardRef(
           hasError={!!error}
           ref={ref}
           autoFocus={autoFocus}
+          style={style}
           onChange={onChange}
           {...rest}
         />

@@ -18,7 +18,7 @@ export const StyledButton = styled.button<IStyledButtonProps>`
   cursor: pointer;
 
   &:hover {
-    background-color: ${({ color }) => Theme.buttons[color].border};
+    background-color: ${({ color }) => Theme.buttons[color]?.hover};
   }
 
   &:disabled {
