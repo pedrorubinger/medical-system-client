@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import { useWindowDimensions } from '../../hooks/useWindowDimensions'
 import { ProfileActionsControl } from './ProfileActionsControl'
@@ -19,12 +19,17 @@ export const PrivateRouteWrapper = ({
   children,
 }: IPrivateRouteWrapperProps) => {
   const { width } = useWindowDimensions()
+  const [mobileMenuIsOpened, setMobileMenuIsOpened] = useState(false)
   const useHamburgerMenu = !!(width && width < mobileLimitWidth)
 
   return (
-    <Container useHamburgerMenu={useHamburgerMenu}>
-      <Menu />
-      <PageContainer>
+    <Container useHamburgerMenu={useHamburgerMenu && !mobileMenuIsOpened}>
+      <Menu
+        mobileMenuIsOpened={mobileMenuIsOpened}
+        onOpenMobileMenu={() => setMobileMenuIsOpened(true)}
+        onCloseMobileMenu={() => setMobileMenuIsOpened(false)}
+      />
+      <PageContainer useHamburgerMenu={useHamburgerMenu && mobileMenuIsOpened}>
         {!useHamburgerMenu && (
           <TopBarContainer>
             <SearchBar />

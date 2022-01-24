@@ -10,7 +10,6 @@ export const Container = styled.div`
   width: 20%;
   min-width: 270px;
   height: 100vh;
-  border-bottom-right-radius: 3px;
   padding: 15px 20px;
 `
 
@@ -62,6 +61,35 @@ export const MenuItem = styled.li<IMenuItemProps>`
   &:hover {
     color: #fff;
     background-color: #363954;
+    text-shadow: 0px 1px 0px #f4f4f4;
+  }
+`
+
+export const Backdrop = styled.div`
+  background-color: #000;
+  opacity: 0.8;
+  width: calc(100% - 270px);
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 270px;
+`
+
+export const CloseBackdrop = styled.span`
+  color: #fff;
+  position: absolute;
+  display: flex;
+  right: 10px;
+  top: 10px;
+  transition: 0.7s;
+  font-size: 22px;
+  cursor: pointer;
+
+  & svg {
+    margin-left: 6px;
+  }
+
+  &:hover {
     text-shadow: 0px 1px 0px #f4f4f4;
   }
 `
