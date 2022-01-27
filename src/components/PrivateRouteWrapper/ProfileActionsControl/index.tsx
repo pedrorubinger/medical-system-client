@@ -16,7 +16,7 @@ import avatar from '../../../assets/images/avatar.jpg'
 import { RootState } from '../../../store'
 
 export const ProfileActionsControl = () => {
-  const { data } = useSelector((state: RootState) => state.UserReducer)
+  const { data } = useSelector((state: RootState) => state.AuthReducer)
   const name = (data?.name || 'Usuário').split(' ')[0]
 
   const getRole = () => {

@@ -7,7 +7,7 @@ interface IUseHasPermission {
 }
 
 export const useHasPermission = (): IUseHasPermission => {
-  const user = useSelector((state: RootState) => state.UserReducer)
+  const user = useSelector((state: RootState) => state.AuthReducer)
   const role = user?.data?.role
   const userIsAdmin = user?.data?.is_admin
 

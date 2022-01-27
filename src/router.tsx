@@ -3,7 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { getToken } from './utils/helpers/token'
-import { Creators } from './store/ducks/user/reducer'
+import { Creators } from './store/ducks/auth/reducer'
 import { GetAccount } from './pages/GetAccount'
 import { Login } from './pages/Login'
 import { RecoverPassword } from './pages/RecoverPassword'
@@ -18,7 +18,7 @@ import { useHasPermission } from './hooks/useHasPermissions'
 export const Router = () => {
   const dispatch = useDispatch()
   const { hasPermission } = useHasPermission()
-  const user = useSelector((state: RootState) => state.UserReducer)
+  const user = useSelector((state: RootState) => state.AuthReducer)
   const [isMounted, setIsMounted] = useState<boolean>(false)
   const isAuthenticated = user?.isAuthorized
   const publicRoutes = [

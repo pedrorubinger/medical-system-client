@@ -5,7 +5,7 @@ import { RootState } from '../../store'
 import { Message, Title } from './styles'
 
 export const Home = (): JSX.Element => {
-  const { data } = useSelector((state: RootState) => state.UserReducer)
+  const { data } = useSelector((state: RootState) => state.AuthReducer)
   const name = data?.name || 'Usuário'
 
   return (

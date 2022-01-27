@@ -15,7 +15,7 @@ import {
   SignInCard,
 } from './styles'
 import { Button } from '../../components/UI/Button'
-import { Creators } from '../../store/ducks/user/reducer'
+import { Creators } from '../../store/ducks/auth/reducer'
 import { Input } from '../../components/UI/Input'
 import { RootState } from '../../store'
 import { TopBar } from '../../components/UI/TopBar'
@@ -35,7 +35,7 @@ const signInSchema = Yup.object().shape({
 export const Login = (): JSX.Element => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const user = useSelector((state: RootState) => state.UserReducer)
+  const user = useSelector((state: RootState) => state.AuthReducer)
   const {
     control,
     handleSubmit,
