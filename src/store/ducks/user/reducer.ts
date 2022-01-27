@@ -5,7 +5,7 @@ import { IUser } from '../../../interfaces/user'
 
 interface IState {
   loading: boolean
-  users: IUser[]
+  users: IUser[] | null
   error: IError | null
 }
 
@@ -19,7 +19,7 @@ export const UserTypes = {
 const initialState: IState = {
   loading: false,
   error: null,
-  users: [],
+  users: null,
 }
 
 export default function reducer(

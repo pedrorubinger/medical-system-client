@@ -14,23 +14,11 @@ import {
 } from './styles'
 import avatar from '../../../assets/images/avatar.jpg'
 import { RootState } from '../../../store'
+import { getTranslatedRole } from '../../../utils/helpers/roles'
 
 export const ProfileActionsControl = () => {
   const { data } = useSelector((state: RootState) => state.AuthReducer)
   const name = (data?.name || 'Usuário').split(' ')[0]
-
-  const getRole = () => {
-    switch (data?.role) {
-      case 'manager':
-        return 'secretário(a)'
-      case 'doctor':
-        return 'médico(a)'
-      case 'admin':
-        return ''
-      default:
-        return ''
-    }
-  }
 
   const DropdownMenu = (
     <Menu>
@@ -67,7 +55,7 @@ export const ProfileActionsControl = () => {
           </Dropdown>
         </NameContainer>
 
-        <Role>{getRole()}</Role>
+        <Role>{getTranslatedRole(data?.role)}</Role>
       </InfoContainer>
     </Container>
   )
