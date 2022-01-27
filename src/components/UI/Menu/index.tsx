@@ -9,6 +9,7 @@ import {
 } from '../../PrivateRouteWrapper/PrivateRoutes'
 import {
   CloseBackdrop,
+  CloseMenu,
   Container,
   TopBar,
   LogoText,
@@ -44,7 +45,12 @@ export const Menu = ({
         <MenuItem
           key={i}
           title={item?.title}
-          onClick={() => navigate(item.path)}
+          onClick={() => {
+            navigate(item.path)
+            if (mobileMenuIsOpened) {
+              onCloseMobileMenu()
+            }
+          }}
           isActive={window.location.pathname === item.path}>
           {item.icon}
           {item.name}
@@ -64,13 +70,22 @@ export const Menu = ({
 
   if (mobileMenuIsOpened) {
     return (
-      <Container>
-        <Backdrop onClick={onCloseMobileMenu} />
-        <CloseBackdrop onClick={onCloseMobileMenu}>
-          {width >= 410 ? 'Fechar' : ''} <FiXCircle size={23} />
-        </CloseBackdrop>
+      <Container mobileMenuIsOpened={mobileMenuIsOpened} width={width}>
+        {width >= 670 && (
+          <>
+            <Backdrop onClick={onCloseMobileMenu} />
+            <CloseBackdrop onClick={onCloseMobileMenu}>
+              Fechar <FiXCircle size={23} />
+            </CloseBackdrop>
+          </>
+        )}
         <LogoText>MedApp</LogoText>
         {MenuList}
+        {width < 670 && (
+          <CloseMenu onClick={onCloseMobileMenu}>
+            Fechar <FiXCircle size={19} />
+          </CloseMenu>
+        )}
       </Container>
     )
   }

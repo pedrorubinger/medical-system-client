@@ -5,12 +5,20 @@ interface IMenuItemProps {
   isActive?: boolean
 }
 
-export const Container = styled.div`
+interface IContainerProps {
+  /** @default false */
+  mobileMenuIsOpened?: boolean
+  width?: number
+}
+
+export const Container = styled.div<IContainerProps>`
   background-color: #3d405b;
   width: 20%;
   min-width: 270px;
   min-height: 100vh;
   padding: 15px 20px;
+  width: ${({ mobileMenuIsOpened = false, width }) =>
+    mobileMenuIsOpened && width && width < 670 ? '100%' : '20%'};
   overflow: auto;
 `
 
@@ -43,6 +51,7 @@ export const MenuItemsContainer = styled.ul`
   display: flex;
   flex-direction: column;
   margin-top: 35px;
+  justify-content: center;
 `
 
 export const MenuItem = styled.li<IMenuItemProps>`
@@ -71,9 +80,9 @@ export const MenuItem = styled.li<IMenuItemProps>`
 export const Backdrop = styled.div`
   background-color: #000;
   opacity: 0.8;
-  width: calc(100% - 270px);
+  width: calc(100vw + 270px);
   height: 100vh;
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 270px;
 `
@@ -86,6 +95,26 @@ export const CloseBackdrop = styled.span`
   top: 10px;
   transition: 0.7s;
   font-size: 22px;
+  cursor: pointer;
+
+  & svg {
+    margin-left: 6px;
+  }
+
+  &:hover {
+    text-shadow: 0px 1px 0px #f4f4f4;
+  }
+`
+
+export const CloseMenu = styled.span`
+  color: #fff;
+  display: flex;
+  margin-top: 15px;
+  border-top: 1px solid #6b6c6d;
+  padding-top: 20px;
+  margin-left: 12px;
+  transition: 0.7s;
+  font-size: 18px;
   cursor: pointer;
 
   & svg {

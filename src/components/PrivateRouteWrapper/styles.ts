@@ -31,7 +31,6 @@ export const PageContainer = styled.div<IContainerProps>`
   margin: 0;
   width: ${({ useHamburgerMenu }) =>
     useHamburgerMenu ? 'calc(100% - 270px)' : '100%'};
-  background: red;
   min-width: 400px;
   overflow: x;
 `
