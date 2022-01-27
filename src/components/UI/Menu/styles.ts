@@ -85,6 +85,7 @@ export const Backdrop = styled.div`
   position: fixed;
   top: 0;
   left: 270px;
+  z-index: 9999;
 `
 
 export const CloseBackdrop = styled.span`

@@ -5,11 +5,12 @@ interface IThemeButtonProps {
   hover?: string
 }
 
-export type TButtonColors = 'primary' | 'white'
+export type TButtonColors = 'primary' | 'white' | 'new'
 
 interface IThemeButton {
   primary: IThemeButtonProps
   white: IThemeButtonProps
+  new: IThemeButtonProps
 }
 
 interface ITheme {
@@ -30,6 +31,12 @@ export const Theme: ITheme = {
       color: '#fff',
       border: '#c6c6c6',
       text: '#000',
+    },
+    new: {
+      color: '#0eb74f',
+      border: '#09a545',
+      hover: '#09a545',
+      text: '#fff',
     },
   },
 }
