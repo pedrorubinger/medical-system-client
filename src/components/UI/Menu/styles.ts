@@ -9,8 +9,9 @@ export const Container = styled.div`
   background-color: #3d405b;
   width: 20%;
   min-width: 270px;
-  height: 100vh;
+  min-height: 100vh;
   padding: 15px 20px;
+  overflow: auto;
 `
 
 export const TopBar = styled.div`
@@ -18,6 +19,8 @@ export const TopBar = styled.div`
   width: 100%;
   height: 50px;
   padding: 10px;
+  min-width: 400px;
+  overflow-x: auto;
 `
 
 export const LogoText = styled.h1`

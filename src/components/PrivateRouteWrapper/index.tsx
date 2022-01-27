@@ -23,21 +23,29 @@ export const PrivateRouteWrapper = ({
   const useHamburgerMenu = !!(width && width < mobileLimitWidth)
 
   return (
-    <Container useHamburgerMenu={useHamburgerMenu && !mobileMenuIsOpened}>
-      <Menu
-        mobileMenuIsOpened={mobileMenuIsOpened}
-        onOpenMobileMenu={() => setMobileMenuIsOpened(true)}
-        onCloseMobileMenu={() => setMobileMenuIsOpened(false)}
-      />
-      <PageContainer useHamburgerMenu={useHamburgerMenu && mobileMenuIsOpened}>
-        {!useHamburgerMenu && (
-          <TopBarContainer>
-            <SearchBar />
-            <ProfileActionsControl />
-          </TopBarContainer>
-        )}
-        <PageContent>{children}</PageContent>
-      </PageContainer>
-    </Container>
+    <div style={{ display: 'flex', background: 'red', height: '100%' }}>
+      <Container useHamburgerMenu={useHamburgerMenu && !mobileMenuIsOpened}>
+        {/* <Menu
+          mobileMenuIsOpened={mobileMenuIsOpened}
+          onOpenMobileMenu={() => setMobileMenuIsOpened(true)}
+          onCloseMobileMenu={() => setMobileMenuIsOpened(false)}
+        /> */}
+        <Menu
+          mobileMenuIsOpened={mobileMenuIsOpened}
+          onOpenMobileMenu={() => setMobileMenuIsOpened(true)}
+          onCloseMobileMenu={() => setMobileMenuIsOpened(false)}
+        />
+        <PageContainer
+          useHamburgerMenu={useHamburgerMenu && mobileMenuIsOpened}>
+          {!useHamburgerMenu && (
+            <TopBarContainer>
+              <SearchBar />
+              <ProfileActionsControl />
+            </TopBarContainer>
+          )}
+          <PageContent>{children}</PageContent>
+        </PageContainer>
+      </Container>
+    </div>
   )
 }

@@ -7,11 +7,11 @@ interface IContainerProps {
 export const Container = styled.div`
   width: 100%;
   height: 100vh;
-  min-width: 400px;
   background: #f3f4f7;
   display: flex;
   flex-direction: ${({ useHamburgerMenu }: IContainerProps) =>
     useHamburgerMenu ? 'column' : 'row'};
+  overflow-x: auto;
 `
 
 export const TopBarContainer = styled.div`
@@ -31,6 +31,9 @@ export const PageContainer = styled.div<IContainerProps>`
   margin: 0;
   width: ${({ useHamburgerMenu }) =>
     useHamburgerMenu ? 'calc(100% - 270px)' : '100%'};
+  background: red;
+  min-width: 400px;
+  overflow: x;
 `
 
 export const PageContent = styled.div`
