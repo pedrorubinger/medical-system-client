@@ -10,6 +10,7 @@ import { IUser } from '../../interfaces/user'
 import { getTranslatedRole } from '../../utils/helpers/roles'
 import { TRole } from '../../interfaces/roles'
 import { UsersDrawer } from './Drawer'
+import { TableActions } from '../../components/UI/TableActions'
 
 interface IDrawerProps {
   data?: IUser
@@ -51,6 +52,12 @@ export const Users = (): JSX.Element => {
       dataIndex: 'created_at',
       key: 'created_at',
       render: (date: string) => new Date(date).toLocaleDateString(),
+    },
+    {
+      title: 'Ações',
+      dataIndex: 'actions',
+      key: 'actions',
+      render: () => <TableActions />,
     },
   ]
 
