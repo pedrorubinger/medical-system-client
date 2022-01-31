@@ -6,6 +6,7 @@ import * as Yup from 'yup'
 
 import { Button, Form } from './styles'
 import { Input } from '../../../components/UI/Input'
+import { rolesOptions } from '../../../utils/helpers/roles'
 
 interface IUsersDrawerProps {
   type: 'create' | 'update'
@@ -152,12 +153,8 @@ export const UsersDrawer = ({
                   label="Função"
                   placeholder="Selecione uma função"
                   error={errors?.role?.message}
+                  options={rolesOptions}
                   isSelect
-                  options={[
-                    { label: 'Admin', value: 'admin' },
-                    { label: 'Secretário(a)', value: 'manager' },
-                    { label: 'Médico', value: 'doctor' },
-                  ]}
                   required
                   {...field}
                 />

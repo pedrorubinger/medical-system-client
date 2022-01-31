@@ -1,5 +1,10 @@
 import { TRole } from '../../interfaces/roles'
 
+export const rolesOptions = [
+  { label: 'Gestor(a)', value: 'manager' },
+  { label: 'Médico', value: 'doctor' },
+]
+
 export const getTranslatedRole = (
   role: TRole,
   capitalizeFirstLetter = false
@@ -8,7 +13,7 @@ export const getTranslatedRole = (
 
   switch (role) {
     case 'manager':
-      translatedRole = 'secretário(a)'
+      translatedRole = 'gestor(a)'
       break
     case 'doctor':
       translatedRole = 'médico(a)'

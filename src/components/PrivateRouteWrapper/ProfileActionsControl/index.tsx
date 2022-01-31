@@ -40,6 +40,16 @@ export const ProfileActionsControl = () => {
     </Menu>
   )
 
+  const getRole = () => {
+    const role = getTranslatedRole(data?.role)
+
+    if (data.is_admin) {
+      return `${role} / admin`
+    }
+
+    return role
+  }
+
   return (
     <Container>
       <AvatarImage src={avatar} width={40} height={40} />
@@ -55,7 +65,7 @@ export const ProfileActionsControl = () => {
           </Dropdown>
         </NameContainer>
 
-        <Role>{getTranslatedRole(data?.role)}</Role>
+        <Role>{getRole()}</Role>
       </InfoContainer>
     </Container>
   )
