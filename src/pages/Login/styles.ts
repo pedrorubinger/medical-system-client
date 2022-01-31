@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
+
+import { Button as CustomButton } from '../../components/UI/Button'
 import { Theme } from '../../utils/constants/theme'
 
 export const Container = styled.div`
@@ -65,4 +67,8 @@ export const StyledLink = styled(Link)`
 export const ButtonContainer = styled.div`
   margin-top: 30px;
   width: 100%;
+`
+
+export const Button = styled(CustomButton)`
+  padding: 10px;
 `

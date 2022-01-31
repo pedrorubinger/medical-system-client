@@ -85,6 +85,7 @@ export const Input = React.forwardRef(
             placeholder={placeholder}
             name={name}
           />
+          {!!error && <ErrorMessage>{error}</ErrorMessage>}
         </Container>
       )
     }

@@ -8,13 +8,13 @@ import * as Yup from 'yup'
 
 import {
   ButtonContainer,
+  Button,
   Container,
   LoginExtraInfoContainer,
   LoginTitle,
   StyledLink,
   SignInCard,
 } from './styles'
-import { Button } from '../../components/UI/Button'
 import { Creators } from '../../store/ducks/auth/reducer'
 import { Input } from '../../components/UI/Input'
 import { RootState } from '../../store'
