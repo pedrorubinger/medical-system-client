@@ -23,9 +23,6 @@ interface IInputProps {
   placeholder?: string | undefined
   error?: string | undefined
   style?: React.CSSProperties | undefined
-  selectStyles?:
-    | StylesConfig<ISelectOptions, false, GroupBase<ISelectOptions>>
-    | undefined
   onChange?: React.ChangeEventHandler<HTMLInputElement> | undefined
 }
 
@@ -42,7 +39,6 @@ export const Input = React.forwardRef(
       autoFocus,
       type = 'text',
       style,
-      selectStyles,
       onChange,
       ...rest
     }: IInputProps,
@@ -58,10 +54,34 @@ export const Input = React.forwardRef(
       return (
         <Container>
           {LabelElement}
-          {/* TO DO: IMPROVE AND TEST... */}
           <Select
+            styles={{
+              control: (provided) => ({
+                ...provided,
+                boxShadow: 'none',
+                border: `1px solid ${error ? 'red' : '#c9c9c9'}`,
+                padding: 1,
+                color: '#636363',
+                marginTop: 9,
+                marginBottom: 9,
+                borderRadius: 6,
+              }),
+              placeholder: (provided) => ({
+                ...provided,
+                color: '#a8a8a8',
+                fontSize: 13,
+              }),
+              input: (provided) => ({
+                ...provided,
+                ':focus': {
+                  borderColor: error ? 'red' : '#4e7de5',
+                  borderWidth: 1,
+                  outline: 'none',
+                },
+              }),
+            }}
+            classNamePrefix="react-select"
             options={options}
-            // styles={selectStyles}
             placeholder={placeholder}
             name={name}
           />
