@@ -13,7 +13,7 @@ export const StyledButton = styled.button<IStyledButtonProps>`
   color: ${({ color }) => Theme.buttons[color].text};
   border: 1px solid ${({ color }) => Theme.buttons[color].border};
   transition: 0.7s;
-  padding: 10px;
+  padding: 7px 12px;
   border-radius: 6px;
   cursor: pointer;
 

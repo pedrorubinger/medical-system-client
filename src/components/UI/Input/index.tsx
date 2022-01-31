@@ -1,8 +1,8 @@
 import React from 'react'
-import Select, { GroupBase, StylesConfig } from 'react-select'
+import { GroupBase, StylesConfig } from 'react-select'
 
 import { Label } from '../Label'
-import { Container, ErrorMessage, StyledInput } from './styles'
+import { Container, ErrorMessage, Select, StyledInput } from './styles'
 
 interface ISelectOptions {
   value: string | number
@@ -61,7 +61,7 @@ export const Input = React.forwardRef(
           {/* TO DO: IMPROVE AND TEST... */}
           <Select
             options={options}
-            styles={selectStyles}
+            // styles={selectStyles}
             placeholder={placeholder}
             name={name}
           />

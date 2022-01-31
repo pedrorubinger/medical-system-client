@@ -9,10 +9,17 @@ import { RootState } from '../../store'
 import { IUser } from '../../interfaces/user'
 import { getTranslatedRole } from '../../utils/helpers/roles'
 import { TRole } from '../../interfaces/roles'
+import { UsersDrawer } from './Drawer'
+
+interface IDrawerProps {
+  data?: IUser
+  type: 'create' | 'update'
+}
 
 export const Users = (): JSX.Element => {
   const dispatch = useDispatch()
   const [records, setRecords] = useState<IUser[]>([])
+  const [drawer, setDrawer] = useState<IDrawerProps | null>(null)
   const { loading, users, error } = useSelector(
     (state: RootState) => state.UserReducer
   )
@@ -66,11 +73,16 @@ export const Users = (): JSX.Element => {
 
   return (
     <PageContent>
+      <UsersDrawer
+        isVisible={!!drawer}
+        onClose={() => setDrawer(null)}
+        type={drawer?.type || 'create'}
+      />
       <TableHeader
         title="Usuários"
         newRecordButton={{
           visible: true,
-          onClick: () => console.log('clicked to add new user'),
+          onClick: () => setDrawer({ type: 'create' }),
         }}
       />
       <Table
