@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 interface IDimensions {
   width: number | null
@@ -8,12 +8,12 @@ interface IDimensions {
 export const useWindowDimensions = (): IDimensions => {
   const hasWindow = typeof window !== 'undefined'
 
-  const getWindowDimensions = (): IDimensions => {
+  const getWindowDimensions = useCallback((): IDimensions => {
     const width = hasWindow ? window.innerWidth : null
     const height = hasWindow ? window.innerHeight : null
 
     return { width, height }
-  }
+  }, [hasWindow])
 
   const [windowDimensions, setWindowDimensions] = useState(
     getWindowDimensions()
@@ -28,7 +28,7 @@ export const useWindowDimensions = (): IDimensions => {
       window.addEventListener('resize', handleResize)
       return () => window.removeEventListener('resize', handleResize)
     }
-  }, [hasWindow])
+  }, [getWindowDimensions, hasWindow])
 
   return windowDimensions
 }

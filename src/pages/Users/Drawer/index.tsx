@@ -1,26 +1,17 @@
 import { Col, Drawer, Row } from 'antd'
 import { Controller, useForm } from 'react-hook-form'
-import { TRole } from '../../../interfaces/roles'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
 
 import { Button, Form } from './styles'
 import { Input } from '../../../components/UI/Input'
 import { rolesOptions } from '../../../utils/helpers/roles'
+import { IUserFormValues } from '../../../interfaces/user'
 
 interface IUsersDrawerProps {
   type: 'create' | 'update'
   isVisible: boolean
   onClose: () => void
-}
-
-interface IFormValues {
-  name: string
-  email: string
-  cpf: string
-  phone: string
-  is_admin: boolean
-  role: TRole
 }
 
 const userSchema = Yup.object().shape({
@@ -44,9 +35,8 @@ export const UsersDrawer = ({
   const {
     control,
     handleSubmit,
-    // setError,
     formState: { errors },
-  } = useForm<IFormValues>({
+  } = useForm<IUserFormValues>({
     resolver: yupResolver(userSchema),
     mode: 'onChange',
   })
@@ -55,8 +45,9 @@ export const UsersDrawer = ({
     onClose()
   }
 
-  const onSubmit = (values: any) => {
+  const onSubmit = (values: IUserFormValues) => {
     console.log('submitted:', values)
+    /** TO DO: Call storeUser() and handleErrors... */
   }
 
   return (

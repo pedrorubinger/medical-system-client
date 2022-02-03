@@ -1,16 +1,14 @@
 import { useEffect, useState } from 'react'
-import { notification, Table } from 'antd'
-import { useDispatch, useSelector } from 'react-redux'
+import { Table } from 'antd'
 
-import { Creators } from '../../store/ducks/user/reducer'
 import { PageContent } from '../../components/UI/PageContent'
 import { TableHeader } from '../../components/UI/TableHeader'
-import { RootState } from '../../store'
 import { IUser } from '../../interfaces/user'
 import { getTranslatedRole } from '../../utils/helpers/roles'
 import { TRole } from '../../interfaces/roles'
 import { UsersDrawer } from './Drawer'
 import { TableActions } from '../../components/UI/TableActions'
+import { fetchUsers } from '../../services/requests/user'
 
 interface IDrawerProps {
   data?: IUser
@@ -18,12 +16,9 @@ interface IDrawerProps {
 }
 
 export const Users = (): JSX.Element => {
-  const dispatch = useDispatch()
   const [records, setRecords] = useState<IUser[]>([])
+  const [loading, setLoading] = useState(false)
   const [drawer, setDrawer] = useState<IDrawerProps | null>(null)
-  const { loading, users, error } = useSelector(
-    (state: RootState) => state.UserReducer
-  )
 
   const columns = [
     {
@@ -62,21 +57,18 @@ export const Users = (): JSX.Element => {
   ]
 
   useEffect(() => {
-    dispatch(Creators.fetchUsers())
+    ;(async () => {
+      setLoading(true)
+
+      const users = await fetchUsers()
+
+      if (users) {
+        setRecords(users)
+      }
+
+      setLoading(false)
+    })()
   }, [])
-
-  useEffect(() => {
-    if (users) {
-      setRecords(users)
-      dispatch(Creators.clearUsers())
-    }
-  }, [users])
-
-  useEffect(() => {
-    if (error) {
-      notification.error({ message: error.message })
-    }
-  }, [error])
 
   return (
     <PageContent>

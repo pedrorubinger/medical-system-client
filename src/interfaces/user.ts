@@ -12,3 +12,12 @@ export interface IUser {
   created_at: string
   updated_at: string
 }
+
+export interface IUserFormValues {
+  name: string
+  email: string
+  cpf: string
+  phone: string
+  is_admin: boolean
+  role: TRole
+}
