@@ -37,7 +37,7 @@ export const Router = () => {
     }
 
     setIsMounted(true)
-  }, [dispatch, user?.isAuthorized, user?.validating])
+  }, [])
 
   if (!isMounted || user?.validating) {
     return <ProgressBar />
