@@ -1,7 +1,7 @@
 import { BiChevronDown } from 'react-icons/bi'
 import { Dropdown, Menu } from 'antd'
-import { Link } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { Link, useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
 
 import {
   AvatarImage,
@@ -15,10 +15,19 @@ import {
 import avatar from '../../../assets/images/avatar.jpg'
 import { RootState } from '../../../store'
 import { getTranslatedRole } from '../../../utils/helpers/roles'
+import { Creators } from '../../../store/ducks/auth/reducer'
 
 export const ProfileActionsControl = () => {
   const { data } = useSelector((state: RootState) => state.AuthReducer)
   const name = (data?.name || 'Usuário').split(' ')[0]
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+
+  const logout = () => {
+    localStorage.clear()
+    dispatch(Creators.clearSignIn())
+    navigate('/login')
+  }
 
   const DropdownMenu = (
     <Menu>
@@ -36,7 +45,9 @@ export const ProfileActionsControl = () => {
 
       <Menu.Divider />
 
-      <Menu.Item key="2">Sair</Menu.Item>
+      <Menu.Item key="2" onClick={logout}>
+        Sair
+      </Menu.Item>
     </Menu>
   )
 
