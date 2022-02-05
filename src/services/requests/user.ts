@@ -12,6 +12,15 @@ interface IStoreOrUpdateUserResponse {
   error?: IError | null
 }
 
+interface IDeleteUserResponse {
+  success: boolean
+  error?: IError | null
+}
+
+interface IDeleteUserAPIResponse {
+  success: boolean
+}
+
 interface IValidateResetTokenUserResponse {
   email: string
   id: number
@@ -22,7 +31,7 @@ interface IValidateResetTokenResponse {
   error?: IError | null
 }
 
-interface IValidateResetTokenAxiosResponse {
+interface IValidateResetTokenAPIResponse {
   success: boolean
   user: IValidateResetTokenUserResponse
 }
@@ -84,11 +93,25 @@ export const updateUser = async (
   }
 }
 
+export const deleteUser = async (id: number): Promise<IDeleteUserResponse> => {
+  try {
+    const response: AxiosResponse<IDeleteUserAPIResponse> = await api.delete(
+      `/user/${id}`
+    )
+
+    return { success: response.data.success, error: null }
+  } catch (err) {
+    const error = handleError(err)
+
+    return { success: false, error }
+  }
+}
+
 export const validateResetToken = async (
   token: string
 ): Promise<IValidateResetTokenResponse> => {
   try {
-    const response: AxiosResponse<IValidateResetTokenAxiosResponse> =
+    const response: AxiosResponse<IValidateResetTokenAPIResponse> =
       await api.get(`/user/set_password/${token}`)
 
     return { user: response.data.user, error: null }

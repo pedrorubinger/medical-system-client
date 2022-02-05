@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Table } from 'antd'
+import { notification, Table } from 'antd'
 
 import { PageContent } from '../../components/UI/PageContent'
 import { TableHeader } from '../../components/UI/TableHeader'
@@ -8,17 +8,47 @@ import { getTranslatedRole } from '../../utils/helpers/roles'
 import { TRole } from '../../interfaces/roles'
 import { UsersDrawer } from './Drawer'
 import { TableActions } from '../../components/UI/TableActions'
-import { fetchUsers } from '../../services/requests/user'
+import { deleteUser, fetchUsers } from '../../services/requests/user'
+import { DeletionModal } from './DeletionModal'
 
 interface IDrawerProps {
   data?: IUser
   type: 'create' | 'update'
 }
 
+interface IDeletionModalProps {
+  isVisible: boolean
+  userName: string
+  onOk: () => void
+}
+
 export const Users = (): JSX.Element => {
   const [records, setRecords] = useState<IUser[]>([])
-  const [loading, setLoading] = useState(false)
+  const [fetching, setFetching] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [deletionModal, setDeletionModal] =
+    useState<IDeletionModalProps | null>(null)
   const [drawer, setDrawer] = useState<IDrawerProps | null>(null)
+
+  const onDeleteUser = async (id: number) => {
+    setIsDeleting(true)
+
+    const response = await deleteUser(id)
+
+    if (response.success) {
+      notification.success({ message: 'O usuário foi excluído com sucesso!' })
+      /** TO DO: Refetch records when pagination is implemented... */
+      setRecords(
+        [...records].filter((record) => record.id.toString() !== id.toString())
+      )
+      setDeletionModal(null)
+    } else if (response.error) {
+      notification.error({ message: response.error.message })
+    }
+
+    setIsDeleting(false)
+  }
+
   const columns = [
     {
       title: 'Nome',
@@ -51,13 +81,28 @@ export const Users = (): JSX.Element => {
       title: 'Ações',
       dataIndex: 'actions',
       key: 'actions',
-      render: () => <TableActions />,
+      render: (_: string, user: IUser) => (
+        <TableActions
+          options={[
+            {
+              id: 'delete',
+              overlay: 'Clique para excluir este usuário',
+              onClick: () =>
+                setDeletionModal({
+                  isVisible: true,
+                  userName: user.name,
+                  onOk: () => onDeleteUser(user.id),
+                }),
+            },
+          ]}
+        />
+      ),
     },
   ]
 
   useEffect(() => {
     ;(async () => {
-      setLoading(true)
+      setFetching(true)
 
       const users = await fetchUsers()
 
@@ -66,7 +111,7 @@ export const Users = (): JSX.Element => {
         setRecords(users)
       }
 
-      setLoading(false)
+      setFetching(false)
     })()
   }, [])
 
@@ -76,6 +121,13 @@ export const Users = (): JSX.Element => {
         isVisible={!!drawer}
         onClose={() => setDrawer(null)}
         type={drawer?.type || 'create'}
+      />
+      <DeletionModal
+        isVisible={deletionModal?.isVisible || false}
+        onCancel={() => setDeletionModal(null)}
+        onOk={deletionModal?.onOk}
+        loading={isDeleting}
+        userName={deletionModal?.userName || ''}
       />
       <TableHeader
         title="Usuários"
@@ -87,7 +139,7 @@ export const Users = (): JSX.Element => {
       <Table
         rowKey="id"
         dataSource={records}
-        loading={loading}
+        loading={fetching}
         scroll={{ x: true }}
         columns={columns}
       />
