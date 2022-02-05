@@ -1,3 +1,4 @@
+import { Row } from 'antd'
 import styled from 'styled-components'
 
 import { Button as CustomButton } from '../../../components/UI/Button'
@@ -18,4 +19,8 @@ export const InfoMessage = styled.h3`
   font-size: 13px;
   font-weight: 300;
   border-bottom: 1px solid #d8d8d8;
+`
+
+export const CheckboxRow = styled(Row)`
+  margin-top: 10px;
 `

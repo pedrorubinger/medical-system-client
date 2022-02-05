@@ -1,12 +1,13 @@
-import { Col, Drawer, Row } from 'antd'
+import { Checkbox, Col, Drawer, Row } from 'antd'
 import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
 
-import { Button, Form, InfoMessage } from './styles'
+import { Button, CheckboxRow, Form, InfoMessage } from './styles'
 import { Input } from '../../../components/UI/Input'
 import { rolesOptions } from '../../../utils/helpers/roles'
 import { IUserFormValues } from '../../../interfaces/user'
+import { InfoTooltip } from '../../../components/UI/InfoTooltip'
 
 interface IUsersDrawerProps {
   type: 'create' | 'update'
@@ -162,6 +163,24 @@ export const UsersDrawer = ({
             />
           </Col>
         </Row>
+
+        <CheckboxRow>
+          <Col>
+            <Controller
+              name="is_admin"
+              control={control}
+              render={({ field }) => (
+                <Checkbox
+                  onChange={field.onChange}
+                  value={field.value}
+                  checked={field.value}>
+                  É administrador{' '}
+                  <InfoTooltip text="Um usuário administrador não poderá ser excluído, além de ter acesso aos relatórios da empresa, gestão de usuários, convênios e especialidades." />
+                </Checkbox>
+              )}
+            />
+          </Col>
+        </CheckboxRow>
 
         <Row>
           <Col span={24}>
