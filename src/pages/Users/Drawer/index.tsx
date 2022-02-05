@@ -35,13 +35,16 @@ export const UsersDrawer = ({
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<IUserFormValues>({
     resolver: yupResolver(userSchema),
+    shouldUnregister: true,
     mode: 'onChange',
   })
 
   const closeDrawer = () => {
+    reset()
     onClose()
   }
 

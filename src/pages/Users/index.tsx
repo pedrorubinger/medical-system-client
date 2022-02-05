@@ -19,7 +19,6 @@ export const Users = (): JSX.Element => {
   const [records, setRecords] = useState<IUser[]>([])
   const [loading, setLoading] = useState(false)
   const [drawer, setDrawer] = useState<IDrawerProps | null>(null)
-
   const columns = [
     {
       title: 'Nome',

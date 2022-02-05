@@ -1,5 +1,4 @@
 import React from 'react'
-import { GroupBase, StylesConfig } from 'react-select'
 
 import { Label } from '../Label'
 import { Container, ErrorMessage, Select, StyledInput } from './styles'

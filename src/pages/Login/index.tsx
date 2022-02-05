@@ -65,7 +65,7 @@ export const Login = (): JSX.Element => {
     if (user.isAuthorized) {
       navigate('/')
     }
-  }, [user])
+  }, [user, navigate, setError])
 
   return (
     <Container>

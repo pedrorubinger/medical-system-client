@@ -10,7 +10,7 @@ export const Container = styled.div`
 `
 
 export const StyledInput = styled.input<IStyledInputProps>`
-  padding: 8px;
+  padding: 9px;
   padding-left: 10px;
   border-radius: 6px;
   position: relative;
