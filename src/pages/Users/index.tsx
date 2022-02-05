@@ -62,6 +62,7 @@ export const Users = (): JSX.Element => {
       const users = await fetchUsers()
 
       if (users) {
+        /** TO DO: Remove own user from list... */
         setRecords(users)
       }
 

@@ -3,7 +3,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
 
-import { Button, Form } from './styles'
+import { Button, Form, InfoMessage } from './styles'
 import { Input } from '../../../components/UI/Input'
 import { rolesOptions } from '../../../utils/helpers/roles'
 import { IUserFormValues } from '../../../interfaces/user'
@@ -57,7 +57,13 @@ export const UsersDrawer = ({
     <Drawer
       visible={isVisible}
       title={type === 'create' ? 'Cadastrar Usuário' : 'Atualizar Usuário'}
+      width={450}
       onClose={closeDrawer}>
+      <InfoMessage>
+        Ao cadastrar este usuário, o mesmo receberá um email para que defina uma
+        senha de acesso ao sistema.
+      </InfoMessage>
+
       <Form onSubmit={handleSubmit(onSubmit)}>
         <Row>
           <Col span={24}>
