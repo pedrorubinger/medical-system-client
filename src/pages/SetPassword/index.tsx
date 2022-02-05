@@ -63,6 +63,7 @@ export const SetPassword = (): JSX.Element => {
     const response = await updateUser({ id: user.id, ...values })
 
     if (response.error) {
+      /** TO DO: Implement error validation... (status 400) */
       notification.error({ message: defaultErrorMessage })
       return
     }

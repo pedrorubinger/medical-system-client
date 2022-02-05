@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { notification, Table } from 'antd'
+import { useSelector } from 'react-redux'
 
 import { PageContent } from '../../components/UI/PageContent'
 import { TableHeader } from '../../components/UI/TableHeader'
@@ -10,6 +11,7 @@ import { UsersDrawer } from './Drawer'
 import { TableActions } from '../../components/UI/TableActions'
 import { deleteUser, fetchUsers } from '../../services/requests/user'
 import { DeletionModal } from './DeletionModal'
+import { RootState } from '../../store'
 
 interface IDrawerProps {
   data?: IUser
@@ -29,6 +31,8 @@ export const Users = (): JSX.Element => {
   const [deletionModal, setDeletionModal] =
     useState<IDeletionModalProps | null>(null)
   const [drawer, setDrawer] = useState<IDrawerProps | null>(null)
+  const user = useSelector((state: RootState) => state.AuthReducer)
+  const ownId = user.data.id
 
   const onDeleteUser = async (id: number) => {
     setIsDeleting(true)
@@ -100,19 +104,22 @@ export const Users = (): JSX.Element => {
     },
   ]
 
+  const fetchUsersAsync = useCallback(async () => {
+    setFetching(true)
+
+    const users = await fetchUsers()
+
+    if (users) {
+      setRecords(
+        users.filter((user) => user.id.toString() !== ownId.toString())
+      )
+    }
+
+    setFetching(false)
+  }, [ownId])
+
   useEffect(() => {
-    ;(async () => {
-      setFetching(true)
-
-      const users = await fetchUsers()
-
-      if (users) {
-        /** TO DO: Remove own user from list... */
-        setRecords(users)
-      }
-
-      setFetching(false)
-    })()
+    fetchUsersAsync()
   }, [])
 
   return (
@@ -121,6 +128,7 @@ export const Users = (): JSX.Element => {
         isVisible={!!drawer}
         onClose={() => setDrawer(null)}
         type={drawer?.type || 'create'}
+        fetchUsers={fetchUsersAsync}
       />
       <DeletionModal
         isVisible={deletionModal?.isVisible || false}

@@ -1,6 +1,5 @@
 import { Tooltip } from 'antd'
-
-import { QuestionIcon } from './styles'
+import { AiOutlineQuestionCircle } from 'react-icons/ai'
 
 interface IInfoTooltipProps {
   text: string
@@ -17,7 +16,10 @@ export const InfoTooltip = ({
 }: IInfoTooltipProps) => {
   return (
     <Tooltip title={text} placement={placement}>
-      <QuestionIcon size={iconSize} />
+      <AiOutlineQuestionCircle
+        size={iconSize}
+        style={{ marginBottom: -2.5, marginLeft: 3 }}
+      />
     </Tooltip>
   )
 }

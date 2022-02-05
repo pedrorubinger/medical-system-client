@@ -1,8 +1,8 @@
 import { TRole } from '../../interfaces/roles'
 
 export const rolesOptions = [
-  { label: 'Gestor(a)', value: 'manager' },
-  { label: 'Médico', value: 'doctor' },
+  { label: 'Gestor(a)', value: 'manager' as TRole },
+  { label: 'Médico', value: 'doctor' as TRole },
 ]
 
 export const getTranslatedRole = (

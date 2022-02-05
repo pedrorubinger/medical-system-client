@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react'
+import { ActionMeta } from 'react-select'
 
 import { Label } from '../Label'
 import { Container, ErrorMessage, Select, StyledInput } from './styles'
 
-interface ISelectOptions {
+interface ISelectOption {
   value: string | number
   label: string
 }
@@ -13,7 +15,7 @@ interface IInputProps {
   isSelect?: boolean | undefined
   autoFocus?: boolean | undefined
   /** @default [] */
-  options?: ISelectOptions[]
+  options?: ISelectOption[]
   label?: string | undefined
   /** @default 'text' */
   type?: React.HTMLInputTypeAttribute | undefined
@@ -22,7 +24,10 @@ interface IInputProps {
   placeholder?: string | undefined
   error?: string | undefined
   style?: React.CSSProperties | undefined
+  value?: any
+  // value?: string | number | readonly string[] | undefined
   onChange?: React.ChangeEventHandler<HTMLInputElement> | undefined
+  selectOnChange?: (newValue: any, actionMeta: ActionMeta<unknown>) => void
 }
 
 export const Input = React.forwardRef(
@@ -37,8 +42,10 @@ export const Input = React.forwardRef(
       error,
       autoFocus,
       type = 'text',
+      value,
       style,
       onChange,
+      selectOnChange,
       ...rest
     }: IInputProps,
     ref: React.ForwardedRef<HTMLInputElement>
@@ -83,6 +90,9 @@ export const Input = React.forwardRef(
             options={options}
             placeholder={placeholder}
             name={name}
+            value={value}
+            onChange={selectOnChange}
+            {...rest}
           />
           {!!error && <ErrorMessage>{error}</ErrorMessage>}
         </Container>
@@ -101,6 +111,7 @@ export const Input = React.forwardRef(
           autoFocus={autoFocus}
           style={style}
           onChange={onChange}
+          value={value}
           {...rest}
         />
         {!!error && <ErrorMessage>{error}</ErrorMessage>}

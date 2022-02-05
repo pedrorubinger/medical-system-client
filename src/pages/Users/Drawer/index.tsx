@@ -1,4 +1,5 @@
-import { Checkbox, Col, Drawer, Row } from 'antd'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Checkbox, Col, Drawer, notification, Row } from 'antd'
 import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
@@ -6,13 +7,15 @@ import * as Yup from 'yup'
 import { Button, CheckboxRow, Form, InfoMessage } from './styles'
 import { Input } from '../../../components/UI/Input'
 import { rolesOptions } from '../../../utils/helpers/roles'
-import { IUserFormValues } from '../../../interfaces/user'
 import { InfoTooltip } from '../../../components/UI/InfoTooltip'
+import { storeUser } from '../../../services/requests/user'
+import { TRole } from '../../../interfaces/roles'
 
 interface IUsersDrawerProps {
   type: 'create' | 'update'
   isVisible: boolean
   onClose: () => void
+  fetchUsers: () => Promise<void>
 }
 
 const userSchema = Yup.object().shape({
@@ -25,22 +28,47 @@ const userSchema = Yup.object().shape({
   /** TO DO: Validate phone format... */
   phone: Yup.string().required('Por favor, insira um número de telefone!'),
   is_admin: Yup.boolean(),
-  role: Yup.string().required('Por favor, selecione uma função!'),
+  // role: Yup.object().required('Por favor, selecione uma função!').nullable(),
+  role: Yup.object().required('Por favor, selecione uma função!'),
 })
+
+interface ISelectOption {
+  label: string
+  value: TRole
+}
+
+interface IFormValues {
+  name: string
+  email: string
+  cpf: string
+  phone: string
+  is_admin: boolean
+  role: ISelectOption
+}
 
 export const UsersDrawer = ({
   isVisible,
   type,
   onClose,
+  fetchUsers,
 }: IUsersDrawerProps) => {
   const {
     control,
     handleSubmit,
+    setValue,
     reset,
-    formState: { errors },
-  } = useForm<IUserFormValues>({
+    formState: { errors, isSubmitting },
+  } = useForm<IFormValues>({
     resolver: yupResolver(userSchema),
     shouldUnregister: true,
+    defaultValues: {
+      cpf: '',
+      email: '',
+      is_admin: false,
+      name: '',
+      phone: '',
+      role: rolesOptions[0],
+    },
     mode: 'onChange',
   })
 
@@ -49,9 +77,18 @@ export const UsersDrawer = ({
     onClose()
   }
 
-  const onSubmit = (values: IUserFormValues) => {
-    console.log('submitted:', values)
-    /** TO DO: Call storeUser() and handleErrors... */
+  const onSubmit = async (values: IFormValues) => {
+    const response = await storeUser({ ...values, role: values.role.value })
+
+    if (response.error) {
+      /** TO DO: handleErrors... */
+      notification.error({ message: response.error.message })
+      return
+    }
+
+    notification.success({ message: 'O usuário foi cadastrado com sucesso!' })
+    fetchUsers()
+    closeDrawer()
   }
 
   return (
@@ -153,8 +190,11 @@ export const UsersDrawer = ({
                 <Input
                   label="Função"
                   placeholder="Selecione uma função"
-                  error={errors?.role?.message}
+                  error={errors?.role?.value?.message}
                   options={rolesOptions}
+                  selectOnChange={(newValue: any) => {
+                    setValue('role', { ...newValue })
+                  }}
                   isSelect
                   required
                   {...field}
@@ -185,6 +225,7 @@ export const UsersDrawer = ({
         <Row>
           <Col span={24}>
             <Button
+              disabled={isSubmitting}
               type="submit"
               title={
                 type === 'create'
