@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { Button as CustomButton } from '../../components/UI/Button'
@@ -15,7 +14,7 @@ export const Container = styled.div`
   }
 `
 
-export const SignInCard = styled.div`
+export const SetPasswordCard = styled.div`
   width: 40%;
   min-width: 450px;
   margin: auto;
@@ -34,35 +33,15 @@ export const SignInCard = styled.div`
   }
 `
 
-export const LoginTitle = styled.h3`
+export const Form = styled.form``
+
+export const Title = styled.h3`
   font-size: 25px;
   color: ${Theme.primary};
   text-align: center;
   margin-bottom: 40px;
   border-bottom: 1px solid #dedee0;
   padding-bottom: 18px;
-`
-
-export const LoginExtraInfoContainer = styled.div`
-  text-align: right;
-  display: flex;
-  justify-content: flex-end;
-  flex-wrap: wrap;
-  width: 100%;
-
-  @media (max-width: 1180px) {
-    flex-direction: column;
-  }
-`
-
-export const StyledLink = styled(Link)`
-  color: ${Theme.primary};
-  font-size: 13px;
-  margin-top: 5px;
-
-  &:not(:first-of-type) {
-    margin-left: 14px;
-  }
 `
 
 export const ButtonContainer = styled.div`
@@ -73,5 +52,3 @@ export const ButtonContainer = styled.div`
 export const Button = styled(CustomButton)`
   padding: 10px;
 `
-
-export const Form = styled.form``

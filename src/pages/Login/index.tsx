@@ -14,6 +14,7 @@ import {
   LoginTitle,
   StyledLink,
   SignInCard,
+  Form,
 } from './styles'
 import { Creators } from '../../store/ducks/auth/reducer'
 import { Input } from '../../components/UI/Input'
@@ -73,7 +74,7 @@ export const Login = (): JSX.Element => {
       <SignInCard>
         <LoginTitle>Iniciar Sessão</LoginTitle>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <Form onSubmit={handleSubmit(onSubmit)}>
           <Row>
             <Col span={24}>
               <Controller
@@ -145,7 +146,7 @@ export const Login = (): JSX.Element => {
               </ButtonContainer>
             </Col>
           </Row>
-        </form>
+        </Form>
       </SignInCard>
     </Container>
   )

@@ -7,6 +7,7 @@ import { Creators } from './store/ducks/auth/reducer'
 import { GetAccount } from './pages/GetAccount'
 import { Login } from './pages/Login'
 import { RecoverPassword } from './pages/RecoverPassword'
+import { SetPassword } from './pages/SetPassword'
 import { RootState } from './store'
 import { ProgressBar } from './components/UI/ProgressBar'
 import {
@@ -19,7 +20,7 @@ export const Router = () => {
   const dispatch = useDispatch()
   const { hasPermission } = useHasPermission()
   const user = useSelector((state: RootState) => state.AuthReducer)
-  const [isMounted, setIsMounted] = useState<boolean>(false)
+  const [isMounted, setIsMounted] = useState(false)
   const isAuthenticated = user?.isAuthorized
   const publicRoutes = [
     <Route key="login" path="/login" element={<Login />} />,
@@ -28,6 +29,7 @@ export const Router = () => {
       path="/recover-password"
       element={<RecoverPassword />}
     />,
+    <Route key="set-password" path="/set-password" element={<SetPassword />} />,
     <Route key="get-account" path="/get-account" element={<GetAccount />} />,
   ]
 
