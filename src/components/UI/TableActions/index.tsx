@@ -13,6 +13,7 @@ interface ITableActionsOption {
   overlay?: string
   /** @default 18 */
   iconSize?: number
+  disabled?: boolean | undefined
 }
 
 interface ITableActionsProps {
@@ -39,11 +40,11 @@ export const TableActions = ({ options }: ITableActionsProps) => {
 
         return (
           <Tooltip key={item.id} overlay={item.overlay || ''}>
-            <Item onClick={item.onClick}>
+            <Item onClick={item.disabled ? undefined : item.onClick}>
               {Icon && (
                 <Icon.icon
-                  color={Icon.color}
-                  cursor="pointer"
+                  color={item.disabled ? 'grey' : Icon.color}
+                  cursor={item.disabled ? 'default' : 'pointer'}
                   size={item.iconSize || 18}
                 />
               )}

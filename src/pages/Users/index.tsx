@@ -68,7 +68,8 @@ export const Users = (): JSX.Element => {
       title: 'Função',
       dataIndex: 'role',
       key: 'role',
-      render: (role: TRole) => getTranslatedRole(role, true),
+      render: (role: TRole, record: IUser) =>
+        `${getTranslatedRole(role, true)}${record.is_admin ? ' / Admin' : ''}`,
     },
     {
       title: 'Telefone',
@@ -90,7 +91,10 @@ export const Users = (): JSX.Element => {
           options={[
             {
               id: 'delete',
-              overlay: 'Clique para excluir este usuário',
+              overlay: user.is_admin
+                ? 'Não é possível excluir este usuário pois ele também é um administrador'
+                : 'Clique para excluir este usuário',
+              disabled: !!user.is_admin,
               onClick: () =>
                 setDeletionModal({
                   isVisible: true,
@@ -127,7 +131,6 @@ export const Users = (): JSX.Element => {
       <UsersDrawer
         isVisible={!!drawer}
         onClose={() => setDrawer(null)}
-        type={drawer?.type || 'create'}
         fetchUsers={fetchUsersAsync}
       />
       <DeletionModal

@@ -25,7 +25,6 @@ interface IInputProps {
   error?: string | undefined
   style?: React.CSSProperties | undefined
   value?: any
-  // value?: string | number | readonly string[] | undefined
   onChange?: React.ChangeEventHandler<HTMLInputElement> | undefined
   selectOnChange?: (newValue: any, actionMeta: ActionMeta<unknown>) => void
 }
@@ -106,12 +105,12 @@ export const Input = React.forwardRef(
           name={name}
           type={type}
           placeholder={placeholder}
-          hasError={!!error}
+          hasError={!!error || false}
           ref={ref}
           autoFocus={autoFocus}
           style={style}
-          onChange={onChange}
           value={value}
+          onChange={onChange}
           {...rest}
         />
         {!!error && <ErrorMessage>{error}</ErrorMessage>}

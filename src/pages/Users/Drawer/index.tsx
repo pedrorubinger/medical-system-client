@@ -10,9 +10,9 @@ import { rolesOptions } from '../../../utils/helpers/roles'
 import { InfoTooltip } from '../../../components/UI/InfoTooltip'
 import { storeUser } from '../../../services/requests/user'
 import { TRole } from '../../../interfaces/roles'
+import { formatCPF } from '../../../utils/helpers/formatters'
 
 interface IUsersDrawerProps {
-  type: 'create' | 'update'
   isVisible: boolean
   onClose: () => void
   fetchUsers: () => Promise<void>
@@ -23,12 +23,15 @@ const userSchema = Yup.object().shape({
   email: Yup.string()
     .email('Você deve fornecer um email válido!')
     .required('Por favor, insira um email!'),
-  /** TO DO: Validate CPF format... */
-  cpf: Yup.string().required('Insira um CPF!'),
-  /** TO DO: Validate phone format... */
+  cpf: Yup.string()
+    .required('Insira um CPF!')
+    .test('is-cpf-valid', 'Este CPF é inválido!', (value) => {
+      const cpf = value?.replace(/\D/g, '')
+
+      return cpf?.length === 11
+    }),
   phone: Yup.string().required('Por favor, insira um número de telefone!'),
   is_admin: Yup.boolean(),
-  // role: Yup.object().required('Por favor, selecione uma função!').nullable(),
   role: Yup.object().required('Por favor, selecione uma função!'),
 })
 
@@ -48,7 +51,6 @@ interface IFormValues {
 
 export const UsersDrawer = ({
   isVisible,
-  type,
   onClose,
   fetchUsers,
 }: IUsersDrawerProps) => {
@@ -94,7 +96,7 @@ export const UsersDrawer = ({
   return (
     <Drawer
       visible={isVisible}
-      title={type === 'create' ? 'Cadastrar Usuário' : 'Atualizar Usuário'}
+      title="Cadastrar Usuário"
       width={450}
       onClose={closeDrawer}>
       <InfoMessage>
@@ -155,6 +157,7 @@ export const UsersDrawer = ({
                   error={errors?.cpf?.message}
                   required
                   {...field}
+                  onChange={(e) => setValue('cpf', formatCPF(e.target.value))}
                 />
               )}
             />
@@ -227,12 +230,8 @@ export const UsersDrawer = ({
             <Button
               disabled={isSubmitting}
               type="submit"
-              title={
-                type === 'create'
-                  ? 'Clique para cadastrar este novo usuário'
-                  : 'Clique para atualizar os dados deste usuário'
-              }>
-              {type === 'create' ? 'Cadastrar' : 'Atualizar'}
+              title="Clique para cadastrar este novo usuário">
+              {isSubmitting ? 'Cadastrando' : 'Cadastrar'}
             </Button>
           </Col>
         </Row>

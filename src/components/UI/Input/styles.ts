@@ -49,18 +49,4 @@ export const ErrorMessage = styled.span`
   margin: 8px 0;
 `
 
-export const Select = styled(ReactSelect)<IStyledInputProps>`
-  /* padding: 8px;
-  padding-left: 10px;
-  border-radius: 6px;
-  position: relative;
-  display: inline-block;
-  width: 100%;
-  min-width: 0;
-  margin: 9px 0;
-  border: 1px solid ${({ hasError }) => (hasError ? 'red' : '#c9c9c9')};
-  transition: 0.6s;
-  background: #fff;
-  color: #636363; */
-  /* box-shadow: 0px 1px 1px #c9c9c9; */
-`
+export const Select = styled(ReactSelect)``

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AxiosResponse } from 'axios'
 import { AnyAction } from 'redux'
 import { all, call, fork, put, takeLatest } from 'redux-saga/effects'
