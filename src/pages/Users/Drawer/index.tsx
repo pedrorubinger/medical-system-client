@@ -15,7 +15,7 @@ import { formatCPF } from '../../../utils/helpers/formatters'
 interface IUsersDrawerProps {
   isVisible: boolean
   onClose: () => void
-  fetchUsers: () => Promise<void>
+  fetchUsers: () => void
 }
 
 const userSchema = Yup.object().shape({

@@ -1,22 +1,23 @@
 import { useCallback, useEffect, useState } from 'react'
-import { notification, Table } from 'antd'
+import { notification, Table, TablePaginationConfig } from 'antd'
 import { useSelector } from 'react-redux'
 
+import {
+  deleteUser,
+  fetchUsers,
+  IFetchUsersParams,
+} from '../../services/requests/user'
+import { getFilterProps } from '../../components/UI/FilterBox/Filter'
+import { getTranslatedRole } from '../../utils/helpers/roles'
 import { PageContent } from '../../components/UI/PageContent'
 import { TableHeader } from '../../components/UI/TableHeader'
 import { IUser } from '../../interfaces/user'
-import { getTranslatedRole } from '../../utils/helpers/roles'
 import { TRole } from '../../interfaces/roles'
 import { UsersDrawer } from './Drawer'
 import { TableActions } from '../../components/UI/TableActions'
-import { deleteUser, fetchUsers } from '../../services/requests/user'
 import { DeletionModal } from './DeletionModal'
 import { RootState } from '../../store'
-
-interface IDrawerProps {
-  data?: IUser
-  type: 'create' | 'update'
-}
+import { FilterValue } from 'antd/lib/table/interface'
 
 interface IDeletionModalProps {
   isVisible: boolean
@@ -24,15 +25,68 @@ interface IDeletionModalProps {
   onOk: () => void
 }
 
+interface IFilters {
+  cpf: string | null
+  role: TRole | null
+  name: string | null
+  email: string | null
+}
+
+const initialPagination = { current: 1, pageSize: 5 }
+const initialFetchParams = {
+  page: initialPagination.current,
+  perPage: initialPagination.pageSize,
+}
+const initialFilters = { cpf: null, name: null, email: null, role: null }
+const roles = [
+  { value: 'doctor', text: 'Médico(a)' },
+  { value: 'manager', text: 'Gestor(a)' },
+]
+
 export const Users = (): JSX.Element => {
   const [records, setRecords] = useState<IUser[]>([])
   const [fetching, setFetching] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [deletionModal, setDeletionModal] =
     useState<IDeletionModalProps | null>(null)
-  const [drawer, setDrawer] = useState<IDrawerProps | null>(null)
+  const [drawer, setDrawer] = useState(false)
+  const [pagination, setPagination] = useState<TablePaginationConfig>({
+    ...initialPagination,
+  })
+  const [searchFilters, setSearchFilters] = useState<IFilters>(initialFilters)
   const user = useSelector((state: RootState) => state.AuthReducer)
   const ownId = user.data.id
+
+  const fetchUsersAsync = useCallback(
+    async (params: IFetchUsersParams) => {
+      setFetching(true)
+
+      const response = await fetchUsers(params)
+
+      if (response.error) {
+        notification.error({
+          message: response.error.message,
+        })
+      }
+
+      if (response.data) {
+        const users = response.data.data
+
+        setRecords(users)
+
+        if (response.data.meta) {
+          setPagination((prevPagination) => ({
+            ...prevPagination,
+            current: response?.data?.meta?.current_page,
+            total: response?.data?.meta?.total,
+          }))
+        }
+      }
+
+      setFetching(false)
+    },
+    [ownId]
+  )
 
   const onDeleteUser = async (id: number) => {
     setIsDeleting(true)
@@ -41,16 +95,13 @@ export const Users = (): JSX.Element => {
 
     if (response.success) {
       notification.success({ message: 'O usuário foi excluído com sucesso!' })
-      /** TO DO: Refetch records when pagination is implemented... */
-      setRecords(
-        [...records].filter((record) => record.id.toString() !== id.toString())
-      )
+      setIsDeleting(false)
       setDeletionModal(null)
+      fetchUsersAsync(initialFetchParams)
     } else if (response.error) {
+      setIsDeleting(false)
       notification.error({ message: response.error.message })
     }
-
-    setIsDeleting(false)
   }
 
   const columns = [
@@ -58,16 +109,50 @@ export const Users = (): JSX.Element => {
       title: 'Nome',
       dataIndex: 'name',
       key: 'name',
+      sorter: (a: IUser, b: IUser) => a.name.localeCompare(b.name),
+      ...getFilterProps({
+        dataIndex: 'name',
+        inputOptions: { placeholder: 'Nome' },
+      }),
+      filteredValue: searchFilters.name as unknown as FilterValue,
+    },
+    {
+      title: 'CPF',
+      dataIndex: 'cpf',
+      key: 'cpf',
+      sorter: (a: IUser, b: IUser) => a.cpf.localeCompare(b.cpf),
+      ...getFilterProps({
+        dataIndex: 'cpf',
+        inputOptions: { placeholder: 'CPF' },
+      }),
+      filteredValue: searchFilters.cpf as unknown as FilterValue,
     },
     {
       title: 'E-mail',
       dataIndex: 'email',
       key: 'email',
+      sorter: (a: IUser, b: IUser) => a.email.localeCompare(b.email),
+      ...getFilterProps({
+        dataIndex: 'email',
+        inputOptions: { placeholder: 'E-mail' },
+      }),
+      filteredValue: searchFilters.email as unknown as FilterValue,
     },
     {
       title: 'Função',
       dataIndex: 'role',
       key: 'role',
+      ...getFilterProps({
+        dataIndex: 'role',
+        inputOptions: {
+          filterType: 'selection',
+          selectionOptions: {
+            items: roles,
+          },
+        },
+        iconType: 'selection',
+      }),
+      filteredValue: searchFilters.role as unknown as FilterValue,
       render: (role: TRole, record: IUser) =>
         `${getTranslatedRole(role, true)}${record.is_admin ? ' / Admin' : ''}`,
     },
@@ -108,30 +193,16 @@ export const Users = (): JSX.Element => {
     },
   ]
 
-  const fetchUsersAsync = useCallback(async () => {
-    setFetching(true)
-
-    const users = await fetchUsers()
-
-    if (users) {
-      setRecords(
-        users.filter((user) => user.id.toString() !== ownId.toString())
-      )
-    }
-
-    setFetching(false)
-  }, [ownId])
-
   useEffect(() => {
-    fetchUsersAsync()
+    fetchUsersAsync(initialFetchParams)
   }, [])
 
   return (
     <PageContent>
       <UsersDrawer
-        isVisible={!!drawer}
-        onClose={() => setDrawer(null)}
-        fetchUsers={fetchUsersAsync}
+        isVisible={drawer}
+        onClose={() => setDrawer(false)}
+        fetchUsers={() => fetchUsersAsync(initialFetchParams)}
       />
       <DeletionModal
         isVisible={deletionModal?.isVisible || false}
@@ -144,15 +215,41 @@ export const Users = (): JSX.Element => {
         title="Usuários"
         newRecordButton={{
           visible: true,
-          onClick: () => setDrawer({ type: 'create' }),
+          onClick: () => setDrawer(true),
         }}
       />
       <Table
         rowKey="id"
         dataSource={records}
         loading={fetching}
-        scroll={{ x: true }}
         columns={columns}
+        pagination={pagination}
+        onChange={async (pagination, filters, sorter, meta) => {
+          const sorting = Array.isArray(sorter) ? sorter?.[0] : sorter
+          let search = { ...searchFilters }
+
+          if (meta.action === 'filter') {
+            search = {
+              cpf: (filters?.cpf as unknown as string) || null,
+              role: (filters?.role as unknown as TRole) || null,
+              email: (filters?.email as unknown as string) || null,
+              name: (filters?.name as unknown as string) || null,
+            }
+
+            setSearchFilters(search)
+          }
+
+          const payload = { ...pagination, ...search }
+
+          await fetchUsersAsync({
+            ...payload,
+            page: payload.current || initialPagination.current,
+            perPage: payload.pageSize || initialPagination.pageSize,
+            order: sorting.order === 'ascend' ? 'asc' : 'desc',
+            orderBy: sorting?.field?.toString(),
+          })
+        }}
+        scroll={{ x: true }}
       />
     </PageContent>
   )

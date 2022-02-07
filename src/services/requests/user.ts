@@ -1,11 +1,28 @@
-import { notification } from 'antd'
 import { AxiosResponse } from 'axios'
+import { IPagination, IPaginationMeta, ISorting } from '../../interfaces/api'
 import { IError } from '../../interfaces/error'
 import { TRole } from '../../interfaces/roles'
 
 import { IUser, IUserFormValues } from '../../interfaces/user'
 import { handleError } from '../../utils/helpers/errors'
 import { api } from '../api'
+
+export interface IFetchUsersParams extends IPagination, Partial<ISorting> {
+  cpf?: string | null
+  name?: string | null
+  email?: string | null
+  role?: TRole | null
+}
+
+interface IFetchUsersAPIResponse {
+  meta?: IPaginationMeta
+  data: IUser[]
+}
+
+interface IFetchUsersResponse {
+  data: IFetchUsersAPIResponse | null
+  error: IError | null
+}
 
 interface IStoreOrUpdateUserResponse {
   user?: IUser | null
@@ -48,17 +65,20 @@ interface IUpdateUserData {
   role?: TRole
 }
 
-export const fetchUsers = async () => {
+export const fetchUsers = async (
+  params: IFetchUsersParams
+): Promise<IFetchUsersResponse> => {
   try {
-    const response: AxiosResponse<IUser[]> = await api.get('/user')
+    const response: AxiosResponse<IFetchUsersAPIResponse> = await api.get(
+      '/user',
+      { params }
+    )
 
-    return response.data
+    return { data: response.data, error: null }
   } catch (err) {
     const error = handleError(err)
 
-    notification.error({
-      message: error.message,
-    })
+    return { data: null, error }
   }
 }
 
