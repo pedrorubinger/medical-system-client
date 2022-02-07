@@ -9,6 +9,7 @@ import { TableHeader } from '../../components/UI/TableHeader'
 import { Button, ButtonContainer, CheckboxRow, Form } from './styles'
 import { Input } from '../../components/UI/Input'
 import { RootState } from '../../store'
+import { formatCPF } from '../../utils/helpers/formatters'
 
 interface IMyAccountFormValues {
   name: string
@@ -25,11 +26,14 @@ const accountSchema = Yup.object().shape({
   email: Yup.string()
     .email('Você deve fornecer um email válido!')
     .required('Por favor, insira um email!'),
-  /** TO DO: Validate CPF format... */
-  cpf: Yup.string().required('Insira um CPF!'),
-  /** TO DO: Validate phone format... */
+  cpf: Yup.string()
+    .required('Insira um CPF!')
+    .test('is-cpf-valid', 'Este CPF é inválido!', (value) => {
+      const cpf = value?.replace(/\D/g, '')
+
+      return cpf?.length === 11
+    }),
   phone: Yup.string().required('Por favor, insira um número de telefone!'),
-  /** TO DO: Add password and password_confirmation fields... */
   current_password: Yup.string().required('Por favor, insira sua senha atual!'),
   change_password: Yup.boolean(),
   new_password: Yup.string().when('change_password', {
@@ -53,6 +57,7 @@ export const MyAccount = (): JSX.Element => {
     control,
     watch,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<IMyAccountFormValues>({
     mode: 'onChange',
@@ -113,10 +118,11 @@ export const MyAccount = (): JSX.Element => {
               render={({ field }) => (
                 <Input
                   label="CPF"
-                  placeholder="Digite o seu CPF"
+                  placeholder="Digite o CPF"
                   error={errors?.cpf?.message}
                   required
                   {...field}
+                  onChange={(e) => setValue('cpf', formatCPF(e.target.value))}
                 />
               )}
             />
