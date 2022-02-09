@@ -12,6 +12,7 @@ export interface IFetchUsersParams extends IPagination, Partial<ISorting> {
   name?: string | null
   email?: string | null
   role?: TRole | null
+  filterOwn?: boolean | null
 }
 
 interface IFetchUsersAPIResponse {
@@ -71,7 +72,7 @@ export const fetchUsers = async (
   try {
     const response: AxiosResponse<IFetchUsersAPIResponse> = await api.get(
       '/user',
-      { params }
+      { params: { ...params, filterOwn: true } }
     )
 
     return { data: response.data, error: null }
