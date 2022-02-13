@@ -1,22 +1,24 @@
-import { Checkbox, Col, Row } from 'antd'
+import { Checkbox, Col, notification, Row } from 'antd'
 import { Controller, useForm } from 'react-hook-form'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
 
+import { Creators } from '../../store/ducks/auth/reducer'
 import { PageContent } from '../../components/UI/PageContent'
 import { TableHeader } from '../../components/UI/TableHeader'
 import { Button, ButtonContainer, CheckboxRow, Form } from './styles'
 import { Input } from '../../components/UI/Input'
 import { RootState } from '../../store'
 import { formatCPF } from '../../utils/helpers/formatters'
+import { updateUser } from '../../services/requests/user'
 
 interface IMyAccountFormValues {
   name: string
   email: string
   cpf: string
   phone: string
-  current_password: string
+  password: string
   new_password: string
   change_password: boolean
 }
@@ -34,7 +36,7 @@ const accountSchema = Yup.object().shape({
       return cpf?.length === 11
     }),
   phone: Yup.string().required('Por favor, insira um número de telefone!'),
-  current_password: Yup.string().required('Por favor, insira sua senha atual!'),
+  password: Yup.string().required('Por favor, insira sua senha atual!'),
   change_password: Yup.boolean(),
   new_password: Yup.string().when('change_password', {
     is: true,
@@ -43,14 +45,15 @@ const accountSchema = Yup.object().shape({
 })
 
 export const MyAccount = (): JSX.Element => {
+  const dispatch = useDispatch()
   const user = useSelector((state: RootState) => state.AuthReducer)
   const initialValues = {
     name: user.data.name,
     email: user.data.email,
-    cpf: user.data.cpf,
+    cpf: formatCPF(user.data.cpf),
     phone: user.data.phone,
     change_password: false,
-    current_password: '',
+    password: '',
     new_password: '',
   }
   const {
@@ -58,7 +61,7 @@ export const MyAccount = (): JSX.Element => {
     watch,
     handleSubmit,
     setValue,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<IMyAccountFormValues>({
     mode: 'onChange',
     resolver: yupResolver(accountSchema),
@@ -69,6 +72,29 @@ export const MyAccount = (): JSX.Element => {
 
   const onSubmit = async (values: IMyAccountFormValues) => {
     console.log('submitted:', values)
+
+    const response = await updateUser({
+      id: user.data.id,
+      cpf: values.cpf !== user.data.cpf ? values.cpf : undefined,
+      email: values.email !== user.data.email ? values.email : undefined,
+      name: values.name,
+      password: values.password,
+      phone: values.phone,
+      new_password: values.change_password ? values.new_password : undefined,
+    })
+
+    if (response.error) {
+      notification.error({ message: response.error.message })
+    } else if (response.user) {
+      dispatch(Creators.setUser(response.user))
+      notification.success({
+        message: 'Seus dados foram atualizados com sucesso!',
+      })
+    }
+
+    setValue('password', '')
+    setValue('new_password', '')
+    setValue('change_password', false)
   }
 
   return (
@@ -148,14 +174,14 @@ export const MyAccount = (): JSX.Element => {
         <Row gutter={16}>
           <Col sm={12} xs={24}>
             <Controller
-              name="current_password"
+              name="password"
               control={control}
               render={({ field }) => (
                 <Input
                   type="password"
                   label="Senha Atual"
                   placeholder="Digite sua senha atual"
-                  error={errors?.current_password?.message}
+                  error={errors?.password?.message}
                   required
                   {...field}
                 />
@@ -203,7 +229,9 @@ export const MyAccount = (): JSX.Element => {
         <Row>
           <Col span={24}>
             <ButtonContainer>
-              <Button type="submit">Salvar Dados</Button>
+              <Button disabled={isSubmitting} type="submit">
+                {isSubmitting ? 'Salvando...' : 'Salvar Dados'}
+              </Button>
             </ButtonContainer>
           </Col>
         </Row>

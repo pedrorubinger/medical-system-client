@@ -57,7 +57,7 @@ interface IValidateResetTokenAPIResponse {
 interface IUpdateUserData {
   id: number
   password?: string
-  confirmed?: string
+  new_password?: string
   name?: string
   email?: string
   cpf?: string

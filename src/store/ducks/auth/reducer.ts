@@ -17,6 +17,7 @@ interface IState {
 }
 
 export const AuthTypes = {
+  AUTH_SET_USER: 'auth/SET_USER',
   AUTH_SIGN_IN_REQUEST: 'auth/AUTH_SIGN_IN_REQUEST',
   AUTH_SIGN_IN_SUCCESS: 'auth/AUTH_SIGN_IN_SUCCESS',
   AUTH_SIGN_IN_FAILURE: 'auth/AUTH_SIGN_IN_FAILURE',
@@ -39,6 +40,14 @@ export default function reducer(
   action: AnyAction
 ) {
   switch (action.type) {
+    case AuthTypes.AUTH_SET_USER:
+      return {
+        ...state,
+        loading: false,
+        validating: false,
+        data: action.payload,
+        error: null,
+      }
     case AuthTypes.AUTH_SIGN_IN_REQUEST:
       return {
         ...state,
@@ -91,6 +100,10 @@ export default function reducer(
 }
 
 export const Creators = {
+  setUser: (payload: IUser): AnyAction => ({
+    type: AuthTypes.AUTH_SET_USER,
+    payload,
+  }),
   signIn: (payload: ICredentials): AnyAction => ({
     type: AuthTypes.AUTH_SIGN_IN_REQUEST,
     payload,
