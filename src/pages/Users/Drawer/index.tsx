@@ -4,13 +4,13 @@ import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
 
-import { Button, CheckboxRow, Form, InfoMessage } from './styles'
-import { Input } from '../../../components/UI/Input'
+import { formatCPF } from '../../../utils/helpers/formatters'
 import { rolesOptions } from '../../../utils/helpers/roles'
-import { InfoTooltip } from '../../../components/UI/InfoTooltip'
 import { storeUser } from '../../../services/requests/user'
 import { TRole } from '../../../interfaces/roles'
-import { formatCPF } from '../../../utils/helpers/formatters'
+import { Button, CheckboxRow, Form, InfoMessage } from './styles'
+import { Input } from '../../../components/UI/Input'
+import { InfoTooltip } from '../../../components/UI/InfoTooltip'
 
 interface IUsersDrawerProps {
   isVisible: boolean
@@ -87,14 +87,14 @@ export const UsersDrawer = ({
     const response = await storeUser({ ...values, role: values.role.value })
 
     if (response.error) {
-      /** TO DO: handleErrors... */
+      /** TO DO: handle errors properly... */
       notification.error({ message: response.error.message })
       return
     }
 
     notification.success({ message: 'O usuário foi cadastrado com sucesso!' })
-    fetchUsers()
     closeDrawer()
+    fetchUsers()
   }
 
   const watchedRole = watch('role')

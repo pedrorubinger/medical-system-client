@@ -78,7 +78,7 @@ export const UserDetailsModal = ({
       <Row gutter={24}>
         <Col span={12} sm={12} xs={24}>
           <ReadOnly
-            label="Data de Registro"
+            label="Data de Cadastro"
             value={new Date(data.created_at).toLocaleString()}
             paperMode
           />

@@ -169,7 +169,7 @@ export const Users = (): JSX.Element => {
       key: 'phone',
     },
     {
-      title: 'Data de Registro',
+      title: 'Data de Cadastro',
       dataIndex: 'created_at',
       key: 'created_at',
       render: (date: string) => new Date(date).toLocaleDateString(),
