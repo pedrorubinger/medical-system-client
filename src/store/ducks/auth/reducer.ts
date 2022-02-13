@@ -102,7 +102,7 @@ export const Creators = {
     type: AuthTypes.AUTH_SIGN_IN_SUCCESS,
     payload,
   }),
-  signInFailure: (payload: IError): AnyAction => ({
+  signInFailure: (payload: IError | null): AnyAction => ({
     type: AuthTypes.AUTH_SIGN_IN_FAILURE,
     payload,
   }),

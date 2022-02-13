@@ -133,7 +133,7 @@ export const validateResetToken = async (
 ): Promise<IValidateResetTokenResponse> => {
   try {
     const response: AxiosResponse<IValidateResetTokenAPIResponse> =
-      await api.get(`/user/set_password/${token}`)
+      await api.get(`/user/password/validate/${token}`)
 
     return { user: response.data.user, error: null }
   } catch (err) {

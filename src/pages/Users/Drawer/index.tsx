@@ -24,7 +24,7 @@ const userSchema = Yup.object().shape({
     .email('Você deve fornecer um email válido!')
     .required('Por favor, insira um email!'),
   cpf: Yup.string()
-    .required('Insira um CPF!')
+    .required('Por favor, insira um CPF!')
     .test('is-cpf-valid', 'Este CPF é inválido!', (value) => {
       const cpf = value?.replace(/\D/g, '')
 
@@ -33,6 +33,7 @@ const userSchema = Yup.object().shape({
   phone: Yup.string().required('Por favor, insira um número de telefone!'),
   is_admin: Yup.boolean(),
   role: Yup.object().required('Por favor, selecione uma função!'),
+  crm_document: Yup.string().required('Por favor, insira o número do CRM!'),
 })
 
 interface ISelectOption {
@@ -47,6 +48,7 @@ interface IFormValues {
   phone: string
   is_admin: boolean
   role: ISelectOption
+  crm_document?: string
 }
 
 export const UsersDrawer = ({
@@ -59,6 +61,7 @@ export const UsersDrawer = ({
     handleSubmit,
     setValue,
     reset,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<IFormValues>({
     resolver: yupResolver(userSchema),
@@ -70,8 +73,9 @@ export const UsersDrawer = ({
       name: '',
       phone: '',
       role: rolesOptions[0],
+      crm_document: '',
     },
-    mode: 'onChange',
+    mode: 'onBlur',
   })
 
   const closeDrawer = () => {
@@ -92,6 +96,8 @@ export const UsersDrawer = ({
     fetchUsers()
     closeDrawer()
   }
+
+  const watchedRole = watch('role')
 
   return (
     <Drawer
@@ -117,7 +123,6 @@ export const UsersDrawer = ({
                   placeholder="Digite o nome completo"
                   error={errors?.name?.message}
                   required
-                  autoFocus
                   {...field}
                 />
               )}
@@ -207,6 +212,26 @@ export const UsersDrawer = ({
           </Col>
         </Row>
 
+        {watchedRole?.value === 'doctor' && (
+          <Row>
+            <Col span={24}>
+              <Controller
+                name="crm_document"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    label="CRM"
+                    placeholder="Informe o CRM do médico"
+                    error={errors?.crm_document?.message}
+                    required
+                    {...field}
+                  />
+                )}
+              />
+            </Col>
+          </Row>
+        )}
+
         <CheckboxRow>
           <Col>
             <Controller
@@ -231,7 +256,7 @@ export const UsersDrawer = ({
               disabled={isSubmitting}
               type="submit"
               title="Clique para cadastrar este novo usuário">
-              {isSubmitting ? 'Cadastrando' : 'Cadastrar'}
+              {isSubmitting ? 'Cadastrando...' : 'Cadastrar'}
             </Button>
           </Col>
         </Row>

@@ -51,7 +51,7 @@ function* validateToken() {
 
     yield put(Creators.validateTokenSuccess(response.data.user))
   } catch (err: any) {
-    yield put(Creators.signInFailure(handleError(err)))
+    yield put(Creators.signInFailure(null))
   }
 }
 
