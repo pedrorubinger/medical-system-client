@@ -62,6 +62,7 @@ export const UsersDrawer = ({
   const {
     control,
     handleSubmit,
+    setError,
     setValue,
     reset,
     watch,

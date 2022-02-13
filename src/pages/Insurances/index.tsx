@@ -56,10 +56,6 @@ export const Insurances = (): JSX.Element => {
 
       const response = await fetchInsurances(params)
 
-      if (response.error) {
-        notification.error({ message: response.error.message })
-      }
-
       if (response.data) {
         const insurances = response.data.data
 
@@ -91,7 +87,6 @@ export const Insurances = (): JSX.Element => {
       fetchInsurancesAsync(initialFetchParams)
     } else if (response.error) {
       setIsDeleting(false)
-      notification.error({ message: response.error.message })
     }
   }
 

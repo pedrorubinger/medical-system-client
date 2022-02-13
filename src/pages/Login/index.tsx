@@ -55,7 +55,7 @@ export const Login = (): JSX.Element => {
     if (user.error) {
       notification.error({ message: user.error.message })
 
-      if (user.error.status === 400) {
+      if (user.error.status === 400 || user.error.status === 422) {
         const message = 'Verifique suas credenciais!'
 
         setError('email', { type: 'manual', message })

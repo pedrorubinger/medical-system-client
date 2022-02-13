@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Col, Drawer, notification, Row } from 'antd'
 import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -10,7 +11,6 @@ import {
   storeSpecialty,
   updateSpecialty,
 } from '../../../services/requests/specialty'
-import { useEffect } from 'react'
 
 interface ISpecialtyDrawerProps {
   isVisible: boolean
@@ -35,16 +35,27 @@ export const SpecialtyDrawer = ({
     control,
     handleSubmit,
     reset,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<ISpecialtyFormValues>({
     resolver: yupResolver(specialtySchema),
     shouldUnregister: true,
     mode: 'onBlur',
   })
+  const watchedName = watch('name', data?.name || '')
+  const [currentName, setCurrentName] = useState(data?.name || '')
 
   const closeDrawer = () => {
     reset()
     onClose()
+  }
+
+  const nameHasChanged = () => {
+    if (type === 'update') {
+      return currentName !== watchedName
+    }
+
+    return true
   }
 
   const onSubmit = async (values: ISpecialtyFormValues): Promise<void> => {
@@ -55,7 +66,6 @@ export const SpecialtyDrawer = ({
 
     if (response.error) {
       /** TO DO: handle errors properly... */
-      notification.error({ message: response.error.message })
       return
     }
 
@@ -65,8 +75,25 @@ export const SpecialtyDrawer = ({
           ? 'A especialidade foi cadastrada com sucesso!'
           : 'Os dados da especialidade foram atualizadas com sucesso!',
     })
+    setCurrentName(values.name)
     closeDrawer()
     fetchSpecialties()
+  }
+
+  const getButtonTitle = () => {
+    if (isSubmitting) {
+      return 'Aguarde. Salvando dados da especialidade...'
+    }
+
+    if (type === 'create') {
+      return 'Clique para cadastrar esta nova especialidade'
+    }
+
+    if (!nameHasChanged()) {
+      return 'Faça mudanças no nome da especialidade para salvar as informações'
+    }
+
+    return 'Clique para atualizar os dados desta especialidade'
   }
 
   const getButtonValue = () => {
@@ -83,6 +110,7 @@ export const SpecialtyDrawer = ({
 
   useEffect(() => {
     reset({ name: data?.name || '' })
+    setCurrentName(data?.name || '')
   }, [data])
 
   return (
@@ -117,13 +145,9 @@ export const SpecialtyDrawer = ({
         <Row>
           <Col span={24}>
             <Button
-              disabled={isSubmitting}
+              disabled={isSubmitting || !nameHasChanged()}
               type="submit"
-              title={
-                type === 'create'
-                  ? 'Clique para cadastrar esta nova especialidade'
-                  : 'Clique para atualizar os dados desta especialidade'
-              }>
+              title={getButtonTitle()}>
               {getButtonValue()}
             </Button>
           </Col>

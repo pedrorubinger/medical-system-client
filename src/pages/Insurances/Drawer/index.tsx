@@ -1,16 +1,17 @@
+import { useEffect, useState } from 'react'
 import { Col, Drawer, notification, Row } from 'antd'
 import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
 
-import { Button, Form } from './styles'
-import { Input } from '../../../components/UI/Input'
-import { IInsurance, IInsuranceFormValues } from '../../../interfaces/insurance'
 import {
   storeInsurance,
   updateInsurance,
 } from '../../../services/requests/insurance'
-import { useEffect } from 'react'
+import { setFieldErrors } from '../../../utils/helpers/errors'
+import { Button, Form } from './styles'
+import { Input } from '../../../components/UI/Input'
+import { IInsurance, IInsuranceFormValues } from '../../../interfaces/insurance'
 
 interface IInsuranceDrawerProps {
   isVisible: boolean
@@ -35,12 +36,24 @@ export const InsuranceDrawer = ({
     control,
     handleSubmit,
     reset,
+    setError,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<IInsuranceFormValues>({
     resolver: yupResolver(insuranceSchema),
     shouldUnregister: true,
     mode: 'onBlur',
   })
+  const watchedName = watch('name', data?.name || '')
+  const [currentName, setCurrentName] = useState(data?.name || '')
+
+  const nameHasChanged = () => {
+    if (type === 'update') {
+      return currentName !== watchedName
+    }
+
+    return true
+  }
 
   const closeDrawer = () => {
     reset()
@@ -54,8 +67,7 @@ export const InsuranceDrawer = ({
         : await updateInsurance(data?.id || 0, { ...values })
 
     if (response.error) {
-      /** TO DO: handle errors properly... */
-      notification.error({ message: response.error.message })
+      setFieldErrors(setError, response.error)
       return
     }
 
@@ -67,6 +79,22 @@ export const InsuranceDrawer = ({
     })
     closeDrawer()
     fetchInsurances()
+  }
+
+  const getButtonTitle = () => {
+    if (isSubmitting) {
+      return 'Aguarde. Salvando dados do convênio...'
+    }
+
+    if (type === 'create') {
+      return 'Clique para cadastrar este novo convênio'
+    }
+
+    if (!nameHasChanged()) {
+      return 'Faça mudanças no nome do convênio para salvar as informações'
+    }
+
+    return 'Clique para atualizar os dados deste convênio'
   }
 
   const getButtonValue = () => {
@@ -83,6 +111,7 @@ export const InsuranceDrawer = ({
 
   useEffect(() => {
     reset({ name: data?.name || '' })
+    setCurrentName(data?.name || '')
   }, [data])
 
   return (
@@ -113,13 +142,9 @@ export const InsuranceDrawer = ({
         <Row>
           <Col span={24}>
             <Button
-              disabled={isSubmitting}
+              disabled={isSubmitting || !nameHasChanged()}
               type="submit"
-              title={
-                type === 'create'
-                  ? 'Clique para cadastrar este novo convênio'
-                  : 'Clique para atualizar os dados deste convênio'
-              }>
+              title={getButtonTitle()}>
               {getButtonValue()}
             </Button>
           </Col>

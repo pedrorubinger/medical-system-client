@@ -56,10 +56,6 @@ export const Specialties = (): JSX.Element => {
 
       const response = await fetchSpecialties(params)
 
-      if (response.error) {
-        notification.error({ message: response.error.message })
-      }
-
       if (response.data) {
         const specialties = response.data.data
 

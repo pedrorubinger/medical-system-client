@@ -64,7 +64,6 @@ export const SetPassword = (): JSX.Element => {
 
     if (response.error) {
       /** TO DO: Implement error validation... (status 400) */
-      notification.error({ message: defaultErrorMessage })
       return
     }
 

@@ -12,6 +12,7 @@ import { Input } from '../../components/UI/Input'
 import { RootState } from '../../store'
 import { formatCPF } from '../../utils/helpers/formatters'
 import { updateUser } from '../../services/requests/user'
+import { setFieldErrors } from '../../utils/helpers/errors'
 
 interface IMyAccountFormValues {
   name: string
@@ -61,6 +62,7 @@ export const MyAccount = (): JSX.Element => {
     control,
     watch,
     handleSubmit,
+    setError,
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<IMyAccountFormValues>({
@@ -72,8 +74,6 @@ export const MyAccount = (): JSX.Element => {
   const watchedChangePassword = watch('change_password')
 
   const onSubmit = async (values: IMyAccountFormValues) => {
-    console.log('submitted:', values)
-
     const response = await updateUser({
       id: user.data.id,
       cpf: values.cpf !== user.data.cpf ? values.cpf : undefined,
@@ -84,13 +84,13 @@ export const MyAccount = (): JSX.Element => {
       new_password: values.change_password ? values.new_password : undefined,
     })
 
-    if (response.error) {
-      notification.error({ message: response.error.message })
-    } else if (response.user) {
+    if (response.user) {
       dispatch(Creators.setUser(response.user))
       notification.success({
         message: 'Seus dados foram atualizados com sucesso!',
       })
+    } else if (response.error) {
+      setFieldErrors(setError, response.error)
     }
 
     setValue('password', '')

@@ -107,7 +107,6 @@ export const Users = (): JSX.Element => {
       fetchUsersAsync(initialFetchParams)
     } else if (response.error) {
       setIsDeleting(false)
-      notification.error({ message: response.error.message })
     }
   }
 
