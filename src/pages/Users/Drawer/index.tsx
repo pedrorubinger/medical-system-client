@@ -33,7 +33,10 @@ const userSchema = Yup.object().shape({
   phone: Yup.string().required('Por favor, insira um número de telefone!'),
   is_admin: Yup.boolean(),
   role: Yup.object().required('Por favor, selecione uma função!'),
-  crm_document: Yup.string().required('Por favor, insira o número do CRM!'),
+  crm_document: Yup.string().when('role.value', {
+    is: 'doctor',
+    then: Yup.string().required('Por favor, insira o número do CRM!'),
+  }),
 })
 
 interface ISelectOption {
