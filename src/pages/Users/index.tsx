@@ -18,11 +18,16 @@ import { TableActions } from '../../components/UI/TableActions'
 import { DeletionModal } from './DeletionModal'
 import { RootState } from '../../store'
 import { FilterValue } from 'antd/lib/table/interface'
+import { UserDetailsModal } from './UserDetails'
 
 interface IDeletionModalProps {
   isVisible: boolean
   userName: string
   onOk: () => void
+}
+
+interface IUserDetailsModal {
+  data: IUser
 }
 
 interface IFilters {
@@ -47,6 +52,8 @@ export const Users = (): JSX.Element => {
   const [records, setRecords] = useState<IUser[]>([])
   const [fetching, setFetching] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [userDetailsModal, setUserDetailsModal] =
+    useState<IUserDetailsModal | null>(null)
   const [deletionModal, setDeletionModal] =
     useState<IDeletionModalProps | null>(null)
   const [drawer, setDrawer] = useState(false)
@@ -175,6 +182,11 @@ export const Users = (): JSX.Element => {
         <TableActions
           options={[
             {
+              id: 'info',
+              overlay: 'Clique para ver detalhes deste usuário',
+              onClick: () => setUserDetailsModal({ data: user }),
+            },
+            {
               id: 'delete',
               overlay: user.is_admin
                 ? 'Não é possível excluir este usuário pois ele também é um administrador'
@@ -203,6 +215,11 @@ export const Users = (): JSX.Element => {
         isVisible={drawer}
         onClose={() => setDrawer(false)}
         fetchUsers={() => fetchUsersAsync(initialFetchParams)}
+      />
+      <UserDetailsModal
+        isVisible={!!userDetailsModal}
+        data={userDetailsModal?.data}
+        onCancel={() => setUserDetailsModal(null)}
       />
       <DeletionModal
         isVisible={deletionModal?.isVisible || false}

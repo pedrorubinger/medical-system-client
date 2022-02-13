@@ -44,6 +44,7 @@ const accountSchema = Yup.object().shape({
   }),
 })
 
+/** TO DO: Implement possibility to update CRM when user is a doc... */
 export const MyAccount = (): JSX.Element => {
   const dispatch = useDispatch()
   const user = useSelector((state: RootState) => state.AuthReducer)

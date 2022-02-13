@@ -1,3 +1,4 @@
+import { IDoctor } from './doctor'
 import { TRole } from './roles'
 
 export interface IUser {
@@ -9,6 +10,7 @@ export interface IUser {
   is_admin: number | boolean
   role: TRole
   reset_password_token: string | null
+  doctor?: IDoctor
   created_at: string
   updated_at: string
 }

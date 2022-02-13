@@ -1,10 +1,10 @@
 import { Tooltip } from 'antd'
 import { IconType } from 'react-icons'
-import { FiCheckCircle, FiEdit, FiTrash } from 'react-icons/fi'
+import { FiCheckCircle, FiEdit, FiInfo, FiTrash } from 'react-icons/fi'
 
 import { Container, Item } from './styles'
 
-type TTableAction = 'check' | 'edit' | 'delete'
+type TTableAction = 'check' | 'edit' | 'delete' | 'info'
 
 interface ITableActionsOption {
   onClick: React.MouseEventHandler<HTMLDivElement>
@@ -28,8 +28,9 @@ interface IIcon {
 
 const Icons: IIcon[] = [
   { id: 'check', icon: FiCheckCircle, color: 'green' },
-  { id: 'edit', icon: FiEdit, color: 'orange' },
   { id: 'delete', icon: FiTrash, color: 'red' },
+  { id: 'edit', icon: FiEdit, color: 'orange' },
+  { id: 'info', icon: FiInfo, color: '#4074e5' },
 ]
 
 export const TableActions = ({ options }: ITableActionsProps) => {
