@@ -11,6 +11,7 @@ import { TRole } from '../../../interfaces/roles'
 import { Button, CheckboxRow, Form, InfoMessage } from './styles'
 import { Input } from '../../../components/UI/Input'
 import { InfoTooltip } from '../../../components/UI/InfoTooltip'
+import { setFieldErrors } from '../../../utils/helpers/errors'
 
 interface IUsersDrawerProps {
   isVisible: boolean
@@ -91,8 +92,7 @@ export const UsersDrawer = ({
     const response = await storeUser({ ...values, role: values.role.value })
 
     if (response.error) {
-      /** TO DO: handle errors properly... */
-      notification.error({ message: response.error.message })
+      setFieldErrors(setError, response.error)
       return
     }
 

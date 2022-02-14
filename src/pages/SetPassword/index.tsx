@@ -19,6 +19,7 @@ import {
 } from './styles'
 import { Input } from '../../components/UI/Input'
 import { ReadOnly } from '../../components/UI/ReadOnly'
+import { setFieldErrors } from '../../utils/helpers/errors'
 
 interface IFormValues {
   password: string
@@ -48,6 +49,7 @@ export const SetPassword = (): JSX.Element => {
   const {
     control,
     handleSubmit,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<IFormValues>({
     resolver: yupResolver(setPasswordSchema),
@@ -63,7 +65,7 @@ export const SetPassword = (): JSX.Element => {
     const response = await updateUser({ id: user.id, ...values })
 
     if (response.error) {
-      /** TO DO: Implement error validation... (status 400) */
+      setFieldErrors(setError, response.error)
       return
     }
 

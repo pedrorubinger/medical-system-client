@@ -35,11 +35,11 @@ export const handleError = (
     } else {
       errorObject.code = err.data?.code
       errorObject.message = err.data.message
-
-      if (notificate) {
-        notification.error({ message: errorObject.message })
-      }
     }
+  }
+
+  if (errStatus !== 422 && errStatus !== 400 && notificate) {
+    notification.error({ message: errorObject.message })
   }
 
   errorObject.status = errStatus
@@ -62,10 +62,12 @@ export function setFieldErrors<T>(
     return null
   }
 
-  error.validation.forEach((err) => {
-    setError(err.field as unknown as T, {
-      type: 'manual',
-      message: err.message,
+  if (error.status === 422 || error.status === 400) {
+    error.validation.forEach((err) => {
+      setError(err.field as unknown as T, {
+        type: 'manual',
+        message: err.message,
+      })
     })
-  })
+  }
 }

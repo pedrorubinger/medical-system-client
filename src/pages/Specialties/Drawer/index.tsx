@@ -11,6 +11,7 @@ import {
   storeSpecialty,
   updateSpecialty,
 } from '../../../services/requests/specialty'
+import { setFieldErrors } from '../../../utils/helpers/errors'
 
 interface ISpecialtyDrawerProps {
   isVisible: boolean
@@ -35,6 +36,7 @@ export const SpecialtyDrawer = ({
     control,
     handleSubmit,
     reset,
+    setError,
     watch,
     formState: { errors, isSubmitting },
   } = useForm<ISpecialtyFormValues>({
@@ -65,7 +67,7 @@ export const SpecialtyDrawer = ({
         : await updateSpecialty(data?.id || 0, { ...values })
 
     if (response.error) {
-      /** TO DO: handle errors properly... */
+      setFieldErrors(setError, response.error)
       return
     }
 
