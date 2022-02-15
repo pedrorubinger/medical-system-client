@@ -4,17 +4,14 @@ import { notification } from 'antd'
 import { ErrorOption } from 'react-hook-form'
 
 import { IBadRequestError, IError } from '../../interfaces/error'
-import { BAD_REQUEST_MESSAGES } from '../constants/errors'
-
-const INTERNAL_ERROR_MSG =
-  'Desculpe, um erro interno ocorreu. Por favor, tente novamente mais tarde ou contate-nos.'
+import { BAD_REQUEST_MESSAGES, ERROR_MESSAGES } from '../constants/errors'
 
 export const handleError = (
   err: AxiosError | any,
   notificate = true
 ): IError => {
   const errorObject: IError = {
-    message: INTERNAL_ERROR_MSG,
+    message: ERROR_MESSAGES.INTERNAL_ERROR_MSG,
     status: 500,
     code: 'INTERNAL_SERVER_ERROR',
   }
@@ -34,7 +31,10 @@ export const handleError = (
       errorObject.message = 'Alguns campos requerem sua atenção!'
     } else {
       errorObject.code = err.data?.code
-      errorObject.message = err.data.message || INTERNAL_ERROR_MSG
+      errorObject.message =
+        ERROR_MESSAGES?.[err.data?.code] ||
+        err.data?.message ||
+        ERROR_MESSAGES.INTERNAL_ERROR_MSG
     }
   }
 

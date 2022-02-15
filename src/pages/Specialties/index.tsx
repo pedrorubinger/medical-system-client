@@ -84,13 +84,11 @@ export const Specialties = (): JSX.Element => {
       notification.success({
         message: 'A especialidade foi excluída com sucesso!',
       })
-      setIsDeleting(false)
       setDeletionModal(null)
       fetchSpecialtiesAsync(initialFetchParams)
-    } else if (response.error) {
-      setIsDeleting(false)
-      notification.error({ message: response.error.message })
     }
+
+    setIsDeleting(false)
   }
 
   const columns = [

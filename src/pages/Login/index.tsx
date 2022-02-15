@@ -20,6 +20,7 @@ import { Creators } from '../../store/ducks/auth/reducer'
 import { Input } from '../../components/UI/Input'
 import { RootState } from '../../store'
 import { TopBar } from '../../components/UI/TopBar'
+import { handleError } from '../../utils/helpers/errors'
 
 interface IFormValues {
   email: string
@@ -53,13 +54,14 @@ export const Login = (): JSX.Element => {
 
   useEffect(() => {
     if (user.error) {
-      notification.error({ message: user.error.message })
-
       if (user.error.status === 400 || user.error.status === 422) {
         const message = 'Verifique suas credenciais!'
 
+        notification.error({ message: user.error.message })
         setError('email', { type: 'manual', message })
         setError('password', { type: 'manual', message })
+      } else {
+        handleError(user.error, true)
       }
     }
 
