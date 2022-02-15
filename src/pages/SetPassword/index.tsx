@@ -8,7 +8,7 @@ import * as Yup from 'yup'
 import { ProgressBar } from '../../components/UI/ProgressBar'
 import { TopBar } from '../../components/UI/TopBar'
 import { useQuery } from '../../hooks/useQuery'
-import { updateUser, validateResetToken } from '../../services/requests/user'
+import { setPassword, validateResetToken } from '../../services/requests/user'
 import {
   Button,
   ButtonContainer,
@@ -23,7 +23,7 @@ import { setFieldErrors } from '../../utils/helpers/errors'
 
 interface IFormValues {
   password: string
-  confirmed: string
+  password_confirmation: string
 }
 
 interface IValidateResetTokenUser {
@@ -35,7 +35,7 @@ const defaultErrorMessage =
   'Não foi possível gerar uma nova senha neste momento. Tente novamente mais tarde ou contate-nos!'
 const setPasswordSchema = Yup.object().shape({
   password: Yup.string().required('Por favor, insira sua senha!'),
-  confirmed: Yup.string()
+  password_confirmation: Yup.string()
     .required('Por favor, confirme sua senha!')
     .oneOf([Yup.ref('password'), null], 'As senhas estão diferentes!'),
 })
@@ -57,12 +57,15 @@ export const SetPassword = (): JSX.Element => {
   })
 
   const onSubmit = async (values: IFormValues) => {
-    if (!user) {
+    if (!user || !resetToken) {
       notification.error({ message: defaultErrorMessage })
       return
     }
 
-    const response = await updateUser({ id: user.id, ...values })
+    const response = await setPassword(user.id, {
+      ...values,
+      reset_password_token: resetToken,
+    })
 
     if (response.error) {
       setFieldErrors(setError, response.error)
@@ -140,7 +143,7 @@ export const SetPassword = (): JSX.Element => {
           <Row>
             <Col span={24}>
               <Controller
-                name="confirmed"
+                name="password_confirmation"
                 control={control}
                 defaultValue=""
                 render={({ field }) => (
@@ -148,7 +151,7 @@ export const SetPassword = (): JSX.Element => {
                     type="password"
                     label="Confirmar Senha"
                     placeholder="Repita sua senha"
-                    error={errors?.confirmed?.message}
+                    error={errors?.password_confirmation?.message}
                     required
                     {...field}
                   />

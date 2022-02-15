@@ -34,7 +34,7 @@ export const handleError = (
       errorObject.message = 'Alguns campos requerem sua atenção!'
     } else {
       errorObject.code = err.data?.code
-      errorObject.message = err.data.message
+      errorObject.message = err.data.message || INTERNAL_ERROR_MSG
     }
   }
 

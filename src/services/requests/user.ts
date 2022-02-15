@@ -66,6 +66,17 @@ interface IUpdateUserData {
   role?: TRole
 }
 
+interface ISetPasswordData {
+  reset_password_token: string
+  password: string
+  password_confirmation: string
+}
+
+interface ISetPasswordResponse {
+  success: boolean
+  error: IError | null
+}
+
 export const fetchUsers = async (
   params: IFetchUsersParams
 ): Promise<IFetchUsersResponse> => {
@@ -140,5 +151,20 @@ export const validateResetToken = async (
     const error = handleError(err)
 
     return { user: null, error }
+  }
+}
+
+export const setPassword = async (
+  id: number,
+  data: ISetPasswordData
+): Promise<ISetPasswordResponse> => {
+  try {
+    await api.put(`/user/password/set_password/${id}`, data)
+
+    return { success: true, error: null }
+  } catch (err) {
+    const error = handleError(err)
+
+    return { success: false, error }
   }
 }
