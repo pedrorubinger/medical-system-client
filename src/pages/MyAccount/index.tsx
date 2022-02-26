@@ -13,6 +13,7 @@ import { RootState } from '../../store'
 import { formatCPF } from '../../utils/helpers/formatters'
 import { updateUser } from '../../services/requests/user'
 import { setFieldErrors } from '../../utils/helpers/errors'
+import { ProfessionalData } from './ProfessionalData'
 
 interface IMyAccountFormValues {
   name: string
@@ -45,7 +46,6 @@ const accountSchema = Yup.object().shape({
   }),
 })
 
-/** TO DO: Implement possibility to update CRM when user is a doc... */
 export const MyAccount = (): JSX.Element => {
   const dispatch = useDispatch()
   const user = useSelector((state: RootState) => state.AuthReducer)
@@ -87,7 +87,7 @@ export const MyAccount = (): JSX.Element => {
     if (response.user) {
       dispatch(Creators.setUser(response.user))
       notification.success({
-        message: 'Seus dados foram atualizados com sucesso!',
+        message: 'Seus dados pessoais foram atualizados com sucesso!',
       })
     } else if (response.error) {
       setFieldErrors(setError, response.error)
@@ -99,144 +99,148 @@ export const MyAccount = (): JSX.Element => {
   }
 
   return (
-    <PageContent>
-      <TableHeader title="Minha Conta" />
-      <Form onSubmit={handleSubmit(onSubmit)}>
-        <Row gutter={16}>
-          <Col sm={12} xs={24}>
-            <Controller
-              name="name"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  label="Nome"
-                  placeholder="Digite o seu nome completo"
-                  error={errors?.name?.message}
-                  required
-                  autoFocus
-                  {...field}
-                />
-              )}
-            />
-          </Col>
-
-          <Col sm={12} xs={24}>
-            <Controller
-              name="email"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  label="E-mail"
-                  placeholder="Digite o seu e-mail"
-                  error={errors?.email?.message}
-                  required
-                  {...field}
-                />
-              )}
-            />
-          </Col>
-        </Row>
-
-        <Row gutter={16}>
-          <Col sm={12} xs={24}>
-            <Controller
-              name="cpf"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  label="CPF"
-                  placeholder="Digite o CPF"
-                  error={errors?.cpf?.message}
-                  required
-                  {...field}
-                  onChange={(e) => setValue('cpf', formatCPF(e.target.value))}
-                />
-              )}
-            />
-          </Col>
-
-          <Col sm={12} xs={24}>
-            <Controller
-              name="phone"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  label="Telefone"
-                  placeholder="Digite o seu telefone"
-                  error={errors?.phone?.message}
-                  required
-                  {...field}
-                />
-              )}
-            />
-          </Col>
-        </Row>
-
-        <Row gutter={16}>
-          <Col sm={12} xs={24}>
-            <Controller
-              name="password"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  type="password"
-                  label="Senha Atual"
-                  placeholder="Digite sua senha atual"
-                  error={errors?.password?.message}
-                  required
-                  {...field}
-                />
-              )}
-            />
-          </Col>
-
-          {!!watchedChangePassword && (
+    <>
+      <PageContent>
+        <TableHeader title="Dados Pessoais" margin="0 0 20px 0" />
+        <Form onSubmit={handleSubmit(onSubmit)}>
+          <Row gutter={16}>
             <Col sm={12} xs={24}>
               <Controller
-                name="new_password"
+                name="name"
                 control={control}
                 render={({ field }) => (
                   <Input
-                    type="password"
-                    label="Nova Senha"
-                    placeholder="Digite sua nova senha"
-                    error={errors?.new_password?.message}
+                    label="Nome"
+                    placeholder="Digite o seu nome completo"
+                    error={errors?.name?.message}
+                    required
+                    autoFocus
+                    {...field}
+                  />
+                )}
+              />
+            </Col>
+
+            <Col sm={12} xs={24}>
+              <Controller
+                name="email"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    label="E-mail"
+                    placeholder="Digite o seu e-mail"
+                    error={errors?.email?.message}
                     required
                     {...field}
                   />
                 )}
               />
             </Col>
-          )}
-        </Row>
+          </Row>
 
-        <CheckboxRow>
-          <Col>
-            <Controller
-              name="change_password"
-              control={control}
-              render={({ field }) => (
-                <Checkbox
-                  onChange={field.onChange}
-                  value={field.value}
-                  checked={field.value}>
-                  Alterar senha
-                </Checkbox>
-              )}
-            />
-          </Col>
-        </CheckboxRow>
+          <Row gutter={16}>
+            <Col sm={12} xs={24}>
+              <Controller
+                name="cpf"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    label="CPF"
+                    placeholder="Digite o CPF"
+                    error={errors?.cpf?.message}
+                    required
+                    {...field}
+                    onChange={(e) => setValue('cpf', formatCPF(e.target.value))}
+                  />
+                )}
+              />
+            </Col>
 
-        <Row>
-          <Col span={24}>
-            <ButtonContainer>
-              <Button disabled={isSubmitting} type="submit">
-                {isSubmitting ? 'Salvando...' : 'Salvar Dados'}
-              </Button>
-            </ButtonContainer>
-          </Col>
-        </Row>
-      </Form>
-    </PageContent>
+            <Col sm={12} xs={24}>
+              <Controller
+                name="phone"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    label="Telefone"
+                    placeholder="Digite o seu telefone"
+                    error={errors?.phone?.message}
+                    required
+                    {...field}
+                  />
+                )}
+              />
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col sm={12} xs={24}>
+              <Controller
+                name="password"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    type="password"
+                    label="Senha Atual"
+                    placeholder="Digite sua senha atual"
+                    error={errors?.password?.message}
+                    required
+                    {...field}
+                  />
+                )}
+              />
+            </Col>
+
+            {!!watchedChangePassword && (
+              <Col sm={12} xs={24}>
+                <Controller
+                  name="new_password"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      type="password"
+                      label="Nova Senha"
+                      placeholder="Digite sua nova senha"
+                      error={errors?.new_password?.message}
+                      required
+                      {...field}
+                    />
+                  )}
+                />
+              </Col>
+            )}
+          </Row>
+
+          <CheckboxRow>
+            <Col>
+              <Controller
+                name="change_password"
+                control={control}
+                render={({ field }) => (
+                  <Checkbox
+                    onChange={field.onChange}
+                    value={field.value}
+                    checked={field.value}>
+                    Alterar senha
+                  </Checkbox>
+                )}
+              />
+            </Col>
+          </CheckboxRow>
+
+          <Row>
+            <Col span={24}>
+              <ButtonContainer>
+                <Button disabled={isSubmitting} type="submit">
+                  {isSubmitting ? 'Salvando...' : 'Salvar Dados'}
+                </Button>
+              </ButtonContainer>
+            </Col>
+          </Row>
+        </Form>
+      </PageContent>
+
+      {user.data.role === 'doctor' && <ProfessionalData user={user.data} />}
+    </>
   )
 }

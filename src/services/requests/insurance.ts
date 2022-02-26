@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AxiosResponse } from 'axios'
 
 import { api } from '../api'
@@ -16,7 +17,8 @@ interface IFetchInsurancesAPIResponse {
 }
 
 interface IFetchInsurancesResponse {
-  data: IFetchInsurancesAPIResponse | null
+  meta: IPaginationMeta | null
+  data: IInsurance[] | null
   error: IError | null
 }
 
@@ -34,18 +36,26 @@ interface IDeleteInsuranceAPIResponse {
   success: boolean
 }
 
+const isInstance = (data: any): data is IFetchInsurancesAPIResponse => {
+  return 'meta' in data
+}
+
 export const fetchInsurances = async (
-  params: IFetchInsurancesParams
+  params?: IFetchInsurancesParams
 ): Promise<IFetchInsurancesResponse> => {
   try {
-    const response: AxiosResponse<IFetchInsurancesAPIResponse> = await api.get(
-      '/insurance',
-      { params: { ...params } }
-    )
+    const response: AxiosResponse<IFetchInsurancesAPIResponse | IInsurance[]> =
+      await api.get('/insurance', { params: { ...params } })
 
-    return { data: response.data, error: null }
+    return isInstance(response.data)
+      ? {
+          data: response.data.data,
+          meta: response.data.meta || null,
+          error: null,
+        }
+      : { data: response.data, error: null, meta: null }
   } catch (err) {
-    return { data: null, error: handleError(err) }
+    return { data: null, meta: null, error: handleError(err) }
   }
 }
 

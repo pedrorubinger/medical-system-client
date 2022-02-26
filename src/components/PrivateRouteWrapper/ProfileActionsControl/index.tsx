@@ -33,7 +33,7 @@ export const ProfileActionsControl = () => {
     <Menu>
       <Menu.Item key="0">
         <Link rel="noopener noreferrer" to="/my-account">
-          Minha Conta
+          Meus Dados
         </Link>
       </Menu.Item>
 

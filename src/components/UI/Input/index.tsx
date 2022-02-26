@@ -13,6 +13,7 @@ interface ISelectOption {
 interface IInputProps {
   name: string
   isSelect?: boolean | undefined
+  isMulti?: boolean | undefined
   autoFocus?: boolean | undefined
   /** @default [] */
   options?: ISelectOption[]
@@ -33,6 +34,7 @@ export const Input = React.forwardRef(
   (
     {
       isSelect,
+      isMulti = false,
       options = [],
       name,
       label,
@@ -91,6 +93,7 @@ export const Input = React.forwardRef(
             name={name}
             value={value}
             onChange={selectOnChange}
+            isMulti={isMulti}
             {...rest}
           />
           {!!error && <ErrorMessage>{error}</ErrorMessage>}

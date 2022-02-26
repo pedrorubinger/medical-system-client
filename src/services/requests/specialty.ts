@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AxiosResponse } from 'axios'
 
 import { api } from '../api'
@@ -18,8 +19,9 @@ interface IFetchSpecialtiesAPIResponse {
 }
 
 interface IFetchSpecialtiesResponse {
-  data: IFetchSpecialtiesAPIResponse | null
+  data: ISpecialty[] | null
   error: IError | null
+  meta: IPaginationMeta | null
 }
 
 interface IStoreOrUpdateSpecialtyResponse {
@@ -36,18 +38,26 @@ interface IDeleteSpecialtyAPIResponse {
   success: boolean
 }
 
+const isInstance = (data: any): data is IFetchSpecialtiesAPIResponse => {
+  return 'meta' in data
+}
+
 export const fetchSpecialties = async (
-  params: IFetchSpecialtiesParams
+  params?: IFetchSpecialtiesParams
 ): Promise<IFetchSpecialtiesResponse> => {
   try {
-    const response: AxiosResponse<IFetchSpecialtiesAPIResponse> = await api.get(
-      '/specialty',
-      { params: { ...params } }
-    )
+    const response: AxiosResponse<IFetchSpecialtiesAPIResponse | ISpecialty[]> =
+      await api.get('/specialty', { params: { ...params } })
 
-    return { data: response.data, error: null }
+    return isInstance(response.data)
+      ? {
+          data: response.data.data,
+          meta: response.data.meta || null,
+          error: null,
+        }
+      : { data: response.data, error: null, meta: null }
   } catch (err) {
-    return { data: null, error: handleError(err) }
+    return { data: null, meta: null, error: handleError(err) }
   }
 }
 

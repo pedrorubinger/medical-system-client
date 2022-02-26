@@ -57,15 +57,15 @@ export const Specialties = (): JSX.Element => {
       const response = await fetchSpecialties(params)
 
       if (response.data) {
-        const specialties = response.data.data
+        const specialties = response.data
 
         setRecords(specialties)
 
-        if (response.data.meta) {
+        if (response.meta) {
           setPagination((prevPagination) => ({
             ...prevPagination,
-            current: response?.data?.meta?.current_page,
-            total: response?.data?.meta?.total,
+            current: response?.meta?.current_page,
+            total: response?.meta?.total,
           }))
         }
       }

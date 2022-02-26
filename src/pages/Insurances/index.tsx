@@ -57,15 +57,15 @@ export const Insurances = (): JSX.Element => {
       const response = await fetchInsurances(params)
 
       if (response.data) {
-        const insurances = response.data.data
+        const insurances = response.data
 
         setRecords(insurances)
 
-        if (response.data.meta) {
+        if (response.meta) {
           setPagination((prevPagination) => ({
             ...prevPagination,
-            current: response?.data?.meta?.current_page,
-            total: response?.data?.meta?.total,
+            current: response.meta?.current_page,
+            total: response.meta?.total,
           }))
         }
       }

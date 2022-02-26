@@ -14,16 +14,18 @@ interface INewRecordButtonProps {
 
 interface ITableHeaderProps {
   title: string
-  newRecordButton?: INewRecordButtonProps
+  newRecordButton?: INewRecordButtonProps | undefined
+  margin?: string | undefined
 }
 
 export const TableHeader = ({
   title,
+  margin,
   newRecordButton,
 }: ITableHeaderProps): JSX.Element => {
   return (
     <TableHeaderContainer>
-      <Title>{title}</Title>
+      <Title margin={margin}>{title}</Title>
       {!!newRecordButton?.visible && (
         <Button
           disabled={newRecordButton?.disabled}
