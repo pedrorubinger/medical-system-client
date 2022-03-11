@@ -3,6 +3,7 @@ import { TRole } from './roles'
 
 export interface IUser {
   id: number
+  tenant_id: number
   name: string
   email: string
   cpf: string
