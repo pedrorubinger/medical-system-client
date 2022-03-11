@@ -76,7 +76,10 @@ export const MyAccount = (): JSX.Element => {
   const onSubmit = async (values: IMyAccountFormValues) => {
     const response = await updateUser({
       id: user.data.id,
-      cpf: values.cpf !== user.data.cpf ? values.cpf : undefined,
+      cpf:
+        values.cpf !== user.data.cpf
+          ? values.cpf?.replace(/\D/g, '')
+          : undefined,
       email: values.email !== user.data.email ? values.email : undefined,
       name: values.name,
       password: values.password,

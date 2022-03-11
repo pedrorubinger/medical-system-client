@@ -15,7 +15,8 @@ import { fetchSpecialties } from '../../../services/requests/specialty'
 import { IInsurance } from '../../../interfaces/insurance'
 import { ISpecialty } from '../../../interfaces/specialty'
 import { IError } from '../../../interfaces/error'
-
+import { updateDoctor } from '../../../services/requests/doctor'
+import { setFieldErrors } from '../../../utils/helpers/errors'
 interface ISelectOption {
   label: string
   value: number
@@ -57,7 +58,7 @@ export const ProfessionalData = ({ user }: IProfessionalDataProps) => {
   const {
     control,
     handleSubmit,
-    // setError,
+    setError,
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<IProfessionalDataFormValues>({
@@ -78,9 +79,31 @@ export const ProfessionalData = ({ user }: IProfessionalDataProps) => {
   const onSubmit = async (values: IProfessionalDataFormValues) => {
     console.log('submitted professional data:', values)
 
-    notification.success({
-      message: 'Os seus dados profissionais foram atualizados com sucesso!',
+    if (!user?.doctor) {
+      return null
+    }
+
+    const response = await updateDoctor({
+      id: user.doctor.id,
+      crm:
+        user.doctor.crm_document === values.crm_document
+          ? undefined
+          : values.crm_document,
+      specialties: values?.specialties?.length
+        ? values?.specialties?.map((specialty) => specialty.value)
+        : undefined,
+      // insurances: values?.insurances?.length
+      //   ? values?.insurances?.map((insurance) => insurance.value)
+      //   : undefined,
     })
+
+    if (response.doctor) {
+      notification.success({
+        message: 'Os seus dados profissionais foram atualizados com sucesso!',
+      })
+    } else if (response.error) {
+      setFieldErrors(setError, response.error)
+    }
   }
 
   useEffect(() => {
