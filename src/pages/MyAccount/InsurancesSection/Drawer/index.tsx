@@ -16,6 +16,7 @@ import {
 import { setFieldErrors } from '../../../../utils/helpers/errors'
 import { convertBrCurrencyToNumber } from '../../../../utils/helpers/formatters'
 import { IDoctorInsurance } from '../../../../interfaces/doctor'
+import { ReadOnly } from '../../../../components/UI/ReadOnly'
 
 interface ISelectOption {
   label: string
@@ -23,6 +24,7 @@ interface ISelectOption {
 }
 
 interface IData {
+  name: string
   price: string
   id: number
 }
@@ -219,6 +221,15 @@ export const AttachInsuranceDrawer = ({
                     {...field}
                   />
                 )}
+              />
+            </Col>
+          )}
+
+          {isEditting && (
+            <Col span={24}>
+              <ReadOnly
+                label="Convênio"
+                value={data?.name || 'Não Fornecido'}
               />
             </Col>
           )}

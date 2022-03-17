@@ -2,7 +2,7 @@ import styled from 'styled-components'
 
 export const FakeInput = styled.div`
   margin: 9px 0;
-  padding: 11px;
+  padding: 9px;
   padding-left: 10px;
   border-radius: 6px;
   width: 100%;

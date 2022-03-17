@@ -75,12 +75,11 @@ export const MyAccount = (): JSX.Element => {
   const watchedChangePassword = watch('change_password')
 
   const onSubmit = async (values: IMyAccountFormValues) => {
+    const cpfHasChanged =
+      values.cpf?.replace(/\D/g, '') !== user.data.cpf?.replace(/\D/g, '')
     const response = await updateUser({
       id: user.data.id,
-      cpf:
-        values.cpf !== user.data.cpf
-          ? values.cpf?.replace(/\D/g, '')
-          : undefined,
+      cpf: cpfHasChanged ? values.cpf?.replace(/\D/g, '') : undefined,
       email: values.email !== user.data.email ? values.email : undefined,
       name: values.name,
       password: values.password,

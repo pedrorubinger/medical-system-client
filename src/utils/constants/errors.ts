@@ -2,6 +2,7 @@ export const ERROR_MESSAGES: { [key: string]: string } = {
   INTERNAL_ERROR_MSG:
     'Desculpe, um erro interno ocorreu. Por favor, tente novamente mais tarde ou contate-nos.',
   INVALID_CREDENTIALS: 'Email ou senha inválidos!',
+  MUST_PROVIDE_VALID_CREDENTIALS: 'Você deve fornecer credenciais válidas!',
   DOCTOR_NOT_FOUND: 'Esse médico não foi encontrado!',
   INSURANCE_NOT_FOUND: 'Esse convênio não foi encontrado!',
   SPECIALTY_NOT_FOUND: 'Essa especialidade não foi encontrada!',
@@ -9,6 +10,8 @@ export const ERROR_MESSAGES: { [key: string]: string } = {
   TOKEN_INVALID_OR_HAS_EXPIRED: 'O token é inválido ou já expirou!',
   NOT_AUTHORIZED_TO_RESET_PASSWORD:
     'Você não está autorizado a resetar sua senha!',
+  USER_HAS_NO_PERMISSION_TO_ACCESS_RESOURCE:
+    'Você não tem permissão para acessar este recurso!',
 }
 
 export const BAD_REQUEST_MESSAGES: { [key: string]: string } = {

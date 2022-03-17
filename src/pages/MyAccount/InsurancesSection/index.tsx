@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react'
-import { Table } from 'antd'
+import { Table, Typography } from 'antd'
 import { useSelector } from 'react-redux'
 
 import { TableActions } from '../../../components/UI/TableActions'
 import { TableHeader } from '../../../components/UI/TableHeader'
 import { IDoctorInsurance } from '../../../interfaces/doctor'
-import { AttachInsuranceDrawer } from './Drawer'
-import { formatBrCurrency } from '../../../utils/helpers/formatters'
-import { RootState } from '../../../store'
-import { fetchInsurances } from '../../../services/requests/insurance'
-import { PageContent } from '../../../components/UI/PageContent'
-import { DeleteMyInsuranceModal as DeletionModal } from './DeletionModal'
 import { IInsurance } from '../../../interfaces/insurance'
+import { fetchInsurances } from '../../../services/requests/insurance'
+import { formatBrCurrency } from '../../../utils/helpers/formatters'
+import { PageContent } from '../../../components/UI/PageContent'
+import { RootState } from '../../../store'
+import { AttachInsuranceDrawer } from './Drawer'
+import { DeleteMyInsuranceModal as DeletionModal } from './DeletionModal'
 
 interface ISelectOption {
   label: string
@@ -20,6 +20,7 @@ interface ISelectOption {
 
 interface IData {
   id: number
+  name: string
   price: string
 }
 
@@ -87,6 +88,7 @@ export const InsurancesSection = () => {
                   type: 'update',
                   isVisible: true,
                   data: {
+                    name: insurance.name,
                     id: insurance.id,
                     price: formatBrCurrency(insurance.price),
                   },
@@ -153,20 +155,18 @@ export const InsurancesSection = () => {
     }
   }, [records])
 
-  if (errorOnFetchData) {
-    return (
-      <>
-        <h2>
-          Desculpe, mas não foi possível buscar os dados profissionais neste
-          momento. O seguinte erro ocorreu:
-        </h2>
-        <strong>{errorOnFetchData}</strong>
-      </>
-    )
-  }
+  const ErrorOnFetchData = (
+    <>
+      <h2>
+        Desculpe, mas não foi possível buscar os dados profissionais neste
+        momento. O seguinte erro ocorreu:
+      </h2>
+      <Typography.Text strong>{errorOnFetchData}</Typography.Text>
+    </>
+  )
 
-  return (
-    <PageContent margin="30px 0">
+  const Content = (
+    <>
       <AttachInsuranceDrawer
         isVisible={drawer?.isVisible || false}
         data={drawer?.data}
@@ -183,6 +183,26 @@ export const InsurancesSection = () => {
         onCancel={() => setDeletionModal(null)}
         setRecords={setRecords}
       />
+      <Table
+        rowKey="name"
+        scroll={{ x: true }}
+        columns={columns}
+        dataSource={records}
+        loading={isFetching}
+      />
+    </>
+  )
+
+  const renderContent = () => {
+    if (errorOnFetchData) {
+      return ErrorOnFetchData
+    }
+
+    return Content
+  }
+
+  return (
+    <PageContent margin="30px 0">
       <TableHeader
         title="Meus Convênios"
         newRecordButton={{
@@ -196,13 +216,7 @@ export const InsurancesSection = () => {
             setDrawer({ options, isVisible: true, type: 'create' }),
         }}
       />
-      <Table
-        rowKey="name"
-        scroll={{ x: true }}
-        columns={columns}
-        dataSource={records}
-        loading={isFetching}
-      />
+      {renderContent()}
     </PageContent>
   )
 }

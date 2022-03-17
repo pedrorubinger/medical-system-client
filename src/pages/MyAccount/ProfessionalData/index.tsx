@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from 'react'
-import { Col, notification, Row, Spin } from 'antd'
+import { Col, notification, Row, Spin, Typography } from 'antd'
 import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
@@ -123,7 +123,9 @@ export const ProfessionalData = ({ user }: IProfessionalDataProps) => {
         momento. O seguinte erro ocorreu:
       </h2>
       {httpErrors.map((item: IError, i: number) => (
-        <h3 key={i}>{item.message}</h3>
+        <h3 key={i}>
+          <Typography.Text strong>{item.message}</Typography.Text>
+        </h3>
       ))}
     </>
   )
