@@ -31,6 +31,7 @@ export const TableHeader = ({
           disabled={newRecordButton?.disabled}
           onClick={newRecordButton.onClick}
           color="new"
+          type="button"
           title={
             newRecordButton?.title || 'Clique para cadastrar um novo registro'
           }>

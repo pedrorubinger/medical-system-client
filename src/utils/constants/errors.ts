@@ -47,4 +47,7 @@ export const BAD_REQUEST_MESSAGES: { [key: string]: string } = {
   RESET_PASSWORD_TOKEN_IS_REQUIRED: 'Você deve fornecer o token!',
   NEW_PASSWORD_MAX_LENGTH_255:
     'A nova senha não pode ultrapassar 255 caracteres!',
+  MANAGE_DOCTOR_INSURANCE_IS_REQUIRED: 'Você deve informar o convênio!',
+  MANAGE_DOCTOR_INSURANCE_FLAG_IS_REQUIRED:
+    'Você deve informar se deseja remover ou adicionar um convênio à sua lista!',
 }

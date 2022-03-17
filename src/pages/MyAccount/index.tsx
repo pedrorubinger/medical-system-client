@@ -14,6 +14,7 @@ import { formatCPF } from '../../utils/helpers/formatters'
 import { updateUser } from '../../services/requests/user'
 import { setFieldErrors } from '../../utils/helpers/errors'
 import { ProfessionalData } from './ProfessionalData'
+import { InsurancesSection } from './InsurancesSection'
 
 interface IMyAccountFormValues {
   name: string
@@ -243,7 +244,12 @@ export const MyAccount = (): JSX.Element => {
         </Form>
       </PageContent>
 
-      {user.data.role === 'doctor' && <ProfessionalData user={user.data} />}
+      {user.data.role === 'doctor' && (
+        <>
+          <ProfessionalData user={user.data} />
+          <InsurancesSection />
+        </>
+      )}
     </>
   )
 }

@@ -5,18 +5,18 @@ import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
 
-import { PageContent } from '../../../components/UI/PageContent'
-import { TableHeader } from '../../../components/UI/TableHeader'
-import { Input } from '../../../components/UI/Input'
 import { Button, ButtonContainer, Form } from '../styles'
-import { IUser } from '../../../interfaces/user'
-import { fetchInsurances } from '../../../services/requests/insurance'
 import { fetchSpecialties } from '../../../services/requests/specialty'
+import { updateDoctor } from '../../../services/requests/doctor'
+import { setFieldErrors } from '../../../utils/helpers/errors'
+import { IUser } from '../../../interfaces/user'
 import { IInsurance } from '../../../interfaces/insurance'
 import { ISpecialty } from '../../../interfaces/specialty'
 import { IError } from '../../../interfaces/error'
-import { updateDoctor } from '../../../services/requests/doctor'
-import { setFieldErrors } from '../../../utils/helpers/errors'
+import { Input } from '../../../components/UI/Input'
+import { PageContent } from '../../../components/UI/PageContent'
+import { TableHeader } from '../../../components/UI/TableHeader'
+
 interface ISelectOption {
   label: string
   value: number
@@ -70,15 +70,10 @@ export const ProfessionalData = ({ user }: IProfessionalDataProps) => {
   const [specialtiesOptions, setSpecialtiesOptions] = useState<ISelectOption[]>(
     []
   )
-  const [insurancesOptions, setInsurancesOptions] = useState<ISelectOption[]>(
-    []
-  )
   const [fetchingData, setFetchingData] = useState(false)
   const [httpErrors, setHttpErrors] = useState<IError[]>([])
 
   const onSubmit = async (values: IProfessionalDataFormValues) => {
-    console.log('submitted professional data:', values)
-
     if (!user?.doctor) {
       return null
     }
@@ -92,9 +87,6 @@ export const ProfessionalData = ({ user }: IProfessionalDataProps) => {
       specialties: values?.specialties?.length
         ? values?.specialties?.map((specialty) => specialty.value)
         : undefined,
-      // insurances: values?.insurances?.length
-      //   ? values?.insurances?.map((insurance) => insurance.value)
-      //   : undefined,
     })
 
     if (response.doctor) {
@@ -110,31 +102,14 @@ export const ProfessionalData = ({ user }: IProfessionalDataProps) => {
     ;(async () => {
       setFetchingData(true)
 
-      const insurancesResponse = await fetchInsurances()
       const specialtiesResponse = await fetchSpecialties()
-      const errorHasOccurred =
-        insurancesResponse.error || specialtiesResponse.error
 
-      if (!errorHasOccurred) {
-        if (insurancesResponse?.data) {
-          setInsurancesOptions(formatOptions(insurancesResponse.data))
-        }
+      if (specialtiesResponse?.data) {
+        setSpecialtiesOptions(formatOptions(specialtiesResponse.data))
+      }
 
-        if (specialtiesResponse?.data) {
-          setSpecialtiesOptions(formatOptions(specialtiesResponse.data))
-        }
-      } else {
-        if (insurancesResponse.error && specialtiesResponse.error) {
-          setHttpErrors([insurancesResponse.error, specialtiesResponse.error])
-        }
-
-        if (insurancesResponse.error) {
-          setHttpErrors([insurancesResponse.error])
-        }
-
-        if (specialtiesResponse.error) {
-          setHttpErrors([specialtiesResponse.error])
-        }
+      if (specialtiesResponse.error) {
+        setHttpErrors([specialtiesResponse.error])
       }
 
       setFetchingData(false)
@@ -183,29 +158,6 @@ export const ProfessionalData = ({ user }: IProfessionalDataProps) => {
           />
         </Col>
 
-        <Col sm={12} xs={24}>
-          <Controller
-            name="insurances"
-            control={control}
-            render={({ field }) => (
-              <Input
-                label="Convênios"
-                placeholder="Selecionar Convênios"
-                error={errors?.insurances?.[0]?.value?.message}
-                options={insurancesOptions}
-                selectOnChange={(newValue: any) =>
-                  setValue('insurances', newValue)
-                }
-                isSelect
-                isMulti
-                {...field}
-              />
-            )}
-          />
-        </Col>
-      </Row>
-
-      <Row gutter={16}>
         <Col sm={12} xs={24}>
           <Controller
             name="crm_document"

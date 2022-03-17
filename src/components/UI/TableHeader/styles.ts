@@ -11,6 +11,7 @@ export const TableHeaderContainer = styled.div`
   margin-bottom: 15px;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
 `
 
 export const Title = styled.h3<ITitleProps>`

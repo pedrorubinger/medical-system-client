@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react'
+import CurrencyFormat from 'react-currency-format'
 import { ActionMeta } from 'react-select'
 
 import { Label } from '../Label'
+import { CurrencyInput } from './CurrencyInput'
 import { Container, ErrorMessage, Select, StyledInput } from './styles'
 
 interface ISelectOption {
@@ -13,7 +15,10 @@ interface ISelectOption {
 interface IInputProps {
   name: string
   isSelect?: boolean | undefined
+  /** @default false */
   isMulti?: boolean | undefined
+  /** @default false */
+  isCurrency?: boolean | undefined
   autoFocus?: boolean | undefined
   /** @default [] */
   options?: ISelectOption[]
@@ -35,6 +40,7 @@ export const Input = React.forwardRef(
     {
       isSelect,
       isMulti = false,
+      isCurrency = false,
       options = [],
       name,
       label,
@@ -97,6 +103,26 @@ export const Input = React.forwardRef(
             {...rest}
           />
           {!!error && <ErrorMessage>{error}</ErrorMessage>}
+        </Container>
+      )
+    }
+
+    if (isCurrency) {
+      return (
+        <Container>
+          {LabelElement}
+          <CurrencyFormat
+            name={name}
+            value={value}
+            autoFocus={autoFocus}
+            decimalSeparator=","
+            thousandSeparator="."
+            prefix={'R$ '}
+            placeholder="R$"
+            onChange={onChange}
+            customInput={CurrencyInput}
+            {...rest}
+          />
         </Container>
       )
     }
