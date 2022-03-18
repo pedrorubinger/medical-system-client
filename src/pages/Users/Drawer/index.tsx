@@ -89,7 +89,11 @@ export const UsersDrawer = ({
   }
 
   const onSubmit = async (values: IFormValues) => {
-    const response = await storeUser({ ...values, role: values.role.value })
+    const response = await storeUser({
+      ...values,
+      cpf: values.cpf.replaceAll(/\D/g, ''),
+      role: values.role.value,
+    })
 
     if (response.error) {
       setFieldErrors(setError, response.error)
