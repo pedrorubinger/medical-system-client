@@ -3,7 +3,7 @@ import { IPagination, IPaginationMeta, ISorting } from '../../interfaces/api'
 import { IError } from '../../interfaces/error'
 import { TRole } from '../../interfaces/roles'
 
-import { IUser, IUserFormValues } from '../../interfaces/user'
+import { IUser } from '../../interfaces/user'
 import { handleError } from '../../utils/helpers/errors'
 import { api } from '../api'
 
@@ -15,14 +15,23 @@ export interface IFetchUsersParams extends IPagination, Partial<ISorting> {
   filterOwn?: boolean | null
 }
 
-interface IFetchUsersAPIResponse {
+export interface IFetchUsersAPIResponse {
   meta?: IPaginationMeta
   data: IUser[]
 }
 
-interface IFetchUsersResponse {
+export interface IFetchUsersResponse {
   data: IFetchUsersAPIResponse | null
   error: IError | null
+}
+
+export interface IStoreUserData {
+  name: string
+  email: string
+  cpf: string
+  phone: string
+  is_admin: boolean
+  role: TRole
 }
 
 interface IStoreOrUpdateUserResponse {
@@ -95,7 +104,7 @@ export const fetchUsers = async (
 }
 
 export const storeUser = async (
-  data: IUserFormValues
+  data: IStoreUserData
 ): Promise<IStoreOrUpdateUserResponse> => {
   try {
     const response: AxiosResponse<IUser> = await api.post('/user', data)

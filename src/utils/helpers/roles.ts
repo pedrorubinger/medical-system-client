@@ -21,6 +21,12 @@ export const getTranslatedRole = (
     case 'admin':
       translatedRole = ''
       break
+    case 'master':
+      translatedRole = ''
+      break
+    case 'developer':
+      translatedRole = 'desenvolvedor(a)'
+      break
     default:
       translatedRole = ''
   }

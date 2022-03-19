@@ -12,6 +12,13 @@ export const ERROR_MESSAGES: { [key: string]: string } = {
     'Você não está autorizado a resetar sua senha!',
   USER_HAS_NO_PERMISSION_TO_ACCESS_RESOURCE:
     'Você não tem permissão para acessar este recurso!',
+  TENANT_NOT_FOUND: 'Essa clínica não foi encontrada!',
+  CANNOT_DELETE_MASTER_USER:
+    'Você não tem permissão para excluir esse usuário!',
+  MISSING_TENANT_ID:
+    'A requisição falhou pois não foi possível identificar a clínica!',
+  ACCESS_DENIED_TENANT_IS_INACTIVE:
+    'Você não está autorizado a realizar essa operação! Por favor, entre em contato conosco.',
 }
 
 export const BAD_REQUEST_MESSAGES: { [key: string]: string } = {
@@ -53,4 +60,9 @@ export const BAD_REQUEST_MESSAGES: { [key: string]: string } = {
   MANAGE_DOCTOR_INSURANCE_IS_REQUIRED: 'Você deve informar o convênio!',
   MANAGE_DOCTOR_INSURANCE_FLAG_IS_REQUIRED:
     'Você deve informar se deseja remover ou adicionar um convênio à sua lista!',
+  TENANT_NAME_IS_REQUIRED: 'Você deve informar o nome da clínica!',
+  TENANT_NAME_MAX_LENGTH_100:
+    'O nome da clínica não pode ultrapassar 100 caracteres!',
+  TENANT_IS_ACTIVE_IS_REQUIRED:
+    'Você deve informar se a clínica está ativa no sistema!',
 }

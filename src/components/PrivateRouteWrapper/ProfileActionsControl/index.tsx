@@ -58,6 +58,10 @@ export const ProfileActionsControl = () => {
       return `${role} / admin`
     }
 
+    if (data.is_master) {
+      return `${role} / master`
+    }
+
     return role
   }
 

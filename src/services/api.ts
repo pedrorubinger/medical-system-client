@@ -9,6 +9,7 @@ api.interceptors.request.use(async (config: AxiosRequestConfig) => {
   return {
     ...config,
     headers: {
+      ...config.headers,
       Authorization: `Bearer ${getToken()}`,
       ContentType: 'application/json',
     },

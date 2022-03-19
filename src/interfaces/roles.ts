@@ -1,1 +1,1 @@
-export type TRole = 'manager' | 'doctor' | 'admin'
+export type TRole = 'manager' | 'doctor' | 'admin' | 'developer' | 'master'

@@ -4,6 +4,7 @@ import {
   FiCalendar,
   FiClipboard,
   FiHome,
+  FiMonitor,
   FiScissors,
   FiUser,
   FiUsers,
@@ -119,7 +120,7 @@ export const PrivateRoutes: IPrivateRoute[] = [
   },
   {
     name: 'Pacientes',
-    permissions: ['*'],
+    permissions: ['manager', 'doctor'],
     path: '/patients',
     title: 'Clique para gerenciar os pacientes',
     show: true,
@@ -150,6 +151,45 @@ export const PrivateRoutes: IPrivateRoute[] = [
         element={
           <PrivateRouteWrapper>
             <Pages.Users />
+          </PrivateRouteWrapper>
+        }
+      />
+    ),
+  },
+  {
+    name: 'Clínicas',
+    permissions: ['developer'],
+    path: '/tenants',
+    title: 'Clique para gerenciar as clínicas',
+    show: true,
+    icon: <FiMonitor />,
+    route: (
+      <Route
+        key="tenants"
+        path="/tenants"
+        element={
+          <PrivateRouteWrapper>
+            <Pages.Tenants />
+          </PrivateRouteWrapper>
+        }
+      />
+    ),
+  },
+  {
+    name: 'Administradores',
+    permissions: ['master'],
+    path: '/admins',
+    title:
+      'Clique para gerenciar os administradores e desenvolvedores do sistema',
+    show: true,
+    icon: <FiUser />,
+    route: (
+      <Route
+        key="admins"
+        path="/admins"
+        element={
+          <PrivateRouteWrapper>
+            <Pages.Admins />
           </PrivateRouteWrapper>
         }
       />

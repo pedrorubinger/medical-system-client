@@ -199,7 +199,7 @@ export const Specialties = (): JSX.Element => {
             orderBy: sorting?.field?.toString(),
           })
         }}
-        scroll={{ x: true }}
+        scroll={{ x: !records?.length ? undefined : true }}
       />
     </PageContent>
   )

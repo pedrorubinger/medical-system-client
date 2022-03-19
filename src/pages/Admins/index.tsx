@@ -1,96 +1,63 @@
 import { useCallback, useEffect, useState } from 'react'
-import { notification, Table, TablePaginationConfig } from 'antd'
 import { useSelector } from 'react-redux'
+import { notification, Table, TablePaginationConfig } from 'antd'
 import { FilterValue } from 'antd/lib/table/interface'
 
 import { RootState } from '../../store'
-import {
-  deleteUser,
-  fetchUsers,
-  IFetchUsersParams,
-} from '../../services/requests/user'
+import { AdminsDrawer } from './Drawer'
 import { IUser } from '../../interfaces/user'
-import { TRole } from '../../interfaces/roles'
-import { getTranslatedRole } from '../../utils/helpers/roles'
 import { formatCPF } from '../../utils/helpers/formatters'
-import { getFilterProps } from '../../components/UI/FilterBox/Filter'
 import { PageContent } from '../../components/UI/PageContent'
 import { TableHeader } from '../../components/UI/TableHeader'
-import { UserDetailsModal } from '../../components/Forms/User/UserDetailsModal'
 import { TableActions } from '../../components/UI/TableActions'
-import { UsersDrawer } from './Drawer'
-import { DeletionModal } from './DeletionModal'
+import { getFilterProps } from '../../components/UI/FilterBox/Filter'
+import {
+  fetchTenantUsers,
+  IFetchTenantUserParams,
+} from '../../services/requests/tenantUser'
+import { DeleteTenantUserModal as DeletionModal } from './DeletionModal'
+import { TRole } from '../../interfaces/roles'
 
-interface IDeletionModalProps {
+interface IDeletionModal {
   isVisible: boolean
-  userName: string
-  onOk: () => void
+  id: number
+  name: string
 }
 
-interface IUserDetailsModal {
-  data: IUser
-}
-
-interface IFilters {
-  cpf: string | null
-  role: TRole | null
-  name: string | null
-  email: string | null
-}
-
-const initialPagination = { current: 1, pageSize: 5 }
-const initialFetchParams = {
-  page: initialPagination.current,
-  perPage: initialPagination.pageSize,
-}
-const initialFilters = { cpf: null, name: null, email: null, role: null }
-const roles = [
-  { value: 'doctor', text: 'Médico(a)' },
-  { value: 'manager', text: 'Gestor(a)' },
-]
-
-export const Users = (): JSX.Element => {
+export const Admins = () => {
+  const user = useSelector((state: RootState) => state.AuthReducer)
   const [records, setRecords] = useState<IUser[]>([])
   const [isFetching, setIsFetching] = useState(false)
-  const [isDeleting, setIsDeleting] = useState(false)
-  const [userDetailsModal, setUserDetailsModal] =
-    useState<IUserDetailsModal | null>(null)
-  const [deletionModal, setDeletionModal] =
-    useState<IDeletionModalProps | null>(null)
-  const [drawer, setDrawer] = useState(false)
+  const [drawerIsVisible, setDrawerIsVisible] = useState(false)
+  const [deletionModal, setDeletionModal] = useState<IDeletionModal | null>(
+    null
+  )
+  interface IFilters {
+    cpf: string | null
+    name: string | null
+    email: string | null
+    role: TRole | null
+  }
+
+  const initialPagination = { current: 1, pageSize: 5 }
+  const initialFetchParams = {
+    page: initialPagination.current,
+    perPage: initialPagination.pageSize,
+  }
+  const initialFilters = { cpf: null, name: null, email: null, role: null }
   const [pagination, setPagination] = useState<TablePaginationConfig>({
     ...initialPagination,
   })
   const [searchFilters, setSearchFilters] = useState<IFilters>(initialFilters)
-  const loggedUser = useSelector((state: RootState) => state.AuthReducer)
-  const ownId = loggedUser.data.id
+  const ownId = user.data.id
 
-  /**
-   * Validates if the specified user can be deleted by the user who's logged in based in system's business rules.
-   * @param userToBeDeleted User to be deleted.
-   * @returns true or false.
-   */
-  const canDeleteUser = (userToBeDeleted: IUser): boolean => {
-    if (userToBeDeleted.is_master) {
-      return false
-    }
-
-    if (loggedUser.data.is_master) {
-      return true
-    }
-
-    if (loggedUser.data.role !== 'developer' && userToBeDeleted.is_admin) {
-      return false
-    }
-
-    return true
-  }
-
-  const fetchUsersAsync = useCallback(
-    async (params: IFetchUsersParams) => {
+  const fetchAdminsAsync = useCallback(
+    async (params: IFetchTenantUserParams) => {
       setIsFetching(true)
 
-      const response = await fetchUsers(params)
+      const response = await fetchTenantUsers(params, {
+        ownerTenant: !!user?.data?.is_master,
+      })
 
       if (response.error) {
         notification.error({
@@ -116,21 +83,6 @@ export const Users = (): JSX.Element => {
     },
     [ownId]
   )
-
-  const onDeleteUser = async (id: number) => {
-    setIsDeleting(true)
-
-    const response = await deleteUser(id)
-
-    if (response.success) {
-      notification.success({ message: 'O usuário foi excluído com sucesso!' })
-      setIsDeleting(false)
-      setDeletionModal(null)
-      fetchUsersAsync(initialFetchParams)
-    } else if (response.error) {
-      setIsDeleting(false)
-    }
-  }
 
   const columns = [
     {
@@ -168,24 +120,6 @@ export const Users = (): JSX.Element => {
       filteredValue: searchFilters.email as unknown as FilterValue,
     },
     {
-      title: 'Função',
-      dataIndex: 'role',
-      key: 'role',
-      ...getFilterProps({
-        dataIndex: 'role',
-        inputOptions: {
-          filterType: 'selection',
-          selectionOptions: {
-            items: roles,
-          },
-        },
-        iconType: 'selection',
-      }),
-      filteredValue: searchFilters.role as unknown as FilterValue,
-      render: (role: TRole, record: IUser) =>
-        `${getTranslatedRole(role, true)}${record.is_admin ? ' / Admin' : ''}`,
-    },
-    {
       title: 'Telefone',
       dataIndex: 'phone',
       key: 'phone',
@@ -204,21 +138,16 @@ export const Users = (): JSX.Element => {
         <TableActions
           options={[
             {
-              id: 'info',
-              overlay: 'Clique para ver detalhes deste usuário',
-              onClick: () => setUserDetailsModal({ data: user }),
-            },
-            {
               id: 'delete',
-              overlay: !canDeleteUser(user)
-                ? 'Não é possível excluir este usuário pois ele também é um administrador'
-                : 'Clique para excluir este usuário',
-              disabled: !canDeleteUser(user),
+              overlay: user.is_master
+                ? 'Não é possível excluir este administrador'
+                : 'Clique para excluir este administrador',
+              disabled: !!user.is_admin,
               onClick: () =>
                 setDeletionModal({
                   isVisible: true,
-                  userName: user.name,
-                  onOk: () => onDeleteUser(user.id),
+                  name: user.name,
+                  id: user.id,
                 }),
             },
           ]}
@@ -228,33 +157,28 @@ export const Users = (): JSX.Element => {
   ]
 
   useEffect(() => {
-    fetchUsersAsync(initialFetchParams)
+    fetchAdminsAsync(initialFetchParams)
   }, [])
 
   return (
     <PageContent>
-      <UsersDrawer
-        isVisible={drawer}
-        onClose={() => setDrawer(false)}
-        fetchUsers={() => fetchUsersAsync(initialFetchParams)}
-      />
-      <UserDetailsModal
-        isVisible={!!userDetailsModal}
-        data={userDetailsModal?.data}
-        onCancel={() => setUserDetailsModal(null)}
-      />
       <DeletionModal
+        id={deletionModal?.id || -1}
         isVisible={deletionModal?.isVisible || false}
-        onCancel={() => setDeletionModal(null)}
-        onOk={deletionModal?.onOk}
-        loading={isDeleting}
-        userName={deletionModal?.userName || ''}
+        name={deletionModal?.name || ''}
+        onClose={() => setDeletionModal(null)}
+        refetchData={async () => await fetchAdminsAsync(initialFetchParams)}
+      />
+      <AdminsDrawer
+        isVisible={drawerIsVisible}
+        onClose={() => setDrawerIsVisible(false)}
+        fetchAdmins={async () => await fetchAdminsAsync(initialFetchParams)}
       />
       <TableHeader
-        title="Usuários"
+        title="Administradores"
         newRecordButton={{
           visible: true,
-          onClick: () => setDrawer(true),
+          onClick: () => setDrawerIsVisible(true),
         }}
       />
       <Table
@@ -270,9 +194,9 @@ export const Users = (): JSX.Element => {
           if (meta.action === 'filter') {
             search = {
               cpf: (filters?.cpf as unknown as string) || null,
-              role: (filters?.role as unknown as TRole) || null,
               email: (filters?.email as unknown as string) || null,
               name: (filters?.name as unknown as string) || null,
+              role: (filters?.role as unknown as TRole) || null,
             }
 
             setSearchFilters(search)
@@ -280,7 +204,7 @@ export const Users = (): JSX.Element => {
 
           const payload = { ...pagination, ...search }
 
-          await fetchUsersAsync({
+          await fetchAdminsAsync({
             ...payload,
             page: payload.current || initialPagination.current,
             perPage: payload.pageSize || initialPagination.pageSize,

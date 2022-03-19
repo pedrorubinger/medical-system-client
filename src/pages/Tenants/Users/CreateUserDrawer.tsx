@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 
 import { rolesOptions } from '../../../utils/helpers/roles'
-import { storeUser } from '../../../services/requests/user'
 import { setFieldErrors } from '../../../utils/helpers/errors'
 import {
   IUserFormValues,
@@ -11,18 +10,21 @@ import {
   userSchema,
 } from '../../../components/Forms/User'
 import { UserFormDescription } from '../../../components/Forms/User/UserFormDescription'
+import { storeTenantUser } from '../../../services/requests/tenantUser'
 
-interface IUsersDrawerProps {
+interface ICreateTenantUserDrawerProps {
   isVisible: boolean
+  tenantId: number
   onClose: () => void
   fetchUsers: () => void
 }
 
-export const UsersDrawer = ({
+export const CreateTenantUserDrawer = ({
+  tenantId,
   isVisible,
   onClose,
   fetchUsers,
-}: IUsersDrawerProps) => {
+}: ICreateTenantUserDrawerProps) => {
   const {
     control,
     handleSubmit,
@@ -52,10 +54,12 @@ export const UsersDrawer = ({
   }
 
   const onSubmit = async (values: IUserFormValues) => {
-    const response = await storeUser({
+    const response = await storeTenantUser({
       ...values,
       cpf: values.cpf.replaceAll(/\D/g, ''),
       role: values.role.value,
+      tenant_id: tenantId,
+      owner_tenant: false,
     })
 
     if (response.error) {

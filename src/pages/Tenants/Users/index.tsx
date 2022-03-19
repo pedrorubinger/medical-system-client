@@ -1,25 +1,32 @@
 import { useCallback, useEffect, useState } from 'react'
-import { notification, Table, TablePaginationConfig } from 'antd'
+import { Drawer, notification, Table, TablePaginationConfig } from 'antd'
 import { useSelector } from 'react-redux'
 import { FilterValue } from 'antd/lib/table/interface'
 
-import { RootState } from '../../store'
+import { RootState } from '../../../store'
+import { IUser } from '../../../interfaces/user'
+import { TRole } from '../../../interfaces/roles'
+import { getTranslatedRole } from '../../../utils/helpers/roles'
+import { getDrawerWidth } from '../../../utils/helpers/formatters'
+import { getFilterProps } from '../../../components/UI/FilterBox/Filter'
+import { TableHeader } from '../../../components/UI/TableHeader'
+import { UserDetailsModal } from '../../../components/Forms/User/UserDetailsModal'
+import { TableActions } from '../../../components/UI/TableActions'
+import { CreateTenantUserDrawer } from './CreateUserDrawer'
+import { DeletionModal } from '../../Users/DeletionModal'
 import {
-  deleteUser,
-  fetchUsers,
-  IFetchUsersParams,
-} from '../../services/requests/user'
-import { IUser } from '../../interfaces/user'
-import { TRole } from '../../interfaces/roles'
-import { getTranslatedRole } from '../../utils/helpers/roles'
-import { formatCPF } from '../../utils/helpers/formatters'
-import { getFilterProps } from '../../components/UI/FilterBox/Filter'
-import { PageContent } from '../../components/UI/PageContent'
-import { TableHeader } from '../../components/UI/TableHeader'
-import { UserDetailsModal } from '../../components/Forms/User/UserDetailsModal'
-import { TableActions } from '../../components/UI/TableActions'
-import { UsersDrawer } from './Drawer'
-import { DeletionModal } from './DeletionModal'
+  deleteTenantUser,
+  fetchTenantUsers,
+  IFetchTenantUserParams,
+} from '../../../services/requests/tenantUser'
+
+interface IListTenantUsersProps {
+  tenantId: number
+  /** @default false */
+  isVisible: boolean
+  tenantName: string
+  onClose: () => void
+}
 
 interface IDeletionModalProps {
   isVisible: boolean
@@ -49,7 +56,12 @@ const roles = [
   { value: 'manager', text: 'Gestor(a)' },
 ]
 
-export const Users = (): JSX.Element => {
+export const ListTenantUsers = ({
+  tenantId,
+  isVisible,
+  tenantName,
+  onClose,
+}: IListTenantUsersProps): JSX.Element => {
   const [records, setRecords] = useState<IUser[]>([])
   const [isFetching, setIsFetching] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -63,7 +75,6 @@ export const Users = (): JSX.Element => {
   })
   const [searchFilters, setSearchFilters] = useState<IFilters>(initialFilters)
   const loggedUser = useSelector((state: RootState) => state.AuthReducer)
-  const ownId = loggedUser.data.id
 
   /**
    * Validates if the specified user can be deleted by the user who's logged in based in system's business rules.
@@ -87,10 +98,13 @@ export const Users = (): JSX.Element => {
   }
 
   const fetchUsersAsync = useCallback(
-    async (params: IFetchUsersParams) => {
+    async (params: IFetchTenantUserParams) => {
       setIsFetching(true)
 
-      const response = await fetchUsers(params)
+      const response = await fetchTenantUsers(params, {
+        id: tenantId,
+        ownerTenant: false,
+      })
 
       if (response.error) {
         notification.error({
@@ -114,13 +128,16 @@ export const Users = (): JSX.Element => {
 
       setIsFetching(false)
     },
-    [ownId]
+    [tenantId]
   )
 
   const onDeleteUser = async (id: number) => {
     setIsDeleting(true)
 
-    const response = await deleteUser(id)
+    const response = await deleteTenantUser(id, {
+      id: tenantId,
+      ownerTenant: false,
+    })
 
     if (response.success) {
       notification.success({ message: 'O usuário foi excluído com sucesso!' })
@@ -143,18 +160,6 @@ export const Users = (): JSX.Element => {
         inputOptions: { placeholder: 'Nome' },
       }),
       filteredValue: searchFilters.name as unknown as FilterValue,
-    },
-    {
-      title: 'CPF',
-      dataIndex: 'cpf',
-      key: 'cpf',
-      sorter: (a: IUser, b: IUser) => a.cpf.localeCompare(b.cpf),
-      ...getFilterProps({
-        dataIndex: 'cpf',
-        inputOptions: { placeholder: 'CPF' },
-      }),
-      filteredValue: searchFilters.cpf as unknown as FilterValue,
-      render: (cpf: string) => formatCPF(cpf),
     },
     {
       title: 'E-mail',
@@ -186,17 +191,6 @@ export const Users = (): JSX.Element => {
         `${getTranslatedRole(role, true)}${record.is_admin ? ' / Admin' : ''}`,
     },
     {
-      title: 'Telefone',
-      dataIndex: 'phone',
-      key: 'phone',
-    },
-    {
-      title: 'Data de Cadastro',
-      dataIndex: 'created_at',
-      key: 'created_at',
-      render: (date: string) => new Date(date).toLocaleDateString(),
-    },
-    {
       title: 'Ações',
       dataIndex: 'actions',
       key: 'actions',
@@ -211,7 +205,7 @@ export const Users = (): JSX.Element => {
             {
               id: 'delete',
               overlay: !canDeleteUser(user)
-                ? 'Não é possível excluir este usuário pois ele também é um administrador'
+                ? 'Não é possível excluir este usuário'
                 : 'Clique para excluir este usuário',
               disabled: !canDeleteUser(user),
               onClick: () =>
@@ -228,15 +222,23 @@ export const Users = (): JSX.Element => {
   ]
 
   useEffect(() => {
-    fetchUsersAsync(initialFetchParams)
-  }, [])
+    if (isVisible) {
+      fetchUsersAsync(initialFetchParams)
+    }
+  }, [isVisible])
 
   return (
-    <PageContent>
-      <UsersDrawer
+    <Drawer
+      title={`Usuários da Clínica ${tenantName}`}
+      visible={isVisible}
+      width={getDrawerWidth()}
+      onClose={onClose}
+      destroyOnClose>
+      <CreateTenantUserDrawer
+        tenantId={tenantId}
         isVisible={drawer}
         onClose={() => setDrawer(false)}
-        fetchUsers={() => fetchUsersAsync(initialFetchParams)}
+        fetchUsers={async () => await fetchUsersAsync(initialFetchParams)}
       />
       <UserDetailsModal
         isVisible={!!userDetailsModal}
@@ -290,6 +292,6 @@ export const Users = (): JSX.Element => {
         }}
         scroll={{ x: !records?.length ? undefined : true }}
       />
-    </PageContent>
+    </Drawer>
   )
 }

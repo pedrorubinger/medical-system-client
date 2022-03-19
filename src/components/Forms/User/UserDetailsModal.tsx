@@ -1,8 +1,10 @@
 import { Col, Modal, Row } from 'antd'
 
-import { IUser } from '../../../interfaces/user'
 import { getTranslatedRole } from '../../../utils/helpers/roles'
-import { ReadOnly } from '../../../components/UI/ReadOnly'
+import { IUser } from '../../../interfaces/user'
+import { ReadOnly } from '../../UI/ReadOnly'
+import { IDoctorInsurance } from '../../../interfaces/doctor'
+import { ISpecialty } from '../../../interfaces/specialty'
 
 interface IUserDetailsModalProps {
   /** @default false */
@@ -11,7 +13,6 @@ interface IUserDetailsModalProps {
   onCancel: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void
 }
 
-/** TO DO: Implement doctors' specialties and insurances... */
 export const UserDetailsModal = ({
   isVisible = false,
   data,
@@ -22,6 +23,26 @@ export const UserDetailsModal = ({
   }
 
   const isDoctor = data.role === 'doctor'
+
+  /**
+   * Get a list of medical specialties or insurances properly formatted (string).
+   * @param array Array of doctor insurances or doctor specialties.
+   * @returns a string with listed insurances or specialties.
+   */
+  const getInsurancesOrSpecs = (
+    type: 'specialty' | 'insurance',
+    array?: IDoctorInsurance[] | ISpecialty[] | undefined
+  ): string => {
+    if (!array?.length) {
+      return type === 'specialty' ? 'Nenhuma especialidade' : 'Nenhum convênio'
+    }
+
+    const itemsName = array.map((item) => item.name)
+    const lastIndex = itemsName.length - 1
+    return `${itemsName.slice(0, lastIndex).join(', ')} e ${
+      itemsName[lastIndex]
+    }`
+  }
 
   return (
     <Modal
@@ -74,6 +95,26 @@ export const UserDetailsModal = ({
           </Col>
         )}
       </Row>
+
+      {isDoctor && (
+        <Row gutter={24}>
+          <Col span={12} sm={12} xs={24}>
+            <ReadOnly
+              label="Convênios"
+              value={getInsurancesOrSpecs('insurance', data?.doctor?.insurance)}
+              paperMode
+            />
+          </Col>
+
+          <Col span={12} sm={12} xs={24}>
+            <ReadOnly
+              label="Especialidades"
+              value={getInsurancesOrSpecs('specialty', data?.doctor?.specialty)}
+              paperMode
+            />
+          </Col>
+        </Row>
+      )}
 
       <Row gutter={24}>
         <Col span={12} sm={12} xs={24}>

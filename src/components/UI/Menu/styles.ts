@@ -38,7 +38,7 @@ export const LogoText = styled.h1`
   text-align: center;
   transition: 0.8s;
   font-family: 'Antic Slab', serif;
-  padding-bottom: 20px;
+  padding-bottom: 15px;
   border-bottom: 1px solid #6b6c6d;
   cursor: default;
 

@@ -1,3 +1,4 @@
+import { Admins } from './Admins'
 import { MyAccount } from './MyAccount'
 import { Schedule } from './Schedule'
 import { MySchedule } from './MySchedule'
@@ -11,8 +12,10 @@ import { Help } from './Help'
 import { Home } from './Home'
 import { Login } from './Login'
 import { RecoverPassword } from './RecoverPassword'
+import { Tenants } from './Tenants'
 
 export const Pages = {
+  Admins,
   MyAccount,
   Schedule,
   MySchedule,
@@ -26,4 +29,5 @@ export const Pages = {
   Home,
   Login,
   RecoverPassword,
+  Tenants,
 }

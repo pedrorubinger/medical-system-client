@@ -22,7 +22,7 @@ export const StyledButton = styled.button<IStyledButtonProps>`
   }
 
   &:disabled {
-    opacity: 0.6;
+    opacity: 0.5;
     cursor: default;
   }
 

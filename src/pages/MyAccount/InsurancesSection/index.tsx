@@ -185,7 +185,7 @@ export const InsurancesSection = () => {
       />
       <Table
         rowKey="name"
-        scroll={{ x: true }}
+        scroll={{ x: !records?.length ? undefined : true }}
         columns={columns}
         dataSource={records}
         loading={isFetching}
