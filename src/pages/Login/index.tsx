@@ -20,7 +20,6 @@ import { Creators } from '../../store/ducks/auth/reducer'
 import { Input } from '../../components/UI/Input'
 import { RootState } from '../../store'
 import { TopBar } from '../../components/UI/TopBar'
-import { handleError } from '../../utils/helpers/errors'
 
 interface IFormValues {
   email: string
@@ -60,8 +59,6 @@ export const Login = (): JSX.Element => {
         notification.error({ message: user.error.message })
         setError('email', { type: 'manual', message })
         setError('password', { type: 'manual', message })
-      } else {
-        handleError(user.error, true)
       }
     }
 

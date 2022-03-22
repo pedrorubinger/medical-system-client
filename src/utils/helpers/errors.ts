@@ -15,6 +15,7 @@ export const handleError = (
     status: 500,
     code: 'INTERNAL_SERVER_ERROR',
   }
+
   const errStatus = err?.data?.status || err?.status || 500
 
   if (err?.data) {
