@@ -17,6 +17,7 @@ import {
 } from '../../services/requests/tenantUser'
 import { DeleteTenantUserModal as DeletionModal } from './DeletionModal'
 import { TRole } from '../../interfaces/roles'
+import { UserDetailsModal } from '../../components/Forms/User/UserDetailsModal'
 
 interface IDeletionModal {
   isVisible: boolean
@@ -24,11 +25,17 @@ interface IDeletionModal {
   name: string
 }
 
+interface IUserDetailsModal {
+  data: IUser
+}
+
 export const Admins = () => {
   const user = useSelector((state: RootState) => state.AuthReducer)
   const [records, setRecords] = useState<IUser[]>([])
   const [isFetching, setIsFetching] = useState(false)
   const [drawerIsVisible, setDrawerIsVisible] = useState(false)
+  const [userDetailsModal, setUserDetailsModal] =
+    useState<IUserDetailsModal | null>(null)
   const [deletionModal, setDeletionModal] = useState<IDeletionModal | null>(
     null
   )
@@ -138,6 +145,11 @@ export const Admins = () => {
         <TableActions
           options={[
             {
+              id: 'info',
+              overlay: 'Clique para ver detalhes deste administrador',
+              onClick: () => setUserDetailsModal({ data: user }),
+            },
+            {
               id: 'delete',
               overlay: user.is_master
                 ? 'Não é possível excluir este administrador'
@@ -173,6 +185,11 @@ export const Admins = () => {
         isVisible={drawerIsVisible}
         onClose={() => setDrawerIsVisible(false)}
         fetchAdmins={async () => await fetchAdminsAsync(initialFetchParams)}
+      />
+      <UserDetailsModal
+        isVisible={!!userDetailsModal}
+        data={userDetailsModal?.data}
+        onCancel={() => setUserDetailsModal(null)}
       />
       <TableHeader
         title="Administradores"
