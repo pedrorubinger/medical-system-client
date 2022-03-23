@@ -2,6 +2,7 @@ import { Admins } from './Admins'
 import { MyAccount } from './MyAccount'
 import { Schedule } from './Schedule'
 import { MySchedule } from './MySchedule'
+import { ScheduleSettings } from './ScheduleSettings'
 import { Patients } from './Patients'
 import { Users } from './Users'
 import { Insurances } from './Insurances'
@@ -19,6 +20,7 @@ export const Pages = {
   MyAccount,
   Schedule,
   MySchedule,
+  ScheduleSettings,
   Users,
   Patients,
   Insurances,

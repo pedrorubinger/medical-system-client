@@ -8,6 +8,7 @@ import {
   FiScissors,
   FiUser,
   FiUsers,
+  FiSettings,
 } from 'react-icons/fi'
 
 import { Pages } from '../../pages'
@@ -113,6 +114,25 @@ export const PrivateRoutes: IPrivateRoute[] = [
         element={
           <PrivateRouteWrapper>
             <Pages.MySchedule />
+          </PrivateRouteWrapper>
+        }
+      />
+    ),
+  },
+  {
+    name: 'Configurar Agenda',
+    permissions: ['doctor'],
+    path: '/schedule-settings',
+    title: 'Clique para configurar sua agenda como horários e dias disponíveis',
+    show: true,
+    icon: <FiSettings />,
+    route: (
+      <Route
+        key="schedule-settings"
+        path="/schedule-settings"
+        element={
+          <PrivateRouteWrapper>
+            <Pages.ScheduleSettings />
           </PrivateRouteWrapper>
         }
       />
