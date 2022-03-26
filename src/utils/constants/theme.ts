@@ -30,7 +30,8 @@ export const Theme: ITheme = {
     white: {
       color: '#fff',
       border: '#c6c6c6',
-      text: '#000',
+      text: '#3762bf',
+      hover: '#f9f9f9',
     },
     new: {
       color: '#0eb74f',

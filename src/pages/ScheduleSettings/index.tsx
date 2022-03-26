@@ -5,7 +5,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
 
-import { Button, ButtonCol, Card, Form, InfoMessage, TimeBoard } from './styles'
+import { Button, ButtonRow, Card, Form, InfoMessage, TimeBoard } from './styles'
 import { PageContent } from '../../components/UI/PageContent'
 import { TableHeader } from '../../components/UI/TableHeader'
 import { Input } from '../../components/UI/Input'
@@ -46,7 +46,13 @@ export const ScheduleSettings = (): JSX.Element => {
   const watchedDay = watch('day', defaultValues?.day)
   const [times, setTimes] = useState<string[]>([])
 
-  const onSubmit = async (values: IScheduleSettingsValues) => {
+  const onReset = (): void => {
+    if (times?.length) {
+      setTimes([])
+    }
+  }
+
+  const onSubmit = async (values: IScheduleSettingsValues): Promise<void> => {
     console.log('submitted:', values)
   }
 
@@ -63,7 +69,7 @@ export const ScheduleSettings = (): JSX.Element => {
   }
 
   useEffect(() => {
-    setTimes([])
+    onReset()
   }, [watchedDay])
 
   return (
@@ -114,16 +120,27 @@ export const ScheduleSettings = (): JSX.Element => {
           ))}
         </TimeBoard>
 
-        <Row>
-          <ButtonCol span={24}>
+        <ButtonRow>
+          <Col>
+            <Button
+              disabled={isSubmitting}
+              onClick={onReset}
+              color="white"
+              type="reset"
+              title={`Clique para desmarcar todos os horários selecionados da ${watchedDay?.label?.toLowerCase()}`}>
+              Desmarcar Todos
+            </Button>
+          </Col>
+
+          <Col>
             <Button
               disabled={isSubmitting}
               type="submit"
               title={`Clique para salvar as configurações de agenda para a ${watchedDay?.label?.toLowerCase()}`}>
               {isSubmitting ? 'Salvando os dados...' : 'Salvar Dados'}
             </Button>
-          </ButtonCol>
-        </Row>
+          </Col>
+        </ButtonRow>
       </Form>
     </PageContent>
   )
