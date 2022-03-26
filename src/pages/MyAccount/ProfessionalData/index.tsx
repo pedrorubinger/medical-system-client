@@ -18,6 +18,7 @@ import { PageContent } from '../../../components/UI/PageContent'
 import { TableHeader } from '../../../components/UI/TableHeader'
 import { IPaymentMethod } from '../../../interfaces/paymentMethod'
 import { fetchPaymentMethods } from '../../../services/requests/paymentMethod'
+import { convertBrCurrencyToNumber } from '../../../utils/helpers/formatters'
 
 interface ISelectOption {
   label: string
@@ -39,12 +40,12 @@ interface IProfessionalDataFormValues {
 
 const professionalDataSchema = Yup.object().shape({
   crm_document: Yup.string().required('Por favor, insira o número do CRM!'),
-  private_appointment_price: Yup.string().required(
-    'Por favor, insira o valor da consulta particular!'
-  ),
-  appointment_follow_up_limit: Yup.number().required(
-    'Por favor, insira o limite da consulta de retorno!'
-  ),
+  private_appointment_price: Yup.string()
+    .required('Por favor, insira o valor da consulta particular!')
+    .typeError('Por favor, insira o valor da consulta particular!'),
+  appointment_follow_up_limit: Yup.number()
+    .required('Por favor, insira o limite da consulta de retorno!')
+    .typeError('Por favor, insira o limite da consulta de retorno!'),
   specialties: Yup.array().nullable(true),
   insurances: Yup.array().nullable(true),
   payment_methods: Yup.array().nullable(true),
@@ -98,10 +99,13 @@ export const ProfessionalData = ({ user }: IProfessionalDataProps) => {
       return null
     }
 
+    const price = convertBrCurrencyToNumber(
+      values?.private_appointment_price?.toString() || 'R$ 0,00'
+    )
     const response = await updateDoctor({
       id: user.doctor.id,
       appointment_follow_up_limit: values?.appointment_follow_up_limit,
-      private_appointment_price: Number(values?.private_appointment_price),
+      private_appointment_price: price,
       crm:
         user.doctor.crm_document === values.crm_document
           ? undefined
@@ -197,10 +201,11 @@ export const ProfessionalData = ({ user }: IProfessionalDataProps) => {
             control={control}
             render={({ field }) => (
               <Input
-                label="Preço da Consulta (Particular)"
+                label="Preço da Consulta Particular (R$)"
                 placeholder="R$"
                 error={errors?.private_appointment_price?.message}
                 required
+                isCurrency
                 {...field}
               />
             )}

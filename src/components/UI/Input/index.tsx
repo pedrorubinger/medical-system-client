@@ -38,6 +38,8 @@ interface IInputProps {
 export const Input = React.forwardRef(
   (
     {
+      onChange,
+      selectOnChange,
       isSelect,
       isMulti = false,
       isCurrency = false,
@@ -51,8 +53,6 @@ export const Input = React.forwardRef(
       type = 'text',
       value,
       style,
-      onChange,
-      selectOnChange,
       ...rest
     }: IInputProps,
     ref: React.ForwardedRef<HTMLInputElement>
@@ -115,6 +115,7 @@ export const Input = React.forwardRef(
             name={name}
             value={value}
             autoFocus={autoFocus}
+            hasError={!!error || false}
             decimalSeparator=","
             thousandSeparator="."
             prefix={'R$ '}
@@ -123,6 +124,7 @@ export const Input = React.forwardRef(
             customInput={CurrencyInput}
             {...rest}
           />
+          {!!error && <ErrorMessage>{error}</ErrorMessage>}
         </Container>
       )
     }
