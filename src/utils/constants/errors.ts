@@ -19,6 +19,7 @@ export const ERROR_MESSAGES: { [key: string]: string } = {
     'A requisição falhou pois não foi possível identificar a clínica!',
   ACCESS_DENIED_TENANT_IS_INACTIVE:
     'Você não está autorizado a realizar essa operação! Por favor, entre em contato conosco.',
+  PAYMENT_METHOD_NOT_FOUND: 'Esse método de pagamento não foi encontrado!',
 }
 
 export const BAD_REQUEST_MESSAGES: { [key: string]: string } = {
@@ -65,4 +66,10 @@ export const BAD_REQUEST_MESSAGES: { [key: string]: string } = {
     'O nome da clínica não pode ultrapassar 100 caracteres!',
   TENANT_IS_ACTIVE_IS_REQUIRED:
     'Você deve informar se a clínica está ativa no sistema!',
+  PAYMENT_METHOD_NAME_IS_REQUIRED:
+    'Você deve informar o nome do método de pagamento!',
+  PAYMENT_METHOD_ALREADY_REGISTERED:
+    'Esse método de pagamento já está registrado!',
+  PAYMENT_METHOD_NAME_MAX_LENGTH_50:
+    'O nome do método não pode ultrapassar 50 caracteres!',
 }

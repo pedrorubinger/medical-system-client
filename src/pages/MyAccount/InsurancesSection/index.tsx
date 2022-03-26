@@ -210,7 +210,7 @@ export const InsurancesSection = () => {
           value: 'Incluir Convênio',
           title: options.length
             ? 'Clique para incluir um novo convênio'
-            : 'Não há mais convênios disponíveis',
+            : 'Não há convênios disponíveis',
           disabled: !options.length,
           onClick: () =>
             setDrawer({ options, isVisible: true, type: 'create' }),

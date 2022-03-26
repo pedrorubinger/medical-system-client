@@ -16,6 +16,8 @@ import { IError } from '../../../interfaces/error'
 import { Input } from '../../../components/UI/Input'
 import { PageContent } from '../../../components/UI/PageContent'
 import { TableHeader } from '../../../components/UI/TableHeader'
+import { IPaymentMethod } from '../../../interfaces/paymentMethod'
+import { fetchPaymentMethods } from '../../../services/requests/paymentMethod'
 
 interface ISelectOption {
   label: string
@@ -29,13 +31,23 @@ interface IProfessionalDataProps {
 interface IProfessionalDataFormValues {
   insurances?: ISelectOption[] | undefined
   specialties?: ISelectOption[] | undefined
+  payment_methods?: ISelectOption[] | undefined
+  private_appointment_price?: number | undefined
+  appointment_follow_up_limit?: number | undefined
   crm_document: string
 }
 
 const professionalDataSchema = Yup.object().shape({
   crm_document: Yup.string().required('Por favor, insira o número do CRM!'),
+  private_appointment_price: Yup.string().required(
+    'Por favor, insira o valor da consulta particular!'
+  ),
+  appointment_follow_up_limit: Yup.number().required(
+    'Por favor, insira o limite da consulta de retorno!'
+  ),
   specialties: Yup.array().nullable(true),
   insurances: Yup.array().nullable(true),
+  payment_methods: Yup.array().nullable(true),
 })
 
 const formatOptions = (
@@ -45,15 +57,20 @@ const formatOptions = (
 }
 
 const formatSelectOption = (
-  data?: IInsurance[] | ISpecialty[]
+  arr?: IInsurance[] | ISpecialty[] | IPaymentMethod[]
 ): ISelectOption[] | undefined =>
-  data?.length ? [{ value: data?.[0]?.id, label: data?.[0]?.name }] : undefined
+  arr?.length
+    ? [...arr].map((item) => ({ value: item.id, label: item.name }))
+    : undefined
 
 export const ProfessionalData = ({ user }: IProfessionalDataProps) => {
   const initialValues: IProfessionalDataFormValues = {
     crm_document: user?.doctor?.crm_document || '',
     insurances: formatSelectOption(user?.doctor?.insurance),
     specialties: formatSelectOption(user?.doctor?.specialty),
+    payment_methods: formatSelectOption(user?.doctor?.payment_method),
+    private_appointment_price: user?.doctor?.private_appointment_price,
+    appointment_follow_up_limit: user?.doctor?.appointment_follow_up_limit,
   }
   const {
     control,
@@ -63,14 +80,17 @@ export const ProfessionalData = ({ user }: IProfessionalDataProps) => {
     formState: { errors, isSubmitting },
   } = useForm<IProfessionalDataFormValues>({
     mode: 'onChange',
-    resolver: yupResolver(professionalDataSchema),
     shouldUnregister: true,
     defaultValues: initialValues,
+    resolver: yupResolver(professionalDataSchema),
   })
   const [specialtiesOptions, setSpecialtiesOptions] = useState<ISelectOption[]>(
     []
   )
-  const [fetchingData, setFetchingData] = useState(false)
+  const [paymentMethodsOptions, setPaymentMethodsOptions] = useState<
+    ISelectOption[]
+  >([])
+  const [isFetching, setIsFetching] = useState(false)
   const [httpErrors, setHttpErrors] = useState<IError[]>([])
 
   const onSubmit = async (values: IProfessionalDataFormValues) => {
@@ -80,12 +100,17 @@ export const ProfessionalData = ({ user }: IProfessionalDataProps) => {
 
     const response = await updateDoctor({
       id: user.doctor.id,
+      appointment_follow_up_limit: values?.appointment_follow_up_limit,
+      private_appointment_price: Number(values?.private_appointment_price),
       crm:
         user.doctor.crm_document === values.crm_document
           ? undefined
           : values.crm_document,
       specialties: values?.specialties?.length
         ? values?.specialties?.map((specialty) => specialty.value)
+        : undefined,
+      payment_methods: values?.payment_methods?.length
+        ? values?.payment_methods?.map((method) => method.value)
         : undefined,
     })
 
@@ -100,19 +125,28 @@ export const ProfessionalData = ({ user }: IProfessionalDataProps) => {
 
   useEffect(() => {
     ;(async () => {
-      setFetchingData(true)
+      setIsFetching(true)
 
       const specialtiesResponse = await fetchSpecialties()
+      const paymentMethodsResponse = await fetchPaymentMethods()
 
       if (specialtiesResponse?.data) {
         setSpecialtiesOptions(formatOptions(specialtiesResponse.data))
+      }
+
+      if (paymentMethodsResponse?.data) {
+        setPaymentMethodsOptions(formatOptions(paymentMethodsResponse.data))
       }
 
       if (specialtiesResponse.error) {
         setHttpErrors([specialtiesResponse.error])
       }
 
-      setFetchingData(false)
+      if (paymentMethodsResponse.error) {
+        setHttpErrors([paymentMethodsResponse.error])
+      }
+
+      setIsFetching(false)
     })()
   }, [])
 
@@ -141,8 +175,60 @@ export const ProfessionalData = ({ user }: IProfessionalDataProps) => {
       <Row gutter={16}>
         <Col sm={12} xs={24}>
           <Controller
-            name="specialties"
+            name="crm_document"
             control={control}
+            render={({ field }) => (
+              <Input
+                label="CRM"
+                placeholder="Informe o CRM do médico"
+                error={errors?.crm_document?.message}
+                required
+                {...field}
+              />
+            )}
+          />
+        </Col>
+      </Row>
+
+      <Row gutter={16}>
+        <Col sm={12} xs={24}>
+          <Controller
+            name="private_appointment_price"
+            control={control}
+            render={({ field }) => (
+              <Input
+                label="Preço da Consulta (Particular)"
+                placeholder="R$"
+                error={errors?.private_appointment_price?.message}
+                required
+                {...field}
+              />
+            )}
+          />
+        </Col>
+
+        <Col sm={12} xs={24}>
+          <Controller
+            name="appointment_follow_up_limit"
+            control={control}
+            render={({ field }) => (
+              <Input
+                label="Limite para Retorno (em dias)"
+                placeholder="Dias"
+                error={errors?.appointment_follow_up_limit?.message}
+                required
+                {...field}
+              />
+            )}
+          />
+        </Col>
+      </Row>
+
+      <Row gutter={16}>
+        <Col sm={12} xs={24}>
+          <Controller
+            control={control}
+            name="specialties"
             render={({ field }) => (
               <Input
                 label="Especialidades Médicas"
@@ -162,14 +248,19 @@ export const ProfessionalData = ({ user }: IProfessionalDataProps) => {
 
         <Col sm={12} xs={24}>
           <Controller
-            name="crm_document"
             control={control}
+            name="payment_methods"
             render={({ field }) => (
               <Input
-                label="CRM"
-                placeholder="Informe o CRM do médico"
-                error={errors?.crm_document?.message}
-                required
+                label="Métodos de Pagamento"
+                placeholder="Selecionar Métodos"
+                error={errors?.payment_methods?.[0]?.value?.message}
+                options={paymentMethodsOptions}
+                selectOnChange={(newValue: any) =>
+                  setValue('payment_methods', newValue)
+                }
+                isSelect
+                isMulti
                 {...field}
               />
             )}
@@ -194,7 +285,7 @@ export const ProfessionalData = ({ user }: IProfessionalDataProps) => {
       return ErrorOnLoadData
     }
 
-    if (fetchingData) {
+    if (isFetching) {
       return FetchingData
     }
 

@@ -33,9 +33,9 @@ export const handleError = (
     } else {
       errorObject.code = err.data?.code
       errorObject.message =
-        ERROR_MESSAGES?.[err.data?.code] ||
-        err.data?.message ||
-        ERROR_MESSAGES.INTERNAL_ERROR_MSG
+        ERROR_MESSAGES?.[err.data?.code] || errStatus === 500
+          ? ERROR_MESSAGES.INTERNAL_ERROR_MSG
+          : err.data?.message || ERROR_MESSAGES.INTERNAL_ERROR_MSG
     }
   }
 

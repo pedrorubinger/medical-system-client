@@ -9,6 +9,7 @@ import {
   FiUser,
   FiUsers,
   FiSettings,
+  FiCreditCard,
 } from 'react-icons/fi'
 
 import { Pages } from '../../pages'
@@ -248,6 +249,25 @@ export const PrivateRoutes: IPrivateRoute[] = [
         element={
           <PrivateRouteWrapper>
             <Pages.Specialties />
+          </PrivateRouteWrapper>
+        }
+      />
+    ),
+  },
+  {
+    name: 'Métodos de Pagamento',
+    permissions: ['admin'],
+    path: '/payment-methods',
+    title: 'Clique para gerenciar os métodos de pagamento de consultas',
+    show: true,
+    icon: <FiCreditCard />,
+    route: (
+      <Route
+        key="payment-methods"
+        path="/payment-methods"
+        element={
+          <PrivateRouteWrapper>
+            <Pages.PaymentMethods />
           </PrivateRouteWrapper>
         }
       />

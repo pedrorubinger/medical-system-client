@@ -20,6 +20,9 @@ interface IUpdateDoctorData {
   id: number
   crm?: string
   specialties?: number[]
+  payment_methods?: number[]
+  private_appointment_price?: number
+  appointment_follow_up_limit?: number
 }
 
 export type TManageDoctorInsuranceFlag = 'attach' | 'dettach'

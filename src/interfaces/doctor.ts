@@ -1,4 +1,5 @@
 import { IInsurance } from './insurance'
+import { IPaymentMethod } from './paymentMethod'
 import { ISpecialty } from './specialty'
 import { IUser } from './user'
 
@@ -13,6 +14,9 @@ export interface IDoctor {
   created_at: string
   insurance: IDoctorInsurance[]
   specialty: ISpecialty[]
+  payment_method: IPaymentMethod[]
+  private_appointment_price: number
+  appointment_follow_up_limit: number
   updated_at: string
   user?: IUser
 }
