@@ -20,6 +20,8 @@ export const ERROR_MESSAGES: { [key: string]: string } = {
   ACCESS_DENIED_TENANT_IS_INACTIVE:
     'Você não está autorizado a realizar essa operação! Por favor, entre em contato conosco.',
   PAYMENT_METHOD_NOT_FOUND: 'Esse método de pagamento não foi encontrado!',
+  SCHEDULE_SETTINGS_NOT_FOUND:
+    'As configurações de agenda especificadas não foram encontradas!',
 }
 
 export const BAD_REQUEST_MESSAGES: { [key: string]: string } = {
@@ -72,4 +74,5 @@ export const BAD_REQUEST_MESSAGES: { [key: string]: string } = {
     'Esse método de pagamento já está registrado!',
   PAYMENT_METHOD_NAME_MAX_LENGTH_50:
     'O nome do método não pode ultrapassar 50 caracteres!',
+  DOCTOR_ID_IS_REQUIRED: 'Você deve informar o médico!',
 }

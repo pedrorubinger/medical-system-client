@@ -1,17 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from 'react'
-import { Col, Row, Typography } from 'antd'
+import { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { Col, notification, Row, Typography } from 'antd'
 import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
 
 import { Button, ButtonRow, Card, Form, InfoMessage, TimeBoard } from './styles'
+import { Creators } from '../../store/ducks/auth/reducer'
+import { RootState } from '../../store'
+import { TDayOfWeek } from '../../interfaces/week'
+import { availableTimes } from '../../utils/constants/availableTimes'
+import { week } from '../../utils/constants/week'
+import { updateScheduleSettings } from '../../services/requests/scheduleSettings'
 import { PageContent } from '../../components/UI/PageContent'
 import { TableHeader } from '../../components/UI/TableHeader'
 import { Input } from '../../components/UI/Input'
-import { TDayOfWeek } from '../../interfaces/week'
-import { week } from '../../utils/constants/week'
-import { availableTimes } from '../../utils/constants/availableTimes'
 
 interface ISelectOption {
   label: string
@@ -43,20 +47,53 @@ export const ScheduleSettings = (): JSX.Element => {
     defaultValues,
     mode: 'onBlur',
   })
+  const dispatch = useDispatch()
+  const user = useSelector((state: RootState) => state.AuthReducer)
+  const userScheduleSettings = user?.data?.doctor?.schedule_settings
+  const userDefaultTimes = userScheduleSettings?.[defaultValues.day.value]
+  const initialTimes = userDefaultTimes
+    ? JSON.parse(userDefaultTimes)?.times
+    : []
   const watchedDay = watch('day', defaultValues?.day)
-  const [times, setTimes] = useState<string[]>([])
+  const [times, setTimes] = useState<string[]>(initialTimes)
 
-  const onReset = (): void => {
+  const onClear = (): void => {
     if (times?.length) {
       setTimes([])
     }
   }
 
   const onSubmit = async (values: IScheduleSettingsValues): Promise<void> => {
-    console.log('submitted:', values)
-  }
+    if (!userScheduleSettings?.id) {
+      return
+    }
 
-  console.log('TIMES:', times)
+    const data = { [values.day.value]: { times } }
+    const response = await updateScheduleSettings(userScheduleSettings.id, data)
+
+    if (response.schedule_settings) {
+      dispatch(
+        Creators.setUser({
+          ...user.data,
+          doctor: {
+            ...user.data.doctor,
+            schedule_settings: {
+              ...userScheduleSettings,
+              [values.day.value]: JSON.stringify({ times }),
+            },
+          },
+        })
+      )
+      notification.success({
+        message: `As configurações de horários de ${values?.day?.label?.toLowerCase()} foram salvas com sucesso!`,
+      })
+    } else if (
+      response.error?.status &&
+      [400, 422].includes(response.error?.status)
+    ) {
+      notification.error({ message: response.error.message })
+    }
+  }
 
   const onClickCard = (value: string): void => {
     const filteredItems = [...times].filter((time) => time !== value)
@@ -68,13 +105,9 @@ export const ScheduleSettings = (): JSX.Element => {
     }
   }
 
-  useEffect(() => {
-    onReset()
-  }, [watchedDay])
-
   return (
     <PageContent>
-      <TableHeader title="Configurações de Agenda" margin="0 0 5px 0" />
+      <TableHeader title="Horários Disponíveis" margin="0 0 5px 0" />
       <InfoMessage>
         Selecione os horários de sua agenda que estarão disponíveis para o
         agendamento de consultas para cada dia da semana. Basta clicar nos
@@ -98,7 +131,15 @@ export const ScheduleSettings = (): JSX.Element => {
                   error={errors?.day?.value?.message}
                   options={week}
                   selectOnChange={(newValue: any) => {
+                    const selectedDayTimes =
+                      userScheduleSettings?.[newValue?.value]
+
                     setValue('day', { ...newValue })
+                    setTimes(
+                      selectedDayTimes
+                        ? JSON.parse(selectedDayTimes)?.times
+                        : []
+                    )
                   }}
                   isSelect
                   {...field}
@@ -124,7 +165,7 @@ export const ScheduleSettings = (): JSX.Element => {
           <Col>
             <Button
               disabled={isSubmitting}
-              onClick={onReset}
+              onClick={onClear}
               color="white"
               type="reset"
               title={`Clique para desmarcar todos os horários selecionados da ${watchedDay?.label?.toLowerCase()}`}>
