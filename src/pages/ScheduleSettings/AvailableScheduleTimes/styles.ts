@@ -1,7 +1,7 @@
 import { Row } from 'antd'
 import styled from 'styled-components'
 
-import { Button as CustomButton } from '../../components/UI/Button'
+import { Button as CustomButton } from '../../../components/UI/Button'
 
 interface ICardProps {
   /** @default undefined */
@@ -26,7 +26,7 @@ export const ButtonRow = styled(Row)`
 `
 
 export const Button = styled(CustomButton)`
-  margin-top: 15px;
+  margin-top: 22px;
   font-size: 14px;
   padding: 10px 15px;
   margin-left: 10px;

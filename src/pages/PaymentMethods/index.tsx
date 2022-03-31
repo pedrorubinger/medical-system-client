@@ -40,7 +40,7 @@ const initialFilters: IFilter = { name: null }
 
 export const PaymentMethods = (): JSX.Element => {
   const [records, setRecords] = useState<IPaymentMethod[]>([])
-  const [fetching, setFetching] = useState(false)
+  const [isFetching, setIsFetching] = useState(false)
   const [searchFilters, setSearchFilters] = useState<IFilter>(initialFilters)
   const [isDeleting, setIsDeleting] = useState(false)
   const [deletionModal, setDeletionModal] =
@@ -52,7 +52,7 @@ export const PaymentMethods = (): JSX.Element => {
 
   const fetchPaymentMethodsAsync = useCallback(
     async (params: IFetchPaymentMethodsParams) => {
-      setFetching(true)
+      setIsFetching(true)
 
       const response = await fetchPaymentMethods(params)
 
@@ -70,7 +70,7 @@ export const PaymentMethods = (): JSX.Element => {
         }
       }
 
-      setFetching(false)
+      setIsFetching(false)
     },
     []
   )
@@ -180,7 +180,7 @@ export const PaymentMethods = (): JSX.Element => {
       <Table
         rowKey="id"
         dataSource={records}
-        loading={fetching}
+        loading={isFetching}
         columns={columns}
         pagination={pagination}
         onChange={async (pagination, filters, sorter, meta) => {

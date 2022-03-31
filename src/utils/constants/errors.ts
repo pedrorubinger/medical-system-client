@@ -22,6 +22,8 @@ export const ERROR_MESSAGES: { [key: string]: string } = {
   PAYMENT_METHOD_NOT_FOUND: 'Esse método de pagamento não foi encontrado!',
   SCHEDULE_SETTINGS_NOT_FOUND:
     'As configurações de agenda especificadas não foram encontradas!',
+  SCHEDULE_DAYS_OFF_NOT_FOUND:
+    'As lista de férias e ausências especificada não foi encontrada!',
 }
 
 export const BAD_REQUEST_MESSAGES: { [key: string]: string } = {
@@ -75,4 +77,6 @@ export const BAD_REQUEST_MESSAGES: { [key: string]: string } = {
   PAYMENT_METHOD_NAME_MAX_LENGTH_50:
     'O nome do método não pode ultrapassar 50 caracteres!',
   DOCTOR_ID_IS_REQUIRED: 'Você deve informar o médico!',
+  DATETIME_START_IS_REQUIRED: 'Você deve informar a data e horário de início!',
+  DATETIME_END_IS_REQUIRED: 'Você deve informar a data e horário finais!',
 }

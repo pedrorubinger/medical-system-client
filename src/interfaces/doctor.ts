@@ -1,5 +1,6 @@
 import { IInsurance } from './insurance'
 import { IPaymentMethod } from './paymentMethod'
+import { IScheduleDaysOff } from './scheduleDaysOff'
 import { IScheduleSettings } from './scheduleSettings'
 import { ISpecialty } from './specialty'
 import { IUser } from './user'
@@ -14,6 +15,7 @@ export interface IDoctor {
   crm_document: string
   created_at: string
   schedule_settings: IScheduleSettings | null
+  schedule_days_off: IScheduleDaysOff[] | null
   insurance: IDoctorInsurance[]
   specialty: ISpecialty[]
   payment_method: IPaymentMethod[]
