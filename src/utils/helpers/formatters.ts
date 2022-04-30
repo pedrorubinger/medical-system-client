@@ -13,6 +13,15 @@ export const formatCPF = (value: string) => {
 }
 
 /**
+ * Transforms a plain string into a formatted CEP (Brazilian format)
+ * @param value - CEP plain string
+ * @returns a formatted CEP string
+ */
+export const formatCEP = (value: string) => {
+  return value.replace(/\D/g, '').replace(/(\d{5})(\d{1,3})/, '$1-$2')
+}
+
+/**
  * Formats a plain string or number in brazilian currency format.
  * @param value - Plain monetary value
  * @returns a formatted monetary string (BR)

@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react'
+import { Spin } from 'antd'
 import CurrencyFormat from 'react-currency-format'
 import { ActionMeta } from 'react-select'
+import { LoadingOutlined } from '@ant-design/icons'
 
 import { Label } from '../Label'
 import { CurrencyInput } from './CurrencyInput'
@@ -31,9 +33,15 @@ interface IInputProps {
   error?: string | undefined
   style?: React.CSSProperties | undefined
   value?: any
+  /** @default false */
+  labelWithLoader?: boolean
   onChange?: React.ChangeEventHandler<HTMLInputElement> | undefined
   selectOnChange?: (newValue: any, actionMeta: ActionMeta<unknown>) => void
 }
+
+const LoadingIcon = (
+  <LoadingOutlined style={{ marginLeft: 10, fontSize: 16 }} spin />
+)
 
 export const Input = React.forwardRef(
   (
@@ -53,14 +61,18 @@ export const Input = React.forwardRef(
       type = 'text',
       value,
       style,
+      labelWithLoader = false,
       ...rest
     }: IInputProps,
     ref: React.ForwardedRef<HTMLInputElement>
   ) => {
     const LabelElement = !!label && (
-      <Label htmlFor={name} required={required}>
-        {label}
-      </Label>
+      <>
+        <Label htmlFor={name} required={required}>
+          {label}
+        </Label>
+        {!!labelWithLoader && <Spin indicator={LoadingIcon} />}
+      </>
     )
 
     if (isSelect) {

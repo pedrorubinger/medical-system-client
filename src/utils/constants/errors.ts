@@ -24,6 +24,8 @@ export const ERROR_MESSAGES: { [key: string]: string } = {
     'As configurações de agenda especificadas não foram encontradas!',
   SCHEDULE_DAYS_OFF_NOT_FOUND:
     'As lista de férias e ausências especificada não foi encontrada!',
+  ADDRESS_NOT_FOUND: 'Este endereço não foi encontrado!',
+  PATIENT_NOT_FOUND: 'Este paciente não foi encontrado!',
 }
 
 export const BAD_REQUEST_MESSAGES: { [key: string]: string } = {
@@ -93,4 +95,41 @@ export const BAD_REQUEST_MESSAGES: { [key: string]: string } = {
     'A data final deve ser superior à data inicial!',
   SCHEDULE_DAYS_OFF_DATETIME_START_BEFORE_NOW:
     'A data inicial deve ser maior que a data atual!',
+  STREET_IS_REQUIRED: 'Você deve informar o nome da rua!',
+  STREET_MAX_LENGTH_80: 'O nome da rua não pode ultrapassar 80 caracteres!',
+  ADDRESS_NUMBER_IS_REQUIRED: 'Você deve informar o número da residência!',
+  ADDRESS_NUMBER_MAX_LENGTH_10:
+    'O número da residência não pode ultrapassar 10 caracteres!',
+  NEIGHBORHOOD_IS_REQUIRED: 'Você deve o nome do bairro!',
+  NEIGHBORHOOD_MAX_LENGTH_50:
+    'O nome do bairro não pode ultrapassar 50 caracteres!',
+  POSTAL_CODE_IS_REQUIRED: 'Você deve informar o CEP!',
+  POSTAL_CODE_MAX_LENGTH_15: 'O CEP não pode ultrapassar 15 caracteres!',
+  ADDRESS_COMPLEMENT_MAX_LENGTH_50:
+    'O complemento não pode ultrapassar 50 caracteres!',
+  PATIENT_NAME_IS_REQUIRED: 'Você deve informar o nome do paciente!',
+  PATIENT_NAME_MAX_LENGTH_150:
+    'O nome do paciente não pode ultrapassar 150 caracteres!',
+  PATIENT_CPF_IS_REQUIRED: 'Você deve informar o CPF do paciente!',
+  PATIENT_CPF_MAX_LENGTH_20:
+    'O CPF do paciente não pode ultrapassar 20 caracteres!',
+  PATIENT_CPF_MUST_BE_UNIQUE: 'Um paciente com este CPF já está cadastrado!',
+  PATIENT_BIRTHDATE_IS_REQUIRED:
+    'Você deve informar a data de nascimento do paciente!',
+  PATIENT_PRIMARY_PHONE_IS_REQUIRED:
+    'Você deve informar um número de telefone!',
+  PATIENT_PRIMARY_PHONE_MAX_LENGTH_30:
+    'O número de telefone não pode ultrapassar 30 caracteres!',
+  PATIENT_MOTHER_NAME_IS_REQUIRED:
+    'Você deve informar o nome da mãe do paciente!',
+  PATIENT_MOTHER_NAME_MAX_LENGTH_150:
+    'O nome da mãe do paciente não pode ultrapassar 150 caracteres!',
+  PATIENT_FATHER_NAME_MAX_LENGTH_150:
+    'O nome do pai do paciecnte não pode ultrapassar 150 caracteres!',
+  PATIENT_SECONDARY_PHONE_MAX_LENGTH_30:
+    'O número de telefone não pode ultrapassar 30 caracteres!',
+  PATIENT_EMAIL_MAX_LENGTH_80:
+    'O email do paciente não pode ultrapassar 80 caracteres!',
+  PATIENT_EMAIL_MUST_BE_UNIQUE:
+    'Já existe um paciente com este email cadastrado!',
 }

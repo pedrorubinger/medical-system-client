@@ -73,7 +73,7 @@ export const userSchema = Yup.object().shape({
     .required('Por favor, insira um email!'),
   cpf: Yup.string()
     .required('Por favor, insira um CPF!')
-    .test('is-cpf-valid', 'Este CPF é inválido!', (value) => {
+    .test('is-cpf-valid', 'Informe um CPF válido!', (value) => {
       const cpf = value?.replace(/\D/g, '')
 
       return cpf?.length === 11
