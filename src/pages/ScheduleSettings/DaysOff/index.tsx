@@ -10,6 +10,8 @@ import { fetchScheduleDaysOffByDoctor } from '../../../services/requests/schedul
 import { PageContent } from '../../../components/UI/PageContent'
 import { TableHeader } from '../../../components/UI/TableHeader'
 import { ScheduleDaysOffDrawer as Drawer } from './Drawer'
+import { DeleteScheduleDayOffModal } from './DeletionModal'
+import { TableActions } from '../../../components/UI/TableActions'
 
 interface IDrawerProps {
   isVisible: boolean
@@ -22,6 +24,10 @@ export const ScheduleDaysOff = () => {
   const user = useSelector((state: RootState) => state.AuthReducer)
   const doctorId = user?.data?.doctor?.id
   const [records, setRecords] = useState<IScheduleDaysOff[]>([])
+  const [deletionModal, setDeletionModal] = useState<{
+    isVisible: boolean
+    id: number
+  } | null>(null)
   const [isFetching, setIsFetching] = useState(false)
   const [pagination, setPagination] = useState<TablePaginationConfig>({
     ...initialPagination,
@@ -33,11 +39,31 @@ export const ScheduleDaysOff = () => {
       title: 'Data Inicial',
       dataIndex: 'datetime_start',
       key: 'datetime_start',
+      render: (date: string) => new Date(date).toLocaleString(),
     },
     {
       title: 'Data Final',
       dataIndex: 'datetime_end',
       key: 'datetime_end',
+      render: (date: string) => new Date(date).toLocaleString(),
+    },
+    {
+      title: 'Ações',
+      dataIndex: 'actions',
+      key: 'actions',
+      render: (_: string, { id, datetime_end }: IScheduleDaysOff) => (
+        <TableActions
+          options={[
+            {
+              id: 'delete',
+              overlay: 'Clique para excluir esta folga/ausência',
+              disabled:
+                Date.parse(datetime_end) < Date.parse(new Date().toString()),
+              onClick: () => setDeletionModal({ isVisible: true, id }),
+            },
+          ]}
+        />
+      ),
     },
   ]
 
@@ -72,9 +98,26 @@ export const ScheduleDaysOff = () => {
 
   return (
     <PageContent margin="30px 0">
+      <DeleteScheduleDayOffModal
+        isVisible={deletionModal?.isVisible || false}
+        id={deletionModal?.id}
+        refetchData={() =>
+          fetchScheduleDaysOffAsync({
+            page: initialPagination.current,
+            perPage: initialPagination.pageSize,
+          })
+        }
+        onCancel={() => setDeletionModal(null)}
+      />
       <Drawer
         isVisible={drawer?.isVisible || false}
         type={drawer?.type || 'create'}
+        refetchData={() =>
+          fetchScheduleDaysOffAsync({
+            page: initialPagination.current,
+            perPage: initialPagination.pageSize,
+          })
+        }
         onClose={() => setDrawer(null)}
       />
       <TableHeader

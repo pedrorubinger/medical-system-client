@@ -77,6 +77,20 @@ export const BAD_REQUEST_MESSAGES: { [key: string]: string } = {
   PAYMENT_METHOD_NAME_MAX_LENGTH_50:
     'O nome do método não pode ultrapassar 50 caracteres!',
   DOCTOR_ID_IS_REQUIRED: 'Você deve informar o médico!',
-  DATETIME_START_IS_REQUIRED: 'Você deve informar a data e horário de início!',
-  DATETIME_END_IS_REQUIRED: 'Você deve informar a data e horário finais!',
+  SCHEDULE_DAYS_OFF_DATETIME_START_IS_REQUIRED:
+    'Você deve informar a data e horário de início!',
+  SCHEDULE_DAYS_OFF_DATETIME_END_IS_REQUIRED:
+    'Você deve informar a data e horário finais!',
+  SCHEDULE_DAYS_OFF_DATETIME_START_MUST_BE_UNIQUE:
+    'Uma folga já foi cadastrada neste dia e horário!',
+  SCHEDULE_DAYS_OFF_DATETIME_END_MUST_BE_UNIQUE:
+    'Uma folga já foi cadastrada neste dia e horário!',
+  SCHEDULE_DAYS_OFF_INVALID_RANGE:
+    'Este intervalo de datas já está sendo utilizado!',
+  SCHEDULE_DAYS_OFF_DATETIME_START_LESS_THAN_END:
+    'A data inicial deve ser inferior à data final!',
+  SCHEDULE_DAYS_OFF_DATETIME_END_GREATER_THAN_START:
+    'A data final deve ser superior à data inicial!',
+  SCHEDULE_DAYS_OFF_DATETIME_START_BEFORE_NOW:
+    'A data inicial deve ser maior que a data atual!',
 }

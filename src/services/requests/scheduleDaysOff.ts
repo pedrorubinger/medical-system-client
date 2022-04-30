@@ -29,6 +29,10 @@ interface IFetchScheduleDaysOffResponse {
   error: IError | null
 }
 
+interface IStoreScheduleDayOffData extends IScheduleDaysOffFormValues {
+  doctor_id: number
+}
+
 interface IStoreOrUpdateScheduleDayOffResponse {
   schedule_days_off: IScheduleDaysOff | null
   error: IError | null
@@ -68,7 +72,7 @@ export const fetchScheduleDaysOffByDoctor = async (
 }
 
 export const storeScheduleDayOff = async (
-  data: IScheduleDaysOffFormValues
+  data: IStoreScheduleDayOffData
 ): Promise<IStoreOrUpdateScheduleDayOffResponse> => {
   try {
     const response: AxiosResponse<IScheduleDaysOff> = await api.post(
