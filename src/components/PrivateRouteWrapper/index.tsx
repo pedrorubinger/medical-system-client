@@ -6,7 +6,7 @@ import { SearchBar } from '../UI/SearchBar'
 import { mobileLimitWidth, Menu } from '../UI/Menu'
 import {
   Container,
-  CopyrightNotice,
+  // CopyrightNotice,
   PageContainer,
   PageContent,
   TopBarContainer,
@@ -48,7 +48,7 @@ export const PrivateRouteWrapper = ({
             )}
             <PageContent>
               {children}
-              <CopyrightNotice>
+              {/* <CopyrightNotice>
                 Copyright &copy; {new Date()?.getFullYear()} MedApp by{' '}
                 <a
                   href="https://github.com/pedrorubinger"
@@ -56,7 +56,7 @@ export const PrivateRouteWrapper = ({
                   rel="noreferrer">
                   Pedro Rubinger
                 </a>
-              </CopyrightNotice>
+              </CopyrightNotice> */}
             </PageContent>
           </PageContainer>
         </>
