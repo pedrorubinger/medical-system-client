@@ -16,4 +16,12 @@ export interface IPatient {
   updated_at: string
 }
 
-export type TPatientData = Omit<IPatient, 'id' | 'created_at' | 'updated_at'>
+interface IAddressData
+  extends Omit<IAddress, 'id' | 'created_at' | 'updated_at'> {
+  id?: number
+}
+
+export type TPatientData = Omit<
+  IPatient,
+  'id' | 'created_at' | 'updated_at' | 'address'
+> & { address?: IAddressData }

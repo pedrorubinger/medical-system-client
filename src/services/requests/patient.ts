@@ -77,7 +77,7 @@ export const storePatient = async (
 
 export const updatePatient = async (
   id: number,
-  data: TPatientData
+  data: Partial<TPatientData>
 ): Promise<IStoreOrUpdatePatientResponse> => {
   try {
     const response: AxiosResponse<IPatient> = await api.put(

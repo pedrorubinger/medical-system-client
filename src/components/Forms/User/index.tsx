@@ -254,7 +254,7 @@ export const UserForm = ({
                   value={field.value}
                   checked={field.value}>
                   É administrador{' '}
-                  <InfoTooltip text="Um usuário administrador não poderá ser excluído, além de ter acesso aos relatórios da empresa, gestão de usuários, convênios e especialidades." />
+                  <InfoTooltip text="Um usuário administrador não poderá ser excluído. Além disso, este usuário terá acesso aos relatórios da empresa, gestão de usuários, convênios e especialidades." />
                 </Checkbox>
               )}
             />

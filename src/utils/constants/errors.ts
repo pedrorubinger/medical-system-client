@@ -132,4 +132,5 @@ export const BAD_REQUEST_MESSAGES: { [key: string]: string } = {
     'O email do paciente não pode ultrapassar 80 caracteres!',
   PATIENT_EMAIL_MUST_BE_UNIQUE:
     'Já existe um paciente com este email cadastrado!',
+  PATIENT_IS_IS_REQUIRED: 'Você deve informar o id do paciente!',
 }

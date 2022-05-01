@@ -13,6 +13,7 @@ import { TableActions } from '../../components/UI/TableActions'
 import { TableHeader } from '../../components/UI/TableHeader'
 import { PatientDrawer } from './Drawer'
 import { DeletePatientModal as DeletionModal } from './DeletionModal'
+import { PatientDetailsModal } from './PatientDetailsModal'
 
 interface IFilter {
   name: string | null
@@ -32,6 +33,11 @@ interface IDeletionModalProps {
   isVisible: boolean
   id: number
   patientName: string
+}
+
+interface IPatientDetailsModalProps {
+  isVisible: boolean
+  data: IPatient
 }
 
 const initialPagination = { current: 1, pageSize: 5 }
@@ -57,6 +63,8 @@ export const Patients = (): JSX.Element => {
     ...initialPagination,
   })
   const [drawer, setDrawer] = useState<IPatientDrawer | null>(null)
+  const [patientDetailsModal, setPatientDetailsModal] =
+    useState<IPatientDetailsModalProps | null>(null)
 
   const fetchPatientsAsync = useCallback(
     async (params: IFetchPatientsParams) => {
@@ -96,10 +104,31 @@ export const Patients = (): JSX.Element => {
       filteredValue: searchFilters.name as unknown as FilterValue,
     },
     {
-      title: 'Data de Cadastro',
-      dataIndex: 'created_at',
-      key: 'created_at',
-      render: (date: string) => new Date(date).toLocaleString(),
+      title: 'CPF',
+      dataIndex: 'cpf',
+      key: 'cpf',
+      sorter: (a: IPatient, b: IPatient) => a.cpf.localeCompare(b.cpf),
+      ...getFilterProps({
+        dataIndex: 'cpf',
+        inputOptions: { placeholder: 'CPF' },
+      }),
+      filteredValue: searchFilters.cpf as unknown as FilterValue,
+    },
+    {
+      title: 'Telefone',
+      dataIndex: 'primary_phone',
+      key: 'primary_phone',
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+      ...getFilterProps({
+        dataIndex: 'email',
+        inputOptions: { placeholder: 'Email' },
+      }),
+      filteredValue: searchFilters.email as unknown as FilterValue,
+      render: (email?: string) => email || 'Nenhum',
     },
     {
       title: 'Última Atualização',
@@ -115,14 +144,20 @@ export const Patients = (): JSX.Element => {
         <TableActions
           options={[
             {
+              id: 'info',
+              overlay: 'Clique para ver detalhes deste paciente',
+              onClick: () =>
+                setPatientDetailsModal({ isVisible: true, data: patient }),
+            },
+            {
               id: 'edit',
-              overlay: 'Clique para editar este convênio',
+              overlay: 'Clique para editar este paciente',
               onClick: () =>
                 setDrawer({ isVisible: true, type: 'update', data: patient }),
             },
             {
               id: 'delete',
-              overlay: 'Clique para excluir este convênio',
+              overlay: 'Clique para excluir este paciente',
               onClick: () =>
                 setDeletionModal({
                   id: patient.id,
@@ -142,6 +177,11 @@ export const Patients = (): JSX.Element => {
 
   return (
     <PageContent>
+      <PatientDetailsModal
+        isVisible={!!patientDetailsModal}
+        data={patientDetailsModal?.data}
+        onCancel={() => setPatientDetailsModal(null)}
+      />
       <PatientDrawer
         type={drawer?.type || 'create'}
         isVisible={drawer?.isVisible || false}

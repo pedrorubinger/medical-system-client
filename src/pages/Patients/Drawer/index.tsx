@@ -7,7 +7,7 @@ import * as Yup from 'yup'
 
 import { storePatient, updatePatient } from '../../../services/requests/patient'
 import { IPatient, TPatientData } from '../../../interfaces/patient'
-import { TAddressData } from '../../../interfaces/address'
+import { IAddress } from '../../../interfaces/address'
 import { formatCEP, formatCPF } from '../../../utils/helpers/formatters'
 import { setFieldErrors } from '../../../utils/helpers/errors'
 import { Button, CheckboxRow, Form } from './styles'
@@ -22,7 +22,7 @@ interface IPatientDrawerProps {
   fetchPatients: () => void
 }
 
-interface IPatientFormValues extends TPatientData, TAddressData {
+interface IPatientFormValues extends TPatientData, IAddress {
   include_address: boolean
   location?: string | undefined
 }
@@ -121,10 +121,10 @@ export const PatientDrawer = ({
 }: IPatientDrawerProps) => {
   const [isFetchingPostalCode, setIsFetchingPostalCode] = useState(false)
   const defaultValues = {
-    include_address: !!data?.address_id,
+    include_address: !!data?.address,
     name: data?.name || '',
     cpf: data?.cpf || '',
-    birthdate: data?.birthdate || '',
+    birthdate: data?.birthdate?.split('T')?.[0] || '',
     primary_phone: data?.primary_phone || '',
     mother_name: data?.mother_name || '',
     father_name: data?.father_name || '',
@@ -153,6 +153,8 @@ export const PatientDrawer = ({
   })
   const watchedAddressCheckbox = watch('include_address', !!data?.address_id)
   const watchedLocation = watch('location', '')
+  const isEditing = type === 'update'
+  const isCreating = type === 'create'
 
   const closeDrawer = () => {
     reset()
@@ -195,14 +197,43 @@ export const PatientDrawer = ({
   }
 
   const onSubmit = async (values: IPatientFormValues): Promise<void> => {
-    if (!data?.id) {
+    if (isEditing && !data?.id) {
       return
     }
 
-    const response =
-      type === 'create'
-        ? await storePatient({ ...values })
-        : await updatePatient(data.id, { ...values })
+    const payload: TPatientData = {
+      name: values.name,
+      birthdate: values.birthdate,
+      cpf: values.cpf,
+      primary_phone: values.primary_phone,
+      secondary_phone: values.secondary_phone,
+      email:
+        isEditing && values.email === data?.email ? undefined : values.email,
+      mother_name: values.mother_name,
+      father_name: values.father_name,
+      address: undefined,
+    }
+
+    if (values.include_address) {
+      payload.address = {
+        street: values.street,
+        number: values.number,
+        neighborhood: values.neighborhood,
+        postal_code: values.postal_code?.replace(/\D/g, ''),
+        complement: values.complement,
+      }
+
+      if (isEditing && data?.address?.id) {
+        payload.address.id = data.address.id
+      }
+    }
+
+    const response = isEditing
+      ? await updatePatient(data?.id || 0, {
+          ...payload,
+          cpf: values.cpf === data?.cpf ? undefined : values.cpf,
+        })
+      : await storePatient(payload)
 
     if (response.error) {
       setFieldErrors(setError, response.error)
@@ -210,10 +241,9 @@ export const PatientDrawer = ({
     }
 
     notification.success({
-      message:
-        type === 'create'
-          ? 'O paciente foi cadastrado com sucesso!'
-          : 'Os dados do paciente foram atualizados com sucesso!',
+      message: isCreating
+        ? 'O paciente foi cadastrado com sucesso!'
+        : 'Os dados do paciente foram atualizados com sucesso!',
     })
     closeDrawer()
     fetchPatients()
@@ -224,7 +254,7 @@ export const PatientDrawer = ({
       return 'Aguarde. Salvando dados do paciente...'
     }
 
-    if (type === 'create') {
+    if (isCreating) {
       return 'Clique para cadastrar este novo paciente'
     }
 
@@ -236,7 +266,7 @@ export const PatientDrawer = ({
       return 'Salvando...'
     }
 
-    if (type === 'create') {
+    if (isCreating) {
       return 'Cadastrar Paciente'
     }
 
@@ -450,8 +480,10 @@ export const PatientDrawer = ({
           <Controller
             name="postal_code"
             control={control}
-            render={({ field }) => (
-              <>
+            render={({ field }) =>
+              isFetchingPostalCode ? (
+                <ReadOnly label="CEP" value="Validando CEP..." />
+              ) : (
                 <Input
                   label="CEP"
                   labelWithLoader={isFetchingPostalCode}
@@ -493,8 +525,8 @@ export const PatientDrawer = ({
                     }
                   }}
                 />
-              </>
-            )}
+              )
+            }
           />
         </Col>
       </Row>
@@ -542,12 +574,14 @@ export const PatientDrawer = ({
         setValue('location', response?.location || '')
       }
     })()
+
+    reset(defaultValues)
   }, [data])
 
   return (
     <Drawer
       visible={isVisible}
-      title={type === 'create' ? 'Cadastrar Paciente' : 'Atualizar Dados'}
+      title={isCreating ? 'Cadastrar Paciente' : 'Atualizar Dados'}
       width={450}
       onClose={closeDrawer}>
       <Form onSubmit={handleSubmit(onSubmit)}>
@@ -575,7 +609,7 @@ export const PatientDrawer = ({
           <Col span={24}>
             <Button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || isFetchingPostalCode}
               title={getButtonTitle()}>
               {getButtonValue()}
             </Button>

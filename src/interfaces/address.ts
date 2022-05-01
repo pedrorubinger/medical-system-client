@@ -8,5 +8,3 @@ export interface IAddress {
   created_at: string
   updated_at: string
 }
-
-export type TAddressData = Omit<IAddress, 'id' | 'created_at' | 'updated_at'>
