@@ -3,9 +3,9 @@ export const ERROR_MESSAGES: { [key: string]: string } = {
     'Desculpe, um erro interno ocorreu. Por favor, tente novamente mais tarde ou contate-nos.',
   INVALID_CREDENTIALS: 'Email ou senha inválidos!',
   MUST_PROVIDE_VALID_CREDENTIALS: 'Você deve fornecer credenciais válidas!',
-  DOCTOR_NOT_FOUND: 'Esse médico não foi encontrado!',
-  INSURANCE_NOT_FOUND: 'Esse convênio não foi encontrado!',
-  SPECIALTY_NOT_FOUND: 'Essa especialidade não foi encontrada!',
+  DOCTOR_NOT_FOUND: 'Este médico não foi encontrado!',
+  INSURANCE_NOT_FOUND: 'Este convênio não foi encontrado!',
+  SPECIALTY_NOT_FOUND: 'Esta especialidade não foi encontrada!',
   TOKEN_DOES_NOT_EXIST: 'O token não existe!',
   TOKEN_INVALID_OR_HAS_EXPIRED: 'O token é inválido ou já expirou!',
   NOT_AUTHORIZED_TO_RESET_PASSWORD:
@@ -26,6 +26,7 @@ export const ERROR_MESSAGES: { [key: string]: string } = {
     'As lista de férias e ausências especificada não foi encontrada!',
   ADDRESS_NOT_FOUND: 'Este endereço não foi encontrado!',
   PATIENT_NOT_FOUND: 'Este paciente não foi encontrado!',
+  APPOINTMENT_NOT_FOUND: 'Esta consulta não foi encontrada!',
 }
 
 export const BAD_REQUEST_MESSAGES: { [key: string]: string } = {
@@ -133,4 +134,13 @@ export const BAD_REQUEST_MESSAGES: { [key: string]: string } = {
   PATIENT_EMAIL_MUST_BE_UNIQUE:
     'Já existe um paciente com este email cadastrado!',
   PATIENT_IS_IS_REQUIRED: 'Você deve informar o id do paciente!',
+  APPOINTMENT_DATETIME_IS_REQUIRED:
+    'Você deve informar o dia e horário da consulta!',
+  APPOINTMENT_DATETIME_MUST_BE_UNIQUE:
+    'Já existe uma consulta agendada para este horário!',
+  APPOINTMENT_DATETIME_FORMAT: 'Verifique o formato de dia e horário enviados!',
+  APPOINTMENT_IS_FOLLOW_UP_IS_REQUIRED:
+    'Você deve informar se a consulta é retorno!',
+  APPOINTMENT_IS_PRIVATE_IS_REQUIRED:
+    'Você deve informar se a consulta é particular!',
 }
