@@ -41,3 +41,11 @@ export const PageContent = styled.div`
   padding: 25px 20px;
   overflow: auto;
 `
+
+export const CopyrightNotice = styled.p`
+  position: fixed;
+  bottom: 6px;
+  font-size: 13px;
+  font-weight: 300;
+  color: #9b9b9b;
+`
