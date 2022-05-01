@@ -2,7 +2,7 @@ import { Col, Modal, Row } from 'antd'
 import Axios from 'axios'
 
 import { IPatient } from '../../../interfaces/patient'
-import { ReadOnly } from '../../../components/UI/ReadOnly'
+import { ReadOnly } from '../../UI/ReadOnly'
 import { useEffect, useState } from 'react'
 
 interface IPatientDetailsModalProps {

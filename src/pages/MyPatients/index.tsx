@@ -11,8 +11,6 @@ import { getFilterProps } from '../../components/UI/FilterBox/Filter'
 import { PageContent } from '../../components/UI/PageContent'
 import { TableActions } from '../../components/UI/TableActions'
 import { TableHeader } from '../../components/UI/TableHeader'
-import { PatientDrawer } from './Drawer'
-import { DeletePatientModal as DeletionModal } from './DeletionModal'
 import { PatientDetailsModal } from '../../components/Forms/Patient/PatientDetailsModal'
 
 interface IFilter {
@@ -21,18 +19,6 @@ interface IFilter {
   motherName: string | null
   primaryPhone: string | null
   email: string | null
-}
-
-interface IPatientDrawer {
-  isVisible: boolean
-  type: 'create' | 'update'
-  data?: IPatient
-}
-
-interface IDeletionModalProps {
-  isVisible: boolean
-  id: number
-  patientName: string
 }
 
 interface IPatientDetailsModalProps {
@@ -53,16 +39,13 @@ const initialFilters: IFilter = {
   email: null,
 }
 
-export const Patients = (): JSX.Element => {
+export const MyPatients = (): JSX.Element => {
   const [records, setRecords] = useState<IPatient[]>([])
   const [fetching, setFetching] = useState(false)
   const [searchFilters, setSearchFilters] = useState<IFilter>(initialFilters)
-  const [deletionModal, setDeletionModal] =
-    useState<IDeletionModalProps | null>(null)
   const [pagination, setPagination] = useState<TablePaginationConfig>({
     ...initialPagination,
   })
-  const [drawer, setDrawer] = useState<IPatientDrawer | null>(null)
   const [patientDetailsModal, setPatientDetailsModal] =
     useState<IPatientDetailsModalProps | null>(null)
 
@@ -149,22 +132,6 @@ export const Patients = (): JSX.Element => {
               onClick: () =>
                 setPatientDetailsModal({ isVisible: true, data: patient }),
             },
-            {
-              id: 'edit',
-              overlay: 'Clique para editar este paciente',
-              onClick: () =>
-                setDrawer({ isVisible: true, type: 'update', data: patient }),
-            },
-            {
-              id: 'delete',
-              overlay: 'Clique para excluir este paciente',
-              onClick: () =>
-                setDeletionModal({
-                  id: patient.id,
-                  isVisible: true,
-                  patientName: patient.name,
-                }),
-            },
           ]}
         />
       ),
@@ -182,27 +149,7 @@ export const Patients = (): JSX.Element => {
         data={patientDetailsModal?.data}
         onCancel={() => setPatientDetailsModal(null)}
       />
-      <PatientDrawer
-        type={drawer?.type || 'create'}
-        isVisible={drawer?.isVisible || false}
-        data={drawer?.data}
-        onClose={() => setDrawer(null)}
-        fetchPatients={() => fetchPatientsAsync(initialFetchParams)}
-      />
-      <DeletionModal
-        isVisible={deletionModal?.isVisible || false}
-        id={deletionModal?.id}
-        patientName={deletionModal?.patientName || ''}
-        refetchPatients={() => fetchPatientsAsync(initialFetchParams)}
-        onCancel={() => setDeletionModal(null)}
-      />
-      <TableHeader
-        title="Pacientes"
-        newRecordButton={{
-          visible: true,
-          onClick: () => setDrawer({ isVisible: true, type: 'create' }),
-        }}
-      />
+      <TableHeader title="Meus Pacientes" />
       <Table
         rowKey="id"
         dataSource={records}

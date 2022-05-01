@@ -15,6 +15,7 @@ import { Login } from './Login'
 import { RecoverPassword } from './RecoverPassword'
 import { Tenants } from './Tenants'
 import { PaymentMethods } from './PaymentMethods'
+import { MyPatients } from './MyPatients'
 
 export const Pages = {
   Admins,
@@ -34,4 +35,5 @@ export const Pages = {
   RecoverPassword,
   Tenants,
   PaymentMethods,
+  MyPatients,
 }
