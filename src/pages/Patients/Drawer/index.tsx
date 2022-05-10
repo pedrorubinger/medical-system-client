@@ -206,11 +206,13 @@ export const PatientDrawer = ({
       birthdate: values.birthdate,
       cpf: values.cpf,
       primary_phone: values.primary_phone,
-      secondary_phone: values.secondary_phone,
+      secondary_phone: values.secondary_phone || undefined,
       email:
-        isEditing && values.email === data?.email ? undefined : values.email,
+        isEditing && values.email === data?.email
+          ? undefined
+          : values.email || undefined,
       mother_name: values.mother_name,
-      father_name: values.father_name,
+      father_name: values.father_name || undefined,
       address: undefined,
     }
 
@@ -271,6 +273,14 @@ export const PatientDrawer = ({
     }
 
     return 'Atualizar Dados'
+  }
+
+  const getIncludeAddressLabel = () => {
+    if (isCreating || !data?.address) {
+      return 'Cadastrar Endereço'
+    }
+
+    return 'Manter Endereço'
   }
 
   const PatientForm = (
@@ -598,7 +608,7 @@ export const PatientDrawer = ({
                   onChange={field.onChange}
                   value={field.value}
                   checked={field.value}>
-                  Cadastrar Endereço
+                  {getIncludeAddressLabel()}
                 </Checkbox>
               )}
             />
