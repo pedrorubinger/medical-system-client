@@ -1,15 +1,15 @@
-import { Drawer, notification } from 'antd'
+import { useState } from 'react'
+import { Col, Drawer, notification, Row } from 'antd'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
+import * as Yup from 'yup'
 
 import { storePatient, updatePatient } from '../../../services/requests/patient'
 import { IPatient, TPatientData } from '../../../interfaces/patient'
 import { IAddress } from '../../../interfaces/address'
 import { setFieldErrors } from '../../../utils/helpers/errors'
-import {
-  patientAndAddressSchema,
-  PatientForm,
-} from '../../../components/Forms/Patient'
+import { Button, Form } from './styles'
+import { PatientFormFields } from '../../../components/Forms/Patient/PatientFormFields'
 
 interface IPatientDrawerProps {
   isVisible: boolean
@@ -23,6 +23,91 @@ interface IPatientFormValues extends TPatientData, IAddress {
   include_address: boolean
   location?: string | undefined
 }
+
+const patientAndAddressSchema = Yup.object().shape({
+  include_address: Yup.boolean(),
+  // PATIENT SCHEMA
+  name: Yup.string()
+    .required('Por favor, insira o nome do paciente!')
+    .max(150, 'O nome do paciente não pode ultrapassar 150 caracteres!'),
+  cpf: Yup.string()
+    .required('Por favor, insira o CPF do paciente!')
+    .max(20, 'O CPF do paciente não pode ultrapassar 20 caracteres!')
+    .test('is-cpf-valid', 'Informe um CPF válido!', (value) => {
+      const cpf = value?.replace(/\D/g, '')
+
+      return cpf?.length === 11
+    }),
+  birthdate: Yup.string()
+    .required('Por favor, insira a data de nascimento do paciente!')
+    .test(
+      'birthdate-must-be-valid',
+      'Por favor, insira uma data de nascimento válida!',
+      (birthdate?: string) => {
+        if (!birthdate) {
+          return true
+        }
+
+        return Date.parse(birthdate) < Date.parse(new Date().toString())
+      }
+    ),
+  primary_phone: Yup.string()
+    .required('Por favor, insira o telefone principal do paciente!')
+    .max(
+      30,
+      'O telefone principal do paciente não pode ultrapassar 30 caracteres!'
+    ),
+  mother_name: Yup.string()
+    .required('Por favor, insira o nome da mãe do paciente!')
+    .max(150, 'O nome da mãe do paciente não pode ultrapassar 150 caracteres!'),
+  father_name: Yup.string().max(
+    150,
+    'O nome do pai do paciente não pode ultrapassar 150 caracteres!'
+  ),
+  secondary_phone: Yup.string().max(
+    30,
+    'O telefone secundário do paciente não pode ultrapassar 30 caracteres!'
+  ),
+  email: Yup.string().max(
+    80,
+    'O email do paciente não pode ultrapassar 80 caracteres!'
+  ),
+  // ADDRESS SCHEMA
+  street: Yup.string().when('include_address', {
+    is: (value: boolean | undefined) => !!value,
+    then: Yup.string()
+      .required('Por favor, insira o nome da rua!')
+      .max(80, 'O nome do paciente não pode ultrapassar 80 caracteres!'),
+  }),
+  number: Yup.string().when('include_address', {
+    is: (value: boolean | undefined) => !!value,
+    then: Yup.string()
+      .required('Por favor, insira o número da residência!')
+      .max(
+        10,
+        'O número da residência do paciente não pode ultrapassar 10 caracteres!'
+      ),
+  }),
+  neighborhood: Yup.string().when('include_address', {
+    is: (value: boolean | undefined) => !!value,
+    then: Yup.string()
+      .required('Por favor, insira o bairro do paciente!')
+      .max(50, 'O bairro do paciente não pode ultrapassar 50 caracteres!'),
+  }),
+  postal_code: Yup.string().when('include_address', {
+    is: (value: boolean | undefined) => !!value,
+    then: Yup.string()
+      .required('Por favor, insira o CEP do paciente!')
+      .max(15, 'O CEP do paciente não pode ultrapassar 15 caracteres!'),
+  }),
+  complement: Yup.string().when('include_addres', {
+    is: (value: boolean | undefined) => !!value,
+    then: Yup.string().max(
+      50,
+      'O complemento do endereço do paciente não pode ultrapassar 50 caracteres!'
+    ),
+  }),
+})
 
 export const PatientDrawer = ({
   data,
@@ -62,10 +147,12 @@ export const PatientDrawer = ({
     shouldUnregister: true,
     mode: 'onBlur',
   })
-  const watchedAddressCheckbox = watch('include_address', !!data?.address_id)
+  const watchedAddressCheckbox = watch('include_address', !!data?.address)
   const watchedLocation = watch('location', '')
+  const watchedPostalCode = watch('postal_code', '')
   const isEditing = type === 'update'
   const isCreating = type === 'create'
+  const [isFetchingPostalCode, setIsFetchingPostalCode] = useState(false)
 
   const closeDrawer = () => {
     reset()
@@ -127,6 +214,30 @@ export const PatientDrawer = ({
     fetchPatients()
   }
 
+  const getButtonTitle = () => {
+    if (isSubmitting) {
+      return 'Aguarde. Salvando dados do paciente...'
+    }
+
+    if (isCreating) {
+      return 'Clique para cadastrar este novo paciente'
+    }
+
+    return 'Clique para atualizar os dados deste paciente'
+  }
+
+  const getButtonValue = () => {
+    if (isSubmitting) {
+      return 'Salvando...'
+    }
+
+    if (isCreating) {
+      return 'Cadastrar Paciente'
+    }
+
+    return 'Atualizar Dados'
+  }
+
   const resetDefaultValues = () => reset(defaultValues)
 
   return (
@@ -134,21 +245,36 @@ export const PatientDrawer = ({
       visible={isVisible}
       title={isCreating ? 'Cadastrar Paciente' : 'Atualizar Dados'}
       width={450}
-      onClose={closeDrawer}>
-      <PatientForm
-        type={type}
-        data={data}
-        control={control}
-        errors={errors}
-        watchedAddressCheckbox={watchedAddressCheckbox}
-        watchedLocation={watchedLocation}
-        isSubmitting={isSubmitting}
-        onSubmit={handleSubmit(onSubmit)}
-        getValues={getValues}
-        setError={setError}
-        setValue={setValue}
-        resetDefaultValues={resetDefaultValues}
-      />
+      onClose={closeDrawer}
+      destroyOnClose>
+      <Form onSubmit={handleSubmit(onSubmit)}>
+        <PatientFormFields
+          data={data}
+          isCreating={isCreating}
+          errors={errors}
+          control={control}
+          watchedAddressCheckbox={watchedAddressCheckbox}
+          watchedLocation={watchedLocation}
+          isFetchingPostalCode={isFetchingPostalCode}
+          watchedPostalCode={watchedPostalCode}
+          resetDefaultValues={resetDefaultValues}
+          getValues={getValues}
+          setIsFetchingPostalCode={setIsFetchingPostalCode}
+          setValue={setValue}
+          setError={setError}
+        />
+
+        <Row>
+          <Col span={24}>
+            <Button
+              type="submit"
+              disabled={isSubmitting || isFetchingPostalCode}
+              title={getButtonTitle()}>
+              {getButtonValue()}
+            </Button>
+          </Col>
+        </Row>
+      </Form>
     </Drawer>
   )
 }
