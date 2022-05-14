@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from 'react'
-import { Col, Drawer, Row } from 'antd'
+import { Col, Drawer, Row, Typography } from 'antd'
 import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
 
-import { Button, Form } from './styles'
+import { Button, Form, InfoMessage } from './styles'
 import { IInsurance } from '../../../interfaces/insurance'
 import { IPaymentMethod } from '../../../interfaces/paymentMethod'
 import { ISpecialty } from '../../../interfaces/specialty'
@@ -75,7 +75,6 @@ export const AppointmentDrawer = ({
     handleSubmit,
     reset,
     setValue,
-    // setError,
     formState: { errors, isSubmitting },
   } = useForm<IAppointmentFormValues>({
     resolver: yupResolver(appointmentSchema),
@@ -125,7 +124,7 @@ export const AppointmentDrawer = ({
   }
 
   const FormContent = (
-    <Form onSubmit={handleSubmit(onSubmit)}>
+    <>
       <Row>
         <Col span={24}>
           <ReadOnly
@@ -226,7 +225,7 @@ export const AppointmentDrawer = ({
           </Button>
         </Col>
       </Row>
-    </Form>
+    </>
   )
 
   useEffect(() => {
@@ -260,7 +259,28 @@ export const AppointmentDrawer = ({
       width={450}
       onClose={closeDrawer}
       destroyOnClose>
-      {FormContent}
+      {!!data && (
+        <InfoMessage>
+          Você está agendando uma consulta com{' '}
+          <Typography.Text strong>{data?.doctor?.label}</Typography.Text> para o
+          dia{' '}
+          <Typography.Text strong>
+            {new Date(data?.datetime).toLocaleDateString()}
+          </Typography.Text>{' '}
+          às{' '}
+          <Typography.Text strong>
+            {new Date(data?.datetime)
+              .toLocaleTimeString('pt-BR')
+              .substring(0, 5)}
+          </Typography.Text>
+          . Selecione um paciente fazendo uma busca pelo seu nome no campo
+          apropriado no formulário abaixo. Caso o paciente não esteja
+          cadastrado, clique no botão{' '}
+          <Typography.Text strong>Cadastrar Paciente</Typography.Text> para
+          fazer seu cadastro e então agendar sua consulta.
+        </InfoMessage>
+      )}
+      <Form onSubmit={handleSubmit(onSubmit)}>{FormContent}</Form>
     </Drawer>
   )
 }
