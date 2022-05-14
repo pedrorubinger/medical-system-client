@@ -4,6 +4,7 @@ import {
   FiCheckCircle,
   FiEdit,
   FiInfo,
+  FiPlusCircle,
   FiRepeat,
   FiTrash,
   FiUsers,
@@ -11,7 +12,14 @@ import {
 
 import { Container, Item } from './styles'
 
-type TTableAction = 'check' | 'edit' | 'delete' | 'info' | 'repeat' | 'users'
+type TTableAction =
+  | 'add'
+  | 'check'
+  | 'edit'
+  | 'delete'
+  | 'info'
+  | 'repeat'
+  | 'users'
 
 interface ITableActionsOption {
   onClick: React.MouseEventHandler<HTMLDivElement>
@@ -21,6 +29,7 @@ interface ITableActionsOption {
   /** @default 18 */
   iconSize?: number
   disabled?: boolean | undefined
+  disabledTitle?: string | undefined
 }
 
 interface ITableActionsProps {
@@ -34,6 +43,7 @@ interface IIcon {
 }
 
 const Icons: IIcon[] = [
+  { id: 'add', icon: FiPlusCircle, color: '#249966' },
   { id: 'check', icon: FiCheckCircle, color: 'green' },
   { id: 'delete', icon: FiTrash, color: 'red' },
   { id: 'edit', icon: FiEdit, color: 'orange' },
@@ -49,7 +59,11 @@ export const TableActions = ({ options }: ITableActionsProps) => {
         const Icon = Icons.find((icon: IIcon) => icon.id === item.id)
 
         return (
-          <Tooltip key={item.id} overlay={item.overlay || ''}>
+          <Tooltip
+            key={item.id}
+            overlay={
+              item.disabled ? item.disabledTitle || '' : item.overlay || ''
+            }>
             <Item onClick={item.disabled ? undefined : item.onClick}>
               {Icon && (
                 <Icon.icon

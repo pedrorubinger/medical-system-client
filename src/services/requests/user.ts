@@ -1,11 +1,18 @@
 import { AxiosResponse } from 'axios'
+
+import { api } from '../api'
 import { IPagination, IPaginationMeta, ISorting } from '../../interfaces/api'
+import { IDoctor } from '../../interfaces/doctor'
 import { IError } from '../../interfaces/error'
 import { TRole } from '../../interfaces/roles'
-
 import { IUser } from '../../interfaces/user'
 import { handleError } from '../../utils/helpers/errors'
-import { api } from '../api'
+
+interface IUserDoctor {
+  user_id: number
+  name: string
+  doctor: IDoctor
+}
 
 export interface IFetchUsersParams extends IPagination, Partial<ISorting> {
   cpf?: string | null
@@ -22,6 +29,11 @@ export interface IFetchUsersAPIResponse {
 
 export interface IFetchUsersResponse {
   data: IFetchUsersAPIResponse | null
+  error: IError | null
+}
+
+export interface IFetchUsersDoctorsResponse {
+  data: IUserDoctor[] | null
   error: IError | null
 }
 
@@ -85,6 +97,21 @@ interface ISetPasswordResponse {
   success: boolean
   error: IError | null
 }
+
+export const fetchUsersDoctors =
+  async (): Promise<IFetchUsersDoctorsResponse> => {
+    try {
+      const response: AxiosResponse<IUserDoctor[]> = await api.get(
+        '/user/doctor'
+      )
+
+      return { data: response.data, error: null }
+    } catch (err) {
+      const error = handleError(err)
+
+      return { data: null, error }
+    }
+  }
 
 export const fetchUsers = async (
   params: IFetchUsersParams

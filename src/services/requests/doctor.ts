@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AxiosResponse } from 'axios'
 
 import { IDoctor } from '../../interfaces/doctor'
@@ -5,6 +6,15 @@ import { IError } from '../../interfaces/error'
 import { IInsurance } from '../../interfaces/insurance'
 import { handleError } from '../../utils/helpers/errors'
 import { api } from '../api'
+
+interface IFetchDoctorsAPIResponse {
+  data: IDoctor[]
+}
+
+interface IFetchDoctorsResponse {
+  data: IDoctor[] | null
+  error: IError | null
+}
 
 interface IUpdateDoctorResponse {
   doctor?: IDoctor | null
@@ -34,6 +44,26 @@ interface IManageDoctorInsuranceData {
     insurance_id: number
     price: number
   }[]
+}
+
+const isInstance = (data: any): data is IFetchDoctorsAPIResponse => {
+  return 'meta' in data
+}
+
+export const fetchDoctors = async (): Promise<IFetchDoctorsResponse> => {
+  try {
+    const response: AxiosResponse<IFetchDoctorsAPIResponse | IDoctor[]> =
+      await api.get('/doctor')
+
+    return isInstance(response.data)
+      ? {
+          data: response.data.data,
+          error: null,
+        }
+      : { data: response.data, error: null }
+  } catch (err) {
+    return { data: null, error: handleError(err) }
+  }
 }
 
 export const updateDoctor = async (

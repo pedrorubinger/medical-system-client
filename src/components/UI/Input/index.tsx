@@ -35,6 +35,10 @@ interface IInputProps {
   value?: any
   /** @default false */
   labelWithLoader?: boolean
+  /** @default true */
+  showError?: boolean
+  /** @default */
+  disabled?: boolean | undefined
   onChange?: React.ChangeEventHandler<HTMLInputElement> | undefined
   selectOnChange?: (newValue: any, actionMeta: ActionMeta<unknown>) => void
 }
@@ -57,6 +61,7 @@ export const Input = React.forwardRef(
       placeholder,
       required,
       error,
+      showError = true,
       autoFocus,
       type = 'text',
       value,
@@ -156,7 +161,7 @@ export const Input = React.forwardRef(
           onChange={onChange}
           {...rest}
         />
-        {!!error && <ErrorMessage>{error}</ErrorMessage>}
+        {!!error && !!showError && <ErrorMessage>{error}</ErrorMessage>}
       </Container>
     )
   }

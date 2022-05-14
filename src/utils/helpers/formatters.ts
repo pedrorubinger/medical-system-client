@@ -1,3 +1,5 @@
+import { TAppointmentStatus } from '../../interfaces/appointment'
+
 /**
  * Transforms a plain string into a formatted CPF
  * @param value - CPF text
@@ -51,4 +53,19 @@ export const convertBrCurrencyToNumber = (currency: string): number => {
  */
 export const getDrawerWidth = () => {
   return window.innerWidth > 900 ? 800 : window.innerWidth - 100
+}
+
+export const getAppointmentStatus = (
+  status?: TAppointmentStatus | undefined
+) => {
+  switch (status) {
+    case 'cancelled':
+      return 'Cancelada'
+    case 'confirmed':
+      return 'Paciente Consultado'
+    case 'pending':
+      return 'Aguardando Paciente'
+    default:
+      return 'Horário Disponível'
+  }
 }
