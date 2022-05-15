@@ -26,8 +26,10 @@ import { getAppointmentStatus } from '../../utils/helpers/formatters'
 import { AppointmentDrawer, IAppointmentDrawerData } from './Drawer'
 
 interface IScheduleDoctorOption {
-  insurances?: IInsurance[]
-  payment_methods?: IPaymentMethod[]
+  insurances?: IInsurance[] | undefined
+  appointment_follow_up_limit?: number | undefined
+  private_appointment_price?: number | undefined
+  payment_methods?: IPaymentMethod[] | undefined
   specialties?: ISpecialty[]
   value: number
   label: string
@@ -40,6 +42,7 @@ interface IRecord {
   insurance_id?: number | undefined | null
   insurance_name?: string | undefined
   is_private?: boolean | undefined
+  last_appointment_datetime?: string | undefined
   status?: TAppointmentStatus
 }
 
@@ -127,6 +130,12 @@ export const Schedule = (): JSX.Element => {
                 setAppointmentDrawer({
                   isVisible: true,
                   data: {
+                    last_appointment_datetime:
+                      appointment.last_appointment_datetime,
+                    appointment_follow_up_limit:
+                      watchedDoctor.appointment_follow_up_limit,
+                    private_appointment_price:
+                      watchedDoctor.private_appointment_price,
                     datetime: `${watchedDate} ${appointment.time}`,
                     doctor: watchedDoctor,
                     insurance: watchedDoctor.insurances,
@@ -226,6 +235,12 @@ export const Schedule = (): JSX.Element => {
             specialties: userDoctor.doctor?.specialty,
             label: userDoctor.name,
             value: userDoctor.doctor.id,
+            last_appointment_datetime:
+              userDoctor.doctor.last_appointment_datetime,
+            appointment_follow_up_limit:
+              userDoctor.doctor.appointment_follow_up_limit,
+            private_appointment_price:
+              userDoctor.doctor.private_appointment_price,
           })
         )
 

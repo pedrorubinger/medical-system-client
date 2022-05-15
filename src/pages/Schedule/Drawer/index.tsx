@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from 'react'
-import { Col, Drawer, Row, Typography } from 'antd'
+import { Checkbox, Col, Drawer, Row, Typography } from 'antd'
 import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
 
-import { Button, Form, LinkButton, InfoMessage } from './styles'
+import { Button, Form, LinkButton, InfoMessage, CheckboxRow } from './styles'
 import { fetchPatients } from '../../../services/requests/patient'
 import { IInsurance } from '../../../interfaces/insurance'
 import { IPaymentMethod } from '../../../interfaces/paymentMethod'
@@ -13,6 +13,7 @@ import { ISpecialty } from '../../../interfaces/specialty'
 import { Input } from '../../../components/UI/Input'
 import { ReadOnly } from '../../../components/UI/ReadOnly'
 import { PatientDrawer } from '../../Patients/Drawer'
+import { formatBrCurrency } from '../../../utils/helpers/formatters'
 
 interface ISelectOption {
   value: number
@@ -22,10 +23,13 @@ interface ISelectOption {
 export interface IAppointmentDrawerData {
   datetime: string
   doctor: ISelectOption
+  appointment_follow_up_limit?: number | undefined
+  private_appointment_price?: number | undefined
   patient?: ISelectOption | undefined
   insurance?: IInsurance[] | undefined
   payment_method?: IPaymentMethod[] | undefined
   specialty?: ISpecialty[] | undefined
+  last_appointment_datetime?: string | undefined
 }
 
 interface IAppointmentDrawerProps {
@@ -47,6 +51,7 @@ interface IAppointmentFormValues {
   insurance?: ISelectOption | undefined
   payment_method?: ISelectOption | undefined
   specialty?: ISelectOption | undefined
+  is_follow_up: boolean
 }
 
 const getFormattedSelectOpts = (
@@ -70,6 +75,7 @@ export const AppointmentDrawer = ({
 }: IAppointmentDrawerProps) => {
   const [currentStep, setCurrentStep] = useState(1)
   const defaultValues: IAppointmentFormValues = {
+    is_follow_up: false,
     patient: undefined,
     insurance: undefined,
     specialty: undefined,
@@ -102,6 +108,8 @@ export const AppointmentDrawer = ({
   const isEditing = type === 'update'
   const isCreating = type === 'create'
   const watchedPatient = watch('patient', undefined)
+  const watchedIsFollowUp = watch('is_follow_up', defaultValues.is_follow_up)
+  const watchedInsurance = watch('insurance', defaultValues.insurance)
   const [selectedPatient, setSelectedPatient] = useState<
     ISelectOption | undefined
   >(undefined)
@@ -148,6 +156,22 @@ export const AppointmentDrawer = ({
     }
 
     return 'Agendar Consulta'
+  }
+
+  const getAppointmentValue = () => {
+    if (watchedIsFollowUp) {
+      return 'R$ 0,00 - Consulta de Retorno'
+    }
+
+    if (watchedInsurance?.value === -1) {
+      return data?.private_appointment_price
+        ? `${formatBrCurrency(
+            data?.private_appointment_price
+          )} - Consulta Particular`
+        : 'Consulta Particular (valor não cadastrado pelo médico)'
+    }
+
+    return 'Pago pelo convênio'
   }
 
   const onProceed = async (): Promise<void> => {
@@ -379,6 +403,56 @@ export const AppointmentDrawer = ({
           />
         </Col>
       </Row>
+
+      {!!data?.appointment_follow_up_limit && (
+        <Row>
+          <Col span={24}>
+            <ReadOnly
+              label="Limite de Dias (Consulta de Retorno)"
+              value={`${data.appointment_follow_up_limit} dias`}
+              required
+            />
+          </Col>
+        </Row>
+      )}
+
+      <Row>
+        <Col span={24}>
+          {/* TO DO: Calculate the difference in days between last appointment and current day... */}
+          <ReadOnly
+            label="Data da Última Consulta"
+            value={data?.last_appointment_datetime || 'Nenhuma'}
+            required
+          />
+        </Col>
+      </Row>
+
+      <Row>
+        <Col span={24}>
+          <ReadOnly
+            label="Valor Final (R$)"
+            value={getAppointmentValue()}
+            required
+          />
+        </Col>
+      </Row>
+
+      <CheckboxRow>
+        <Col>
+          <Controller
+            name="is_follow_up"
+            control={control}
+            render={({ field }) => (
+              <Checkbox
+                onChange={field.onChange}
+                value={field.value}
+                checked={field.value}>
+                É consulta de retorno
+              </Checkbox>
+            )}
+          />
+        </Col>
+      </CheckboxRow>
 
       <Row>
         <Col span={24}>
