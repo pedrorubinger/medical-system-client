@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { Button as AntdButton } from 'antd'
 
 import { Button as CustomButton } from '../../../components/UI/Button'
 
@@ -8,6 +9,13 @@ export const Button = styled(CustomButton)`
   margin-top: 15px;
   width: 100%;
   font-size: 14px;
+`
+
+export const LinkButton = styled(AntdButton)`
+  margin: 0;
+  padding-left: 0;
+  padding-top: 0;
+  font-size: 12px;
 `
 
 export const InfoMessage = styled.h3`

@@ -7,7 +7,9 @@ import { IError } from '../../interfaces/error'
 import { IPatient, TPatientData } from '../../interfaces/patient'
 import { IPagination, IPaginationMeta, ISorting } from '../../interfaces/api'
 
-export interface IFetchPatientsParams extends IPagination, Partial<ISorting> {
+export interface IFetchPatientsParams
+  extends Partial<IPagination>,
+    Partial<ISorting> {
   name?: string | null | undefined
   cpf?: string | null | undefined
   motherName?: string | null | undefined

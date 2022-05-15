@@ -5,12 +5,14 @@ import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
 
-import { Button, Form, InfoMessage } from './styles'
+import { Button, Form, LinkButton, InfoMessage } from './styles'
+import { fetchPatients } from '../../../services/requests/patient'
 import { IInsurance } from '../../../interfaces/insurance'
 import { IPaymentMethod } from '../../../interfaces/paymentMethod'
 import { ISpecialty } from '../../../interfaces/specialty'
 import { Input } from '../../../components/UI/Input'
 import { ReadOnly } from '../../../components/UI/ReadOnly'
+import { PatientDrawer } from '../../Patients/Drawer'
 
 interface ISelectOption {
   value: number
@@ -20,21 +22,28 @@ interface ISelectOption {
 export interface IAppointmentDrawerData {
   datetime: string
   doctor: ISelectOption
+  patient?: ISelectOption | undefined
   insurance?: IInsurance[] | undefined
   payment_method?: IPaymentMethod[] | undefined
   specialty?: ISpecialty[] | undefined
 }
 
 interface IAppointmentDrawerProps {
-  /** @default false */
-  isVisible?: boolean
+  /** @default undefined */
+  isVisible?: boolean | undefined
   data?: IAppointmentDrawerData
   type?: 'create' | 'update'
   onClose: () => void
   // refetchData: () => void
 }
 
+interface IIncludePatientDrawerProps {
+  /** @default undefined */
+  isVisible?: boolean | undefined
+}
+
 interface IAppointmentFormValues {
+  patient?: ISelectOption
   insurance?: ISelectOption | undefined
   payment_method?: ISelectOption | undefined
   specialty?: ISelectOption | undefined
@@ -59,13 +68,19 @@ export const AppointmentDrawer = ({
   type,
   onClose,
 }: IAppointmentDrawerProps) => {
+  const [currentStep, setCurrentStep] = useState(1)
   const defaultValues: IAppointmentFormValues = {
+    patient: undefined,
     insurance: undefined,
     specialty: undefined,
     payment_method: undefined,
   }
   const appointmentSchema = Yup.object().shape({
     doctor: Yup.object().required('Você deve selecionar um médico!'),
+    patient:
+      currentStep === 1
+        ? Yup.object().required('Você deve selecionar um paciente!')
+        : Yup.object(),
     insurance: Yup.object(),
     specialty: Yup.object(),
     payment_method: Yup.object(),
@@ -75,6 +90,8 @@ export const AppointmentDrawer = ({
     handleSubmit,
     reset,
     setValue,
+    trigger,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<IAppointmentFormValues>({
     resolver: yupResolver(appointmentSchema),
@@ -84,20 +101,32 @@ export const AppointmentDrawer = ({
   })
   const isEditing = type === 'update'
   const isCreating = type === 'create'
+  const watchedPatient = watch('patient', undefined)
+  const [selectedPatient, setSelectedPatient] = useState<
+    ISelectOption | undefined
+  >(undefined)
   const [insurances, setInsurances] = useState<ISelectOption[]>([])
   const [specialties, setSpecialties] = useState<ISelectOption[]>([])
   const [paymentMethods, setPaymentMethods] = useState<ISelectOption[]>([])
+  const [includePatientDrawer, setIncludePatientDrawer] =
+    useState<IIncludePatientDrawerProps | null>(null)
 
   const closeDrawer = () => {
+    setCurrentStep(1)
     reset(defaultValues)
     onClose()
   }
 
-  const onSubmit = async (values: IAppointmentFormValues) => {
-    console.log('submitted:', values)
+  const onSubmit = async (values: IAppointmentFormValues): Promise<void> => {
+    const payload = {
+      ...values,
+      patient_id: selectedPatient?.value,
+    }
+
+    console.log('submitted:', values, payload)
   }
 
-  const getButtonTitle = () => {
+  const getButtonTitle = (): string => {
     if (isSubmitting) {
       return 'Aguarde. Salvando dados...'
     }
@@ -109,21 +138,47 @@ export const AppointmentDrawer = ({
     return 'Clique para atualizar os dados desta consulta'
   }
 
-  const getButtonValue = () => {
+  const getButtonValue = (): string => {
     if (isSubmitting) {
       return 'Salvando...'
-    }
-
-    if (isCreating) {
-      return 'Agendar Consulta'
     }
 
     if (isEditing) {
       return 'Editar Consulta'
     }
+
+    return 'Agendar Consulta'
   }
 
-  const FormContent = (
+  const onProceed = async (): Promise<void> => {
+    await trigger('patient')
+
+    if (!errors.patient) {
+      setSelectedPatient(watchedPatient)
+      setCurrentStep(2)
+    }
+  }
+
+  const searchPatientsAsync = async (
+    inputValue: string
+  ): Promise<ISelectOption[]> => {
+    const response = await fetchPatients({ name: inputValue })
+
+    if (response.data) {
+      return response.data?.map(({ id, name }) => ({ value: id, label: name }))
+    }
+
+    return []
+  }
+
+  const loadOptions = async (
+    inputValue: string,
+    callback: (options: ISelectOption[]) => void
+  ) => {
+    callback(await searchPatientsAsync(inputValue))
+  }
+
+  const AppointmentInfoFields = (
     <>
       <Row>
         <Col span={24}>
@@ -148,6 +203,116 @@ export const AppointmentDrawer = ({
           />
         </Col>
       </Row>
+    </>
+  )
+
+  const DefaultAppointmentTextInfo = (
+    <>
+      {!!data && (
+        <>
+          Você está agendando uma consulta com{' '}
+          <Typography.Text strong>{data?.doctor?.label}</Typography.Text> para o
+          dia{' '}
+          <Typography.Text strong>
+            {new Date(data?.datetime).toLocaleDateString()}
+          </Typography.Text>{' '}
+          às{' '}
+          <Typography.Text strong>
+            {new Date(data?.datetime)
+              .toLocaleTimeString('pt-BR')
+              .substring(0, 5)}
+          </Typography.Text>
+          .
+        </>
+      )}
+    </>
+  )
+
+  const FormContentStepOne = (
+    <>
+      {!!data && (
+        <InfoMessage>
+          {DefaultAppointmentTextInfo} Para prosseguir com o agendamento, você
+          deve selecionar um paciente. Para isso, digite seu nome no campo
+          apropriado abaixo. Caso não o encontre, clique em{' '}
+          <Typography.Text strong>Cadastrar Paciente</Typography.Text> para
+          realizar seu cadastro.
+        </InfoMessage>
+      )}
+      {AppointmentInfoFields}
+      <Row>
+        <Col span={24}>
+          <Controller
+            control={control}
+            name="patient"
+            render={({ field }) => (
+              <Input
+                label="Selecionar Paciente"
+                placeholder="Digite o nome do paciente"
+                error={errors?.patient?.value?.message}
+                selectOnChange={(newValue: any) => {
+                  setValue('patient', newValue)
+                }}
+                loadAsyncOptions={loadOptions}
+                required
+                isSelectAsync
+                {...field}
+              />
+            )}
+          />
+          <LinkButton
+            type="link"
+            title="Não encontrou o paciente? Clique para cadastrá-lo e prosseguir com o agendamento"
+            onClick={() => setIncludePatientDrawer({ isVisible: true })}>
+            Cadastrar Paciente
+          </LinkButton>
+        </Col>
+      </Row>
+
+      <Row>
+        <Col span={24}>
+          <Button
+            type="button"
+            title={
+              !watchedPatient
+                ? 'Selecione um paciente para continuar com o agendamento'
+                : 'Clique para continuar com o agendamento da consulta'
+            }
+            disabled={!watchedPatient}
+            onClick={onProceed}>
+            Continuar
+          </Button>
+        </Col>
+      </Row>
+    </>
+  )
+
+  const FormContentStepTwo = (
+    <>
+      <InfoMessage>{DefaultAppointmentTextInfo}</InfoMessage>
+
+      <LinkButton
+        type="link"
+        title="Deseja selecionar outro paciente?"
+        style={{ marginBottom: 5 }}
+        onClick={() => {
+          setValue('patient', undefined)
+          setCurrentStep(1)
+        }}>
+        Selecionar outro paciente
+      </LinkButton>
+
+      <Row>
+        <Col span={24}>
+          <ReadOnly
+            label="Paciente"
+            value={selectedPatient?.label || 'Não identificado'}
+            required
+          />
+        </Col>
+      </Row>
+
+      {AppointmentInfoFields}
 
       <Row>
         <Col span={24}>
@@ -259,28 +424,16 @@ export const AppointmentDrawer = ({
       width={450}
       onClose={closeDrawer}
       destroyOnClose>
-      {!!data && (
-        <InfoMessage>
-          Você está agendando uma consulta com{' '}
-          <Typography.Text strong>{data?.doctor?.label}</Typography.Text> para o
-          dia{' '}
-          <Typography.Text strong>
-            {new Date(data?.datetime).toLocaleDateString()}
-          </Typography.Text>{' '}
-          às{' '}
-          <Typography.Text strong>
-            {new Date(data?.datetime)
-              .toLocaleTimeString('pt-BR')
-              .substring(0, 5)}
-          </Typography.Text>
-          . Selecione um paciente fazendo uma busca pelo seu nome no campo
-          apropriado no formulário abaixo. Caso o paciente não esteja
-          cadastrado, clique no botão{' '}
-          <Typography.Text strong>Cadastrar Paciente</Typography.Text> para
-          fazer seu cadastro e então agendar sua consulta.
-        </InfoMessage>
-      )}
-      <Form onSubmit={handleSubmit(onSubmit)}>{FormContent}</Form>
+      <Form onSubmit={handleSubmit(onSubmit)}>
+        {currentStep === 1 && FormContentStepOne}
+        {currentStep === 2 && FormContentStepTwo}
+      </Form>
+      <PatientDrawer
+        type="create"
+        isVisible={includePatientDrawer?.isVisible || false}
+        onClose={() => setIncludePatientDrawer(null)}
+        fetchPatients={() => null}
+      />
     </Drawer>
   )
 }

@@ -7,7 +7,13 @@ import { LoadingOutlined } from '@ant-design/icons'
 
 import { Label } from '../Label'
 import { CurrencyInput } from './CurrencyInput'
-import { Container, ErrorMessage, Select, StyledInput } from './styles'
+import {
+  AsyncSelect,
+  Container,
+  ErrorMessage,
+  Select,
+  StyledInput,
+} from './styles'
 
 interface ISelectOption {
   value: string | number
@@ -16,7 +22,10 @@ interface ISelectOption {
 
 interface IInputProps {
   name: string
+  /** @default false */
   isSelect?: boolean | undefined
+  /** @default false */
+  isSelectAsync?: boolean | undefined
   /** @default false */
   isMulti?: boolean | undefined
   /** @default false */
@@ -37,8 +46,19 @@ interface IInputProps {
   labelWithLoader?: boolean
   /** @default true */
   showError?: boolean
-  /** @default */
+  /** @default false */
   disabled?: boolean | undefined
+  /** @default undefined */
+  cacheOptions?: boolean | undefined
+  /** @default undefined */
+  defaultAsyncOptions?: boolean | undefined
+  /** @default undefined */
+  loadAsyncOptions?: (
+    inputValue: string,
+    callback: (options: any) => void
+  ) => Promise<void> | undefined
+  /** @default undefined */
+  onAsyncInputChange?: (newValue: string) => string | undefined
   onChange?: React.ChangeEventHandler<HTMLInputElement> | undefined
   selectOnChange?: (newValue: any, actionMeta: ActionMeta<unknown>) => void
 }
@@ -52,7 +72,10 @@ export const Input = React.forwardRef(
     {
       onChange,
       selectOnChange,
-      isSelect,
+      loadAsyncOptions,
+      // onAsyncInputChange,
+      isSelect = false,
+      isSelectAsync = false,
       isMulti = false,
       isCurrency = false,
       options = [],
@@ -66,7 +89,10 @@ export const Input = React.forwardRef(
       type = 'text',
       value,
       style,
+      cacheOptions,
+      defaultAsyncOptions,
       labelWithLoader = false,
+      disabled = false,
       ...rest
     }: IInputProps,
     ref: React.ForwardedRef<HTMLInputElement>
@@ -79,6 +105,54 @@ export const Input = React.forwardRef(
         {!!labelWithLoader && <Spin indicator={LoadingIcon} />}
       </>
     )
+
+    if (isSelectAsync) {
+      return (
+        <Container>
+          {LabelElement}
+          <AsyncSelect
+            styles={{
+              control: (provided) => ({
+                ...provided,
+                boxShadow: 'none',
+                border: `1px solid ${error ? 'red' : '#c9c9c9'}`,
+                padding: 1,
+                color: '#636363',
+                marginTop: 9,
+                marginBottom: 9,
+                borderRadius: 6,
+              }),
+              placeholder: (provided) => ({
+                ...provided,
+                color: '#a8a8a8',
+                fontSize: 13,
+              }),
+              input: (provided) => ({
+                ...provided,
+                ':focus': {
+                  borderColor: error ? 'red' : '#4e7de5',
+                  borderWidth: 1,
+                  outline: 'none',
+                },
+              }),
+            }}
+            classNamePrefix="react-select"
+            options={options}
+            placeholder={placeholder}
+            name={name}
+            value={value}
+            isMulti={isMulti}
+            cacheOptions={cacheOptions || false}
+            defaultOptions={defaultAsyncOptions || false}
+            onChange={selectOnChange}
+            loadOptions={loadAsyncOptions}
+            // onInputChange={onAsyncInputChange}
+            {...rest}
+          />
+          {!!error && <ErrorMessage>{error}</ErrorMessage>}
+        </Container>
+      )
+    }
 
     if (isSelect) {
       return (
@@ -115,8 +189,8 @@ export const Input = React.forwardRef(
             placeholder={placeholder}
             name={name}
             value={value}
-            onChange={selectOnChange}
             isMulti={isMulti}
+            onChange={selectOnChange}
             {...rest}
           />
           {!!error && <ErrorMessage>{error}</ErrorMessage>}
@@ -133,6 +207,7 @@ export const Input = React.forwardRef(
             value={value}
             autoFocus={autoFocus}
             hasError={!!error || false}
+            disabled={disabled}
             decimalSeparator=","
             thousandSeparator="."
             prefix={'R$ '}
@@ -158,6 +233,7 @@ export const Input = React.forwardRef(
           autoFocus={autoFocus}
           style={style}
           value={value}
+          disabled={disabled}
           onChange={onChange}
           {...rest}
         />

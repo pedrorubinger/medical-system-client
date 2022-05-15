@@ -1,5 +1,6 @@
 import styled from 'styled-components'
 import ReactSelect from 'react-select'
+import AsyncReactSelect from 'react-select/async'
 
 interface IStyledInputProps {
   hasError?: boolean
@@ -50,3 +51,4 @@ export const ErrorMessage = styled.span`
 `
 
 export const Select = styled(ReactSelect)``
+export const AsyncSelect = styled(AsyncReactSelect)``
