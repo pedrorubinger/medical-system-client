@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from 'react'
-import { Checkbox, Col, Drawer, Row, Typography } from 'antd'
+import { Checkbox, Col, Drawer, notification, Row, Typography } from 'antd'
 import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
@@ -17,6 +17,12 @@ import {
   formatBrCurrency,
   getDrawerWidth,
 } from '../../../utils/helpers/formatters'
+import { setFieldErrors } from '../../../utils/helpers/errors'
+import {
+  storeAppointment,
+  // updateAppointment,
+} from '../../../services/requests/appointment'
+import { TAppointmentStatus } from '../../../interfaces/appointment'
 
 interface ISelectOption {
   value: number
@@ -41,7 +47,7 @@ interface IAppointmentDrawerProps {
   data?: IAppointmentDrawerData
   type?: 'create' | 'update'
   onClose: () => void
-  // refetchData: () => void
+  refetchData: () => void
 }
 
 interface IIncludePatientDrawerProps {
@@ -78,6 +84,7 @@ export const AppointmentDrawer = ({
   data,
   type,
   onClose,
+  refetchData,
 }: IAppointmentDrawerProps) => {
   const [currentStep, setCurrentStep] = useState(1)
   const defaultValues: IAppointmentFormValues = {
@@ -88,7 +95,6 @@ export const AppointmentDrawer = ({
     payment_method: undefined,
   }
   const appointmentSchema = Yup.object().shape({
-    doctor: Yup.object().required('Você deve selecionar um médico!'),
     patient:
       currentStep === 1
         ? Yup.object().required('Você deve selecionar um paciente!')
@@ -102,6 +108,7 @@ export const AppointmentDrawer = ({
     handleSubmit,
     reset,
     setValue,
+    setError,
     trigger,
     watch,
     formState: { errors, isSubmitting },
@@ -132,12 +139,63 @@ export const AppointmentDrawer = ({
   }
 
   const onSubmit = async (values: IAppointmentFormValues): Promise<void> => {
-    const payload = {
-      ...values,
-      patient_id: selectedPatient?.value,
+    if (!data?.datetime || !selectedPatient?.value) {
+      notification.error({
+        message:
+          'Ocorreu um erro ao agendar esta consulta. Por favor, recarregue a página, tente novamente mais tarde ou contate-nos.',
+      })
+      return
     }
 
-    console.log('submitted:', values, payload)
+    const payload = {
+      patient_id: selectedPatient.value,
+      datetime: data.datetime,
+      is_follow_up: !!values.is_follow_up,
+      last_appointment_datetime: data?.last_appointment_datetime,
+      is_private: !values.insurance?.value || values.insurance?.value === -1,
+      doctor_id: data?.doctor.value,
+      status: 'pending' as TAppointmentStatus,
+      insurance_id:
+        !values.insurance?.value || values.insurance?.value === -1
+          ? null
+          : values.insurance.value,
+      specialty_id:
+        !values.specialty?.value || values.specialty?.value === -1
+          ? null
+          : values.specialty.value,
+      payment_method_id:
+        !values.payment_method?.value || values.payment_method?.value === -1
+          ? null
+          : values.payment_method.value,
+    }
+
+    console.log('submitted:', payload)
+
+    // const response = isCreating
+    //   ? await storeAppointment(payload)
+    //   : await updateAppointment(datapayload)
+
+    const response = await storeAppointment(payload)
+
+    if (response.error) {
+      setFieldErrors(setError, response.error)
+      return
+    }
+
+    if (isCreating) {
+      notification.success({
+        message: 'A consulta foi agendada com sucesso!',
+      })
+    }
+
+    if (isEditing) {
+      notification.success({
+        message: 'Os dados da consulta foram atualizados com sucesso!',
+      })
+    }
+
+    closeDrawer()
+    refetchData()
   }
 
   const getButtonTitle = (): string => {
@@ -154,7 +212,7 @@ export const AppointmentDrawer = ({
 
   const getButtonValue = (): string => {
     if (isSubmitting) {
-      return 'Salvando...'
+      return 'Processando...'
     }
 
     if (isEditing) {

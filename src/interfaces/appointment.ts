@@ -8,22 +8,21 @@ export interface IAppointment {
   id: number
   datetime: string
   is_follow_up: boolean
-  last_appointment_datetime?: Date
+  last_appointment_datetime?: string
   notes?: string
   exam_request?: string
-  status?: TAppointmentStatus
+  status: TAppointmentStatus
   is_private: boolean
-  tenant_id: number
   patient_id: number
   doctor_id: number
-  insurance_id: number
-  specialty_id: number
-  payment_method_id: number
+  insurance_id: number | undefined | null
+  specialty_id: number | undefined | null
+  payment_method_id: number | undefined | null
   created_at: string
   updated_at: string
   patient?: IPatient
-  insurance?: IInsurance
-  specialty?: ISpecialty
+  insurance?: IInsurance | undefined | null
+  specialty?: ISpecialty | undefined | null
 }
 
 export type TAppointmentData = Omit<

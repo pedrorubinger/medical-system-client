@@ -307,6 +307,12 @@ export const Schedule = (): JSX.Element => {
         isVisible={appointmentDrawer?.isVisible || false}
         data={appointmentDrawer?.data}
         onClose={() => setAppointmentDrawer(null)}
+        refetchData={() =>
+          fetchAppointmentsAsync({
+            date: watchedDate,
+            doctor: watchedDoctor.value,
+          })
+        }
       />
 
       <Form>
