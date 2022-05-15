@@ -11,3 +11,13 @@ export interface IScheduleSettings {
   updated_at: string
   created_at: string
 }
+
+export interface IParsedDaysScheduleSettings {
+  sunday: string[]
+  monday: string[]
+  tuesday: string[]
+  wednesday: string[]
+  thursday: string[]
+  friday: string[]
+  saturday: string[]
+}

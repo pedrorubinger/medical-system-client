@@ -11,6 +11,7 @@ import {
 } from '../../../components/Forms/User'
 import { UserFormDescription } from '../../../components/Forms/User/UserFormDescription'
 import { storeTenantUser } from '../../../services/requests/tenantUser'
+import { getDrawerWidth } from '../../../utils/helpers/formatters'
 
 interface ICreateTenantUserDrawerProps {
   isVisible: boolean
@@ -76,7 +77,7 @@ export const CreateTenantUserDrawer = ({
     <Drawer
       visible={isVisible}
       title="Cadastrar Usuário"
-      width={450}
+      width={getDrawerWidth(450)}
       onClose={closeDrawer}
       destroyOnClose>
       <UserFormDescription />

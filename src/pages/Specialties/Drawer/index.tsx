@@ -12,6 +12,7 @@ import {
   updateSpecialty,
 } from '../../../services/requests/specialty'
 import { setFieldErrors } from '../../../utils/helpers/errors'
+import { getDrawerWidth } from '../../../utils/helpers/formatters'
 
 interface ISpecialtyDrawerProps {
   isVisible: boolean
@@ -123,7 +124,7 @@ export const SpecialtyDrawer = ({
           ? 'Cadastrar Especialidade'
           : 'Atualizar Especialidade'
       }
-      width={450}
+      width={getDrawerWidth(450)}
       onClose={closeDrawer}>
       <Form onSubmit={handleSubmit(onSubmit)}>
         <Row>

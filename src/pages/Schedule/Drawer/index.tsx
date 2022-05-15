@@ -13,7 +13,10 @@ import { ISpecialty } from '../../../interfaces/specialty'
 import { Input } from '../../../components/UI/Input'
 import { ReadOnly } from '../../../components/UI/ReadOnly'
 import { PatientDrawer } from '../../Patients/Drawer'
-import { formatBrCurrency } from '../../../utils/helpers/formatters'
+import {
+  formatBrCurrency,
+  getDrawerWidth,
+} from '../../../utils/helpers/formatters'
 
 interface ISelectOption {
   value: number
@@ -220,7 +223,11 @@ export const AppointmentDrawer = ({
             label="Data e Horário"
             value={
               data?.datetime
-                ? new Date(data?.datetime).toLocaleString()
+                ? `${new Date(
+                    data?.datetime
+                  ).toLocaleDateString()} às ${new Date(data?.datetime)
+                    .toLocaleTimeString('pt-BR')
+                    .substring(0, 5)}`
                 : 'Não identificado'
             }
             required
@@ -313,7 +320,10 @@ export const AppointmentDrawer = ({
 
   const FormContentStepTwo = (
     <>
-      <InfoMessage>{DefaultAppointmentTextInfo}</InfoMessage>
+      <InfoMessage>
+        {DefaultAppointmentTextInfo} Confira se os dados da consulta estão
+        corretos e preencha os campos restantes para finalizar este agendamento.
+      </InfoMessage>
 
       <LinkButton
         type="link"
@@ -495,7 +505,7 @@ export const AppointmentDrawer = ({
     <Drawer
       visible={isVisible}
       title={isCreating ? 'Agendar Consulta' : 'Editar Consulta'}
-      width={450}
+      width={getDrawerWidth(450)}
       onClose={closeDrawer}
       destroyOnClose>
       <Form onSubmit={handleSubmit(onSubmit)}>

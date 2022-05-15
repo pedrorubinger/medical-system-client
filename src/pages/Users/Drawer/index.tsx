@@ -11,6 +11,7 @@ import {
   userSchema,
 } from '../../../components/Forms/User'
 import { UserFormDescription } from '../../../components/Forms/User/UserFormDescription'
+import { getDrawerWidth } from '../../../utils/helpers/formatters'
 
 interface IUsersDrawerProps {
   isVisible: boolean
@@ -72,7 +73,7 @@ export const UsersDrawer = ({
     <Drawer
       visible={isVisible}
       title="Cadastrar Usuário"
-      width={450}
+      width={getDrawerWidth(450)}
       onClose={closeDrawer}
       destroyOnClose>
       <UserFormDescription />

@@ -15,6 +15,7 @@ import {
   IPaymentMethod,
   IPaymentMethodFormValues,
 } from '../../../interfaces/paymentMethod'
+import { getDrawerWidth } from '../../../utils/helpers/formatters'
 
 interface IPaymentMethodDrawerProps {
   isVisible: boolean
@@ -127,7 +128,7 @@ export const PaymentMethodDrawer = ({
           ? 'Cadastrar Método de Pagamento'
           : 'Atualizar Método de Pagamento'
       }
-      width={450}
+      width={getDrawerWidth(450)}
       onClose={closeDrawer}>
       <Form onSubmit={handleSubmit(onSubmit)}>
         <Row>

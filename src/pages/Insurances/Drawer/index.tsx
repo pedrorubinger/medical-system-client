@@ -12,6 +12,7 @@ import { setFieldErrors } from '../../../utils/helpers/errors'
 import { Button, Form } from './styles'
 import { Input } from '../../../components/UI/Input'
 import { IInsurance, IInsuranceFormValues } from '../../../interfaces/insurance'
+import { getDrawerWidth } from '../../../utils/helpers/formatters'
 
 interface IInsuranceDrawerProps {
   isVisible: boolean
@@ -118,7 +119,7 @@ export const InsuranceDrawer = ({
     <Drawer
       visible={isVisible}
       title={type === 'create' ? 'Cadastrar Convênio' : 'Atualizar Convênio'}
-      width={450}
+      width={getDrawerWidth(450)}
       onClose={closeDrawer}>
       <Form onSubmit={handleSubmit(onSubmit)}>
         <Row>

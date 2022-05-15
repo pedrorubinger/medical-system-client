@@ -11,6 +11,7 @@ import {
 import { UserFormDescription } from '../../../components/Forms/User/UserFormDescription'
 import { storeTenantUser } from '../../../services/requests/tenantUser'
 import { TRole } from '../../../interfaces/roles'
+import { getDrawerWidth } from '../../../utils/helpers/formatters'
 
 interface IAdminsDrawerProps {
   isVisible: boolean
@@ -77,7 +78,7 @@ export const AdminsDrawer = ({
     <Drawer
       visible={isVisible}
       title="Cadastrar Administrador/Desenvolvedor"
-      width={450}
+      width={getDrawerWidth(450)}
       onClose={closeDrawer}
       destroyOnClose>
       <UserFormDescription />

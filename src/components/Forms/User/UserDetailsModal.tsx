@@ -5,6 +5,7 @@ import { IUser } from '../../../interfaces/user'
 import { ReadOnly } from '../../UI/ReadOnly'
 import { IDoctorInsurance } from '../../../interfaces/doctor'
 import { ISpecialty } from '../../../interfaces/specialty'
+import { getDrawerWidth } from '../../../utils/helpers/formatters'
 
 interface IUserDetailsModalProps {
   /** @default false */
@@ -47,7 +48,7 @@ export const UserDetailsModal = ({
   return (
     <Modal
       footer={null}
-      width={800}
+      width={getDrawerWidth()}
       visible={isVisible}
       onCancel={onCancel}
       title="Detalhes do Usuário">

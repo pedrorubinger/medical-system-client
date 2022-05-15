@@ -10,19 +10,22 @@ import {
   IFetchAppointmentsParams,
 } from '../../services/requests/appointment'
 import { fetchUsersDoctors } from '../../services/requests/user'
-import { availableTimes } from '../../utils/constants/availableTimes'
 // import { IAppointment } from '../../interfaces/appointment'
 
+import {
+  getAppointmentStatus,
+  getFormattedDoctorSchedule,
+} from '../../utils/helpers/formatters'
 import { TAppointmentStatus } from '../../interfaces/appointment'
 import { IInsurance } from '../../interfaces/insurance'
 import { IPaymentMethod } from '../../interfaces/paymentMethod'
 import { ISpecialty } from '../../interfaces/specialty'
+import { IParsedDaysScheduleSettings } from '../../interfaces/scheduleSettings'
 import { Form, InfoMessage } from './styles'
 import { PageContent } from '../../components/UI/PageContent'
 import { TableActions } from '../../components/UI/TableActions'
 import { TableHeader } from '../../components/UI/TableHeader'
 import { Input } from '../../components/UI/Input'
-import { getAppointmentStatus } from '../../utils/helpers/formatters'
 import { AppointmentDrawer, IAppointmentDrawerData } from './Drawer'
 
 interface IScheduleDoctorOption {
@@ -31,6 +34,7 @@ interface IScheduleDoctorOption {
   private_appointment_price?: number | undefined
   payment_methods?: IPaymentMethod[] | undefined
   specialties?: ISpecialty[]
+  scheduleSettings: IParsedDaysScheduleSettings
   value: number
   label: string
 }
@@ -68,7 +72,6 @@ export const Schedule = (): JSX.Element => {
   }
   const {
     control,
-    handleSubmit,
     setValue,
     watch,
     formState: { errors },
@@ -175,30 +178,39 @@ export const Schedule = (): JSX.Element => {
     },
   ]
 
-  const onSubmit = async (values: ISelectScheduleDataValues) => {
-    console.log('submitted:', values)
-  }
-
   const fetchAppointmentsAsync = useCallback(
     async (params: IFetchAppointmentsParams) => {
       setIsFetching(true)
+
+      const doctorId = params.doctor
+      const selectedDay = new Date(watchedDate).getDay()
+
+      if (isNaN(selectedDay) || !doctorId) {
+        return
+      }
 
       const response = await fetchAppointments(params)
 
       if (response.data) {
         const appointments = response.data
+        const availableTimes = Object.values(watchedDoctor.scheduleSettings)?.[
+          selectedDay
+        ]
+
+        console.log('available', availableTimes)
+
         const formattedAppointments: IRecord[] = [...availableTimes].map(
-          (item) => {
+          (time) => {
             const scheduledAppointment = appointments.find(
               (appointment) =>
                 new Date(appointment.datetime)
                   .toLocaleTimeString('pt-BR')
-                  .substring(0, 5) === item.value
+                  .substring(0, 5) === time
             )
 
             if (scheduledAppointment && scheduledAppointment.patient) {
               return {
-                time: item.value,
+                time: time,
                 patient_id: scheduledAppointment.patient_id,
                 patient_name: scheduledAppointment.patient.name,
                 insurance_id: scheduledAppointment?.insurance_id,
@@ -208,7 +220,7 @@ export const Schedule = (): JSX.Element => {
               }
             }
 
-            return { time: item.value }
+            return { time }
           }
         )
 
@@ -217,7 +229,7 @@ export const Schedule = (): JSX.Element => {
 
       setIsFetching(false)
     },
-    []
+    [watchedDate, watchedDoctor]
   )
 
   useEffect(() => {
@@ -241,6 +253,9 @@ export const Schedule = (): JSX.Element => {
               userDoctor.doctor.appointment_follow_up_limit,
             private_appointment_price:
               userDoctor.doctor.private_appointment_price,
+            scheduleSettings: getFormattedDoctorSchedule(
+              userDoctor.doctor.schedule_settings
+            ),
           })
         )
 
@@ -257,13 +272,13 @@ export const Schedule = (): JSX.Element => {
       setValue('date', defaultValues.date)
     }
 
-    if (doctorsList?.length && watchedDate) {
+    if (watchedDoctor?.value && watchedDate) {
       fetchAppointmentsAsync({
         date: watchedDate,
-        doctor: doctorsList[0].value,
+        doctor: watchedDoctor.value,
       })
     }
-  }, [doctorsList, watchedDate, watchedDoctor])
+  }, [watchedDate, watchedDoctor])
 
   return (
     <PageContent>
@@ -280,7 +295,7 @@ export const Schedule = (): JSX.Element => {
         onClose={() => setAppointmentDrawer(null)}
       />
 
-      <Form onSubmit={handleSubmit(onSubmit)}>
+      <Form>
         <Row gutter={12}>
           <Col span={4} sm={12} md={12} xs={12} lg={6}>
             <Controller
@@ -326,11 +341,17 @@ export const Schedule = (): JSX.Element => {
 
       <Table
         rowKey="time"
+        rowClassName={(record, index) =>
+          index % 2 === 0 ? 'table-row-light' : 'table-row-dark'
+        }
         dataSource={records}
         loading={isFetching}
         columns={columns}
         pagination={false}
         scroll={{ x: !records?.length ? undefined : true }}
+        locale={{
+          emptyText: 'Não há horários disponíveis nesta data',
+        }}
       />
     </PageContent>
   )

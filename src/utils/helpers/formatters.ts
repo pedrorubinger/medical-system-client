@@ -1,4 +1,8 @@
 import { TAppointmentStatus } from '../../interfaces/appointment'
+import {
+  IParsedDaysScheduleSettings,
+  IScheduleSettings,
+} from '../../interfaces/scheduleSettings'
 
 /**
  * Transforms a plain string into a formatted CPF
@@ -49,12 +53,18 @@ export const convertBrCurrencyToNumber = (currency: string): number => {
 
 /**
  * Gets a responsive width to Antd Drawer.
+ * @param {number | undefined} baseWidth width number in px that will be used whether the window inner width is greater than 900px
  * @returns a numeric width based in window inner width
  */
-export const getDrawerWidth = () => {
-  return window.innerWidth > 900 ? 800 : window.innerWidth - 100
+export const getDrawerWidth = (baseWidth = 800): number => {
+  return window.innerWidth > 900 ? baseWidth : window.innerWidth
 }
 
+/**
+ * Gets translated and formatted appointment status.
+ * @param {TAppointmentStatus | undefined} status appointment status
+ * @returns an appointment status.
+ */
 export const getAppointmentStatus = (
   status?: TAppointmentStatus | undefined
 ) => {
@@ -68,4 +78,53 @@ export const getAppointmentStatus = (
     default:
       return 'Horário Disponível'
   }
+}
+
+/**
+ * Gets formatted doctor's schedule with the available times for each day of week.
+ * @param {IScheduleSettings | null | undefined} schedule doctor's schedule settings.
+ * @returns an object containing the available times for each day of week based in the doctor's schedule settings.
+ */
+export const getFormattedDoctorSchedule = (
+  schedule?: IScheduleSettings | null
+): IParsedDaysScheduleSettings => {
+  const times: IParsedDaysScheduleSettings = {
+    monday: [],
+    tuesday: [],
+    wednesday: [],
+    thursday: [],
+    friday: [],
+    saturday: [],
+    sunday: [],
+  }
+
+  if (schedule?.monday) {
+    times.monday = JSON.parse(schedule?.monday)?.times
+  }
+
+  if (schedule?.tuesday) {
+    times.tuesday = JSON.parse(schedule?.tuesday)?.times
+  }
+
+  if (schedule?.wednesday) {
+    times.wednesday = JSON.parse(schedule?.wednesday)?.times
+  }
+
+  if (schedule?.thursday) {
+    times.thursday = JSON.parse(schedule?.thursday)?.times
+  }
+
+  if (schedule?.friday) {
+    times.friday = JSON.parse(schedule?.friday)?.times
+  }
+
+  if (schedule?.saturday) {
+    times.saturday = JSON.parse(schedule?.saturday)?.times
+  }
+
+  if (schedule?.sunday) {
+    times.sunday = JSON.parse(schedule?.sunday)?.times
+  }
+
+  return times
 }

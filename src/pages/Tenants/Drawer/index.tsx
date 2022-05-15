@@ -8,6 +8,7 @@ import { Input } from '../../../components/UI/Input'
 import { InfoTooltip } from '../../../components/UI/InfoTooltip'
 import { setFieldErrors } from '../../../utils/helpers/errors'
 import { storeTenant } from '../../../services/requests/tenant'
+import { getDrawerWidth } from '../../../utils/helpers/formatters'
 
 interface ICreateTenantDrawerProps {
   isVisible: boolean
@@ -68,7 +69,7 @@ export const CreateTenantDrawer = ({
     <Drawer
       visible={isVisible}
       title="Cadastrar Clínica"
-      width={450}
+      width={getDrawerWidth(450)}
       onClose={closeDrawer}
       destroyOnClose>
       <InfoMessage>

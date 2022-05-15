@@ -14,7 +14,10 @@ import {
   TManageDoctorInsuranceFlag,
 } from '../../../../services/requests/doctor'
 import { setFieldErrors } from '../../../../utils/helpers/errors'
-import { convertBrCurrencyToNumber } from '../../../../utils/helpers/formatters'
+import {
+  convertBrCurrencyToNumber,
+  getDrawerWidth,
+} from '../../../../utils/helpers/formatters'
 import { IDoctorInsurance } from '../../../../interfaces/doctor'
 import { ReadOnly } from '../../../../components/UI/ReadOnly'
 
@@ -197,7 +200,7 @@ export const AttachInsuranceDrawer = ({
     <Drawer
       visible={isVisible}
       title={isCreating ? 'Incluir Convênio' : 'Atualizar Valor'}
-      width={450}
+      width={getDrawerWidth(450)}
       onClose={closeDrawer}
       destroyOnClose>
       <Form onSubmit={handleSubmit(onSubmit)}>

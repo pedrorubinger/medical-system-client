@@ -4,6 +4,7 @@ import Axios from 'axios'
 import { IPatient } from '../../../interfaces/patient'
 import { ReadOnly } from '../../UI/ReadOnly'
 import { useEffect, useState } from 'react'
+import { getDrawerWidth } from '../../../utils/helpers/formatters'
 
 interface IPatientDetailsModalProps {
   /** @default false */
@@ -51,7 +52,7 @@ export const PatientDetailsModal = ({
   return (
     <Modal
       footer={null}
-      width={800}
+      width={getDrawerWidth()}
       visible={isVisible}
       onCancel={onCancel}
       title="Detalhes do Paciente">

@@ -10,6 +10,7 @@ import { IAddress } from '../../../interfaces/address'
 import { setFieldErrors } from '../../../utils/helpers/errors'
 import { Button, Form } from './styles'
 import { PatientFormFields } from '../../../components/Forms/Patient/PatientFormFields'
+import { getDrawerWidth } from '../../../utils/helpers/formatters'
 
 interface IPatientDrawerProps {
   isVisible: boolean
@@ -244,7 +245,7 @@ export const PatientDrawer = ({
     <Drawer
       visible={isVisible}
       title={isCreating ? 'Cadastrar Paciente' : 'Atualizar Dados'}
-      width={450}
+      width={getDrawerWidth(450)}
       onClose={closeDrawer}
       destroyOnClose>
       <Form onSubmit={handleSubmit(onSubmit)}>

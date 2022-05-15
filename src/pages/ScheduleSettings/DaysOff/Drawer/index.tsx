@@ -11,6 +11,7 @@ import { storeScheduleDayOff } from '../../../../services/requests/scheduleDaysO
 import { RootState } from '../../../../store'
 import { setFieldErrors } from '../../../../utils/helpers/errors'
 import { Input } from '../../../../components/UI/Input'
+import { getDrawerWidth } from '../../../../utils/helpers/formatters'
 
 interface IScheduleDaysOffDrawerProps {
   /** @default false */
@@ -133,7 +134,7 @@ export const ScheduleDaysOffDrawer = ({
     <Drawer
       visible={isVisible}
       title={isCreating ? 'Incluir Folga/Ausência' : 'Atualizar Folga/Ausência'}
-      width={450}
+      width={getDrawerWidth(450)}
       onClose={closeDrawer}
       destroyOnClose>
       <Form onSubmit={handleSubmit(onSubmit)}>
