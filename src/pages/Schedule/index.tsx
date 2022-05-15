@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useCallback, useEffect, useState } from 'react'
-import { Col, Row, Table } from 'antd'
+import { Col, Row, Table, Tag } from 'antd'
 import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
@@ -111,8 +111,23 @@ export const Schedule = (): JSX.Element => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (status: TAppointmentStatus | undefined) =>
-        getAppointmentStatus(status),
+      render: (status: TAppointmentStatus | undefined) => {
+        let color = '#3ed862'
+
+        if (status === 'pending') {
+          color = '#fcd55f'
+        }
+
+        if (status === 'confirmed') {
+          color = '#4370d8'
+        }
+
+        return (
+          <Tag color={color} key={status}>
+            {getAppointmentStatus(status)}
+          </Tag>
+        )
+      },
     },
     {
       title: 'Ações',
@@ -158,7 +173,9 @@ export const Schedule = (): JSX.Element => {
             {
               id: 'check',
               overlay: 'Clique para confirmar esta consulta',
-              disabledTitle: 'Esta consulta ainda não pode ser confirmada',
+              disabledTitle: !appointment.status
+                ? 'Ainda não há uma consulta agendada para este horário'
+                : 'Esta consulta ainda não pode ser confirmada',
               disabled: appointment.status !== 'pending',
               onClick: () => console.log('clicked to confirm', appointment),
             },
@@ -196,9 +213,6 @@ export const Schedule = (): JSX.Element => {
         const availableTimes = Object.values(watchedDoctor.scheduleSettings)?.[
           selectedDay
         ]
-
-        console.log('available', availableTimes)
-
         const formattedAppointments: IRecord[] = [...availableTimes].map(
           (time) => {
             const scheduledAppointment = appointments.find(

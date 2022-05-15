@@ -62,7 +62,10 @@ const getFormattedSelectOpts = (
 ): ISelectOption[] | undefined =>
   arr ? arr.map(({ id, name }) => ({ label: name, value: id })) : undefined
 
-const addNoneOpt = (arr?: ISelectOption[] | undefined, label = 'Nenhum') => {
+const addNoneOpt = (
+  arr?: ISelectOption[] | undefined,
+  label = 'Não informado'
+) => {
   if (arr) {
     arr.unshift({ value: -1, label })
   }
@@ -294,7 +297,11 @@ export const AppointmentDrawer = ({
           <LinkButton
             type="link"
             title="Não encontrou o paciente? Clique para cadastrá-lo e prosseguir com o agendamento"
-            onClick={() => setIncludePatientDrawer({ isVisible: true })}>
+            onClick={() => {
+              setValue('patient', defaultValues.patient)
+              setSelectedPatient(undefined)
+              setIncludePatientDrawer({ isVisible: true })
+            }}>
             Cadastrar Paciente
           </LinkButton>
         </Col>
@@ -370,27 +377,31 @@ export const AppointmentDrawer = ({
         </Col>
       </Row>
 
-      <Row>
-        <Col span={24}>
-          <Controller
-            control={control}
-            name="payment_method"
-            render={({ field }) => (
-              <Input
-                label="Método de Pagamento"
-                placeholder="Selecionar Método de Pagamento"
-                error={errors?.payment_method?.value?.message}
-                options={paymentMethods}
-                selectOnChange={(newValue: any) =>
-                  setValue('payment_method', newValue)
-                }
-                isSelect
-                {...field}
+      {!!watchedIsFollowUp ||
+        !watchedInsurance?.value ||
+        (!!watchedInsurance?.value && watchedInsurance?.value === -1 && (
+          <Row>
+            <Col span={24}>
+              <Controller
+                control={control}
+                name="payment_method"
+                render={({ field }) => (
+                  <Input
+                    label="Método de Pagamento"
+                    placeholder="Selecionar Método de Pagamento"
+                    error={errors?.payment_method?.value?.message}
+                    options={paymentMethods}
+                    selectOnChange={(newValue: any) =>
+                      setValue('payment_method', newValue)
+                    }
+                    isSelect
+                    {...field}
+                  />
+                )}
               />
-            )}
-          />
-        </Col>
-      </Row>
+            </Col>
+          </Row>
+        ))}
 
       <Row>
         <Col span={24}>
@@ -483,13 +494,9 @@ export const AppointmentDrawer = ({
       'Nenhum (Consulta Particular)'
     )
     const paymentMethodsArr = addNoneOpt(
-      getFormattedSelectOpts(data?.payment_method),
-      'Não informado'
+      getFormattedSelectOpts(data?.payment_method)
     )
-    const specialtiesArr = addNoneOpt(
-      getFormattedSelectOpts(data?.specialty),
-      'Nenhuma'
-    )
+    const specialtiesArr = addNoneOpt(getFormattedSelectOpts(data?.specialty))
 
     setInsurances(insurancesArr || [])
     setPaymentMethods(paymentMethodsArr || [])
