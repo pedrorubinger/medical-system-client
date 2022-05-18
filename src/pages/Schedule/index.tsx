@@ -27,6 +27,7 @@ import { TableActions } from '../../components/UI/TableActions'
 import { TableHeader } from '../../components/UI/TableHeader'
 import { Input } from '../../components/UI/Input'
 import { AppointmentDrawer, IAppointmentDrawerData } from './Drawer'
+import { IScheduleDaysOff } from '../../interfaces/scheduleDaysOff'
 
 interface IScheduleDoctorOption {
   insurances?: IInsurance[] | undefined
@@ -35,6 +36,7 @@ interface IScheduleDoctorOption {
   payment_methods?: IPaymentMethod[] | undefined
   specialties?: ISpecialty[]
   scheduleSettings: IParsedDaysScheduleSettings
+  schedule_days_off: IScheduleDaysOff[] | null
   value: number
   label: string
 }
@@ -65,6 +67,7 @@ const scheduleSchema = Yup.object().shape({
   date: Yup.string().required('Por favor, insira a data para ver a agenda!'),
 })
 
+/** TO DO: Add schedule days off on fetch appointments... */
 export const Schedule = (): JSX.Element => {
   const defaultValues = {
     date: new Date().toLocaleDateString('pt-BR').split('/').reverse().join('-'),
@@ -85,6 +88,7 @@ export const Schedule = (): JSX.Element => {
   const watchedDate = watch('date')
   const [doctorsList, setDoctorsList] = useState<IScheduleDoctorOption[]>([])
   const [records, setRecords] = useState<any>([])
+  const [isMounted, setIsMounted] = useState(false)
   const [isFetching, setIsFetching] = useState(false)
   const [appointmentDrawer, setAppointmentDrawer] =
     useState<IAppointmentDrawer | null>(null)
@@ -198,6 +202,7 @@ export const Schedule = (): JSX.Element => {
   const fetchAppointmentsAsync = useCallback(
     async (params: IFetchAppointmentsParams) => {
       setIsFetching(true)
+      setIsMounted(true)
 
       const doctorId = params.doctor
       const selectedDay = new Date(watchedDate).getDay()
@@ -207,6 +212,8 @@ export const Schedule = (): JSX.Element => {
       }
 
       const response = await fetchAppointments(params)
+
+      console.log('time schedule days off:', watchedDoctor.schedule_days_off)
 
       if (response.data) {
         const appointments = response.data
@@ -224,7 +231,7 @@ export const Schedule = (): JSX.Element => {
 
             if (scheduledAppointment && scheduledAppointment.patient) {
               return {
-                time: time,
+                time,
                 patient_id: scheduledAppointment.patient_id,
                 patient_name: scheduledAppointment.patient.name,
                 insurance_id: scheduledAppointment?.insurance_id,
@@ -270,6 +277,7 @@ export const Schedule = (): JSX.Element => {
             scheduleSettings: getFormattedDoctorSchedule(
               userDoctor.doctor.schedule_settings
             ),
+            schedule_days_off: userDoctor.doctor.schedule_days_off,
           })
         )
 
@@ -279,6 +287,10 @@ export const Schedule = (): JSX.Element => {
 
       setIsFetching(false)
     })()
+
+    return () => {
+      setIsMounted(false)
+    }
   }, [])
 
   useEffect(() => {
@@ -299,7 +311,10 @@ export const Schedule = (): JSX.Element => {
       <TableHeader title="Agenda" />
 
       <InfoMessage>
-        Selecione um médico e uma data para gerenciar as suas consultas.
+        Selecione um médico e uma data para gerenciar as suas consultas. Quando
+        o paciente for atendido, não se esqueça de confirmar sua consulta na
+        agenda para que os dados das consultas e dos pacientes estejam
+        consistentes no sistema.
       </InfoMessage>
 
       <AppointmentDrawer
@@ -370,7 +385,10 @@ export const Schedule = (): JSX.Element => {
         pagination={false}
         scroll={{ x: !records?.length ? undefined : true }}
         locale={{
-          emptyText: 'Não há horários disponíveis nesta data',
+          emptyText:
+            !isMounted || isFetching
+              ? 'Buscando dados...'
+              : 'Não há horários disponíveis nesta data',
         }}
       />
     </PageContent>
