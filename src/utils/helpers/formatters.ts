@@ -3,6 +3,7 @@ import {
   IParsedDaysScheduleSettings,
   IScheduleSettings,
 } from '../../interfaces/scheduleSettings'
+import { isISODate } from './validators'
 
 /**
  * Transforms a plain string into a formatted CPF
@@ -69,6 +70,8 @@ export const getAppointmentStatus = (
   status?: TAppointmentStatus | undefined
 ) => {
   switch (status) {
+    case 'off':
+      return 'Horário indisponível'
     case 'cancelled':
       return 'Cancelada'
     case 'confirmed':
@@ -127,4 +130,25 @@ export const getFormattedDoctorSchedule = (
   }
 
   return times
+}
+
+/**
+ * Gets UTC date.
+ * @param {string} ISODate date string in ISO8601 format.
+ * @param {boolean} plainDate flag that indicates if the function must return the formatted date in a plain format. Assigned as false by default.
+ * @returns the formatted date in ISO8601 format or a Date object.
+ */
+export const getUTCDate = (ISODate: string, plainDate = false) => {
+  if (!isISODate(ISODate)) {
+    return ISODate
+  }
+
+  const date = new Date(ISODate)
+  const hours = date.getHours()
+  const minutes = date.getMinutes()
+  const formattedDate = new Date(
+    new Date(date).setUTCHours(hours, minutes, 0, 0)
+  )
+
+  return plainDate ? formattedDate : formattedDate.toISOString()
 }

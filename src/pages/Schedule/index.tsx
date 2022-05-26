@@ -10,16 +10,18 @@ import {
   IFetchAppointmentsParams,
 } from '../../services/requests/appointment'
 import { fetchUsersDoctors } from '../../services/requests/user'
-// import { IAppointment } from '../../interfaces/appointment'
 
 import {
   getAppointmentStatus,
   getFormattedDoctorSchedule,
+  getUTCDate,
 } from '../../utils/helpers/formatters'
+import { dateIsInRange } from '../../utils/helpers/validators'
 import { TAppointmentStatus } from '../../interfaces/appointment'
 import { IInsurance } from '../../interfaces/insurance'
 import { IPaymentMethod } from '../../interfaces/paymentMethod'
 import { ISpecialty } from '../../interfaces/specialty'
+import { IScheduleDaysOff } from '../../interfaces/scheduleDaysOff'
 import { IParsedDaysScheduleSettings } from '../../interfaces/scheduleSettings'
 import { Form, InfoMessage } from './styles'
 import { PageContent } from '../../components/UI/PageContent'
@@ -27,7 +29,6 @@ import { TableActions } from '../../components/UI/TableActions'
 import { TableHeader } from '../../components/UI/TableHeader'
 import { Input } from '../../components/UI/Input'
 import { AppointmentDrawer, IAppointmentDrawerData } from './Drawer'
-import { IScheduleDaysOff } from '../../interfaces/scheduleDaysOff'
 
 interface IScheduleDoctorOption {
   insurances?: IInsurance[] | undefined
@@ -67,7 +68,6 @@ const scheduleSchema = Yup.object().shape({
   date: Yup.string().required('Por favor, insira a data para ver a agenda!'),
 })
 
-/** TO DO: Add schedule days off on fetch appointments... */
 export const Schedule = (): JSX.Element => {
   const defaultValues = {
     date: new Date().toLocaleDateString('pt-BR').split('/').reverse().join('-'),
@@ -118,6 +118,10 @@ export const Schedule = (): JSX.Element => {
       render: (status: TAppointmentStatus | undefined) => {
         let color = '#3ed862'
 
+        if (status === 'off') {
+          color = '#cccccc'
+        }
+
         if (status === 'pending') {
           color = '#fcd55f'
         }
@@ -143,7 +147,10 @@ export const Schedule = (): JSX.Element => {
             {
               id: 'add',
               overlay: 'Clique para marcar uma consulta neste horário',
-              disabledTitle: 'Este horário já está ocupado',
+              disabledTitle:
+                appointment.status === 'off'
+                  ? 'Ainda não há uma consulta agendada para este horário'
+                  : 'Este horário já está ocupado',
               disabled:
                 !watchedDate ||
                 !!appointment.status ||
@@ -171,26 +178,29 @@ export const Schedule = (): JSX.Element => {
               overlay: 'Clique para ver detalhes desta consulta',
               disabledTitle:
                 'Ainda não há uma consulta agendada para este horário',
-              disabled: !appointment.status,
+              disabled: !appointment.status || appointment.status === 'off',
               onClick: () => console.log('clicked to see details', appointment),
             },
             {
               id: 'check',
               overlay: 'Clique para confirmar esta consulta',
-              disabledTitle: !appointment.status
-                ? 'Ainda não há uma consulta agendada para este horário'
-                : 'Esta consulta ainda não pode ser confirmada',
+              disabledTitle:
+                !appointment.status || appointment.status === 'off'
+                  ? 'Ainda não há uma consulta agendada para este horário'
+                  : 'Esta consulta ainda não pode ser confirmada',
               disabled: appointment.status !== 'pending',
               onClick: () => console.log('clicked to confirm', appointment),
             },
             {
               id: 'delete',
               overlay: 'Clique para cancelar e excluir esta consulta',
-              disabledTitle: !appointment.status
-                ? 'Ainda não há uma consulta agendada para este horário'
-                : 'Esta consulta já está confirmada e não pode ser excluída',
+              disabledTitle:
+                !appointment.status || appointment.status === 'off'
+                  ? 'Ainda não há uma consulta agendada para este horário'
+                  : 'Esta consulta já está confirmada e não pode ser excluída',
               disabled:
-                !appointment.status || appointment.status === 'confirmed',
+                !appointment.status ||
+                ['confirmed', 'off'].includes(appointment.status),
               onClick: () => console.log('clicked to cancel', appointment),
             },
           ]}
@@ -212,8 +222,14 @@ export const Schedule = (): JSX.Element => {
       }
 
       const response = await fetchAppointments(params)
-
-      console.log('time schedule days off:', watchedDoctor.schedule_days_off)
+      const dayOff = watchedDoctor.schedule_days_off?.filter(
+        ({ datetime_start, datetime_end }) =>
+          dateIsInRange({
+            current: watchedDate,
+            start: datetime_start?.split('T')?.[0],
+            end: datetime_end?.split('T')?.[0],
+          })
+      )?.[0]
 
       if (response.data) {
         const appointments = response.data
@@ -228,6 +244,23 @@ export const Schedule = (): JSX.Element => {
                   .toLocaleTimeString('pt-BR')
                   .substring(0, 5) === time
             )
+
+            const hours = time.split(':')[0]
+            const minutes = time.split(':')[1]
+            const fullDatetime = new Date(
+              new Date(watchedDate).setUTCHours(hours, minutes, 0, 0)
+            ).toISOString()
+            const datetimeIsOff = dayOff
+              ? dateIsInRange({
+                  current: fullDatetime,
+                  start: getUTCDate(dayOff.datetime_start).toString(),
+                  end: getUTCDate(dayOff.datetime_end).toString(),
+                })
+              : false
+
+            if (datetimeIsOff) {
+              return { time, status: 'off' }
+            }
 
             if (scheduledAppointment && scheduledAppointment.patient) {
               return {
@@ -245,7 +278,9 @@ export const Schedule = (): JSX.Element => {
           }
         )
 
-        setRecords(formattedAppointments)
+        setRecords(
+          formattedAppointments.sort((a, b) => a.time.localeCompare(b.time))
+        )
       }
 
       setIsFetching(false)
@@ -359,11 +394,11 @@ export const Schedule = (): JSX.Element => {
                   placeholder="Selecionar Médico"
                   error={errors?.doctor?.value?.message}
                   options={doctorsList}
+                  showError={false}
+                  disabled={isFetching}
                   selectOnChange={(newValue: any) =>
                     setValue('doctor', newValue)
                   }
-                  showError={false}
-                  disabled={isFetching}
                   required
                   isSelect
                   {...field}

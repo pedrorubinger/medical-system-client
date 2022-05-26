@@ -2,7 +2,7 @@ import { IInsurance } from './insurance'
 import { IPatient } from './patient'
 import { ISpecialty } from './specialty'
 
-export type TAppointmentStatus = 'pending' | 'confirmed' | 'cancelled'
+export type TAppointmentStatus = 'off' | 'pending' | 'confirmed' | 'cancelled'
 
 export interface IAppointment {
   id: number

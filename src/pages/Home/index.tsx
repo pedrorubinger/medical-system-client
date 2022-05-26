@@ -10,7 +10,7 @@ export const Home = (): JSX.Element => {
 
   return (
     <PageContent>
-      <Title>Seja bem-vindo, {name}</Title>
+      <Title>Seja bem-vindo(a), {name}</Title>
       <Message>
         Navegue por meio do menu à esquerda para começar a utilizar o sistema.
       </Message>
