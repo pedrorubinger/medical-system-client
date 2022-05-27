@@ -10,7 +10,6 @@ import {
   IFetchAppointmentsParams,
 } from '../../services/requests/appointment'
 import { fetchUsersDoctors } from '../../services/requests/user'
-
 import {
   getAppointmentStatus,
   getFormattedDoctorSchedule,
@@ -29,6 +28,7 @@ import { TableActions } from '../../components/UI/TableActions'
 import { TableHeader } from '../../components/UI/TableHeader'
 import { Input } from '../../components/UI/Input'
 import { AppointmentDrawer, IAppointmentDrawerData } from './Drawer'
+import { AppointmentDetailsModal } from './AppointmentDetailsModal'
 
 interface IScheduleDoctorOption {
   insurances?: IInsurance[] | undefined
@@ -58,10 +58,15 @@ interface ISelectScheduleDataValues {
   doctor: IScheduleDoctorOption
 }
 
-interface IAppointmentDrawer {
+interface IAppointmentDrawerProps {
   isVisible?: boolean | undefined
   data?: IAppointmentDrawerData
   type?: 'create' | 'update' | undefined
+}
+
+interface IAppointmentDetailsModalProps {
+  isVisible: boolean
+  data: any
 }
 
 const scheduleSchema = Yup.object().shape({
@@ -91,7 +96,9 @@ export const Schedule = (): JSX.Element => {
   const [isMounted, setIsMounted] = useState(false)
   const [isFetching, setIsFetching] = useState(false)
   const [appointmentDrawer, setAppointmentDrawer] =
-    useState<IAppointmentDrawer | null>(null)
+    useState<IAppointmentDrawerProps | null>(null)
+  const [appointmentDetailsModal, setAppointmentDetailsModal] =
+    useState<IAppointmentDetailsModalProps | null>(null)
   const columns = [
     {
       title: 'Horário',
@@ -179,7 +186,11 @@ export const Schedule = (): JSX.Element => {
               disabledTitle:
                 'Ainda não há uma consulta agendada para este horário',
               disabled: !appointment.status || appointment.status === 'off',
-              onClick: () => console.log('clicked to see details', appointment),
+              onClick: () =>
+                setAppointmentDetailsModal({
+                  isVisible: true,
+                  data: appointment,
+                }),
             },
             {
               id: 'check',
@@ -267,10 +278,22 @@ export const Schedule = (): JSX.Element => {
                 time,
                 patient_id: scheduledAppointment.patient_id,
                 patient_name: scheduledAppointment.patient.name,
+                patient_phone: scheduledAppointment.patient?.primary_phone,
                 insurance_id: scheduledAppointment?.insurance_id,
                 insurance_name: scheduledAppointment?.insurance?.name,
+                specialty_id: scheduledAppointment?.specialty_id,
+                specialty_name: scheduledAppointment?.specialty?.name,
                 status: scheduledAppointment?.status,
                 is_private: scheduledAppointment.is_private || false,
+                is_follow_up: scheduledAppointment.is_follow_up || false,
+                payment_method_id: scheduledAppointment?.payment_method_id,
+                payment_method_name: scheduledAppointment?.payment_method?.name,
+                last_appointment_datetime:
+                  scheduledAppointment?.last_appointment_datetime,
+                doctor_id: scheduledAppointment?.doctor_id,
+                doctor_name: watchedDoctor?.label,
+                created_at: scheduledAppointment.created_at,
+                updated_at: scheduledAppointment.updated_at,
               }
             }
 
@@ -408,6 +431,13 @@ export const Schedule = (): JSX.Element => {
           </Col>
         </Row>
       </Form>
+
+      <AppointmentDetailsModal
+        date={watchedDate?.split('-')?.reverse()?.join('/')}
+        isVisible={appointmentDetailsModal?.isVisible || false}
+        data={appointmentDetailsModal?.data}
+        onCancel={() => setAppointmentDetailsModal(null)}
+      />
 
       <Table
         rowKey="time"
