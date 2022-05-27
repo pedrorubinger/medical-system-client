@@ -29,6 +29,7 @@ import { TableHeader } from '../../components/UI/TableHeader'
 import { Input } from '../../components/UI/Input'
 import { AppointmentDrawer, IAppointmentDrawerData } from './Drawer'
 import { AppointmentDetailsModal } from './AppointmentDetailsModal'
+import { DeleteAppointmentModal } from './DeleteAppointmentModal'
 
 interface IScheduleDoctorOption {
   insurances?: IInsurance[] | undefined
@@ -45,6 +46,8 @@ interface IScheduleDoctorOption {
 interface IRecord {
   time: string
   patient_id?: number | undefined
+  id?: number | undefined
+  appointment_id?: number | undefined
   patient_name?: string | undefined
   insurance_id?: number | undefined | null
   insurance_name?: string | undefined
@@ -67,6 +70,13 @@ interface IAppointmentDrawerProps {
 interface IAppointmentDetailsModalProps {
   isVisible: boolean
   data: any
+}
+
+interface IDeleteAppointmentModalProps {
+  isVisible: boolean
+  id: number
+  datetime: string
+  patientName: string
 }
 
 const scheduleSchema = Yup.object().shape({
@@ -99,6 +109,8 @@ export const Schedule = (): JSX.Element => {
     useState<IAppointmentDrawerProps | null>(null)
   const [appointmentDetailsModal, setAppointmentDetailsModal] =
     useState<IAppointmentDetailsModalProps | null>(null)
+  const [deleteAppointmentModal, setDeleteAppointmentModal] =
+    useState<IDeleteAppointmentModalProps | null>(null)
   const columns = [
     {
       title: 'Horário',
@@ -212,7 +224,16 @@ export const Schedule = (): JSX.Element => {
               disabled:
                 !appointment.status ||
                 ['confirmed', 'off'].includes(appointment.status),
-              onClick: () => console.log('clicked to cancel', appointment),
+              onClick: () =>
+                setDeleteAppointmentModal({
+                  isVisible: true,
+                  datetime: `${watchedDate
+                    ?.split('-')
+                    ?.reverse()
+                    ?.join('/')} às ${appointment.time}`,
+                  id: appointment?.id || -1,
+                  patientName: appointment.patient_name || '',
+                }),
             },
           ]}
         />
@@ -255,7 +276,6 @@ export const Schedule = (): JSX.Element => {
                   .toLocaleTimeString('pt-BR')
                   .substring(0, 5) === time
             )
-
             const hours = time.split(':')[0]
             const minutes = time.split(':')[1]
             const fullDatetime = new Date(
@@ -276,6 +296,7 @@ export const Schedule = (): JSX.Element => {
             if (scheduledAppointment && scheduledAppointment.patient) {
               return {
                 time,
+                id: scheduledAppointment.id,
                 patient_id: scheduledAppointment.patient_id,
                 patient_name: scheduledAppointment.patient.name,
                 patient_phone: scheduledAppointment.patient?.primary_phone,
@@ -386,6 +407,20 @@ export const Schedule = (): JSX.Element => {
             doctor: watchedDoctor.value,
           })
         }
+      />
+
+      <DeleteAppointmentModal
+        datetime={deleteAppointmentModal?.datetime || ''}
+        isVisible={deleteAppointmentModal?.isVisible || false}
+        onCancel={() => setDeleteAppointmentModal(null)}
+        refetchAppointments={() =>
+          fetchAppointmentsAsync({
+            date: watchedDate,
+            doctor: watchedDoctor.value,
+          })
+        }
+        id={deleteAppointmentModal?.id}
+        patientName={deleteAppointmentModal?.patientName}
       />
 
       <Form>
