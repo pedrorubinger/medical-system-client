@@ -30,6 +30,7 @@ import { Input } from '../../components/UI/Input'
 import { AppointmentDrawer, IAppointmentDrawerData } from './Drawer'
 import { AppointmentDetailsModal } from './AppointmentDetailsModal'
 import { DeleteAppointmentModal } from './DeleteAppointmentModal'
+import { ConfirmAppointmentModal } from './ConfirmAppointmentModal'
 
 interface IScheduleDoctorOption {
   insurances?: IInsurance[] | undefined
@@ -79,6 +80,8 @@ interface IDeleteAppointmentModalProps {
   patientName: string
 }
 
+type IConfirmAppointmentModalProps = IDeleteAppointmentModalProps
+
 const scheduleSchema = Yup.object().shape({
   date: Yup.string().required('Por favor, insira a data para ver a agenda!'),
 })
@@ -111,6 +114,8 @@ export const Schedule = (): JSX.Element => {
     useState<IAppointmentDetailsModalProps | null>(null)
   const [deleteAppointmentModal, setDeleteAppointmentModal] =
     useState<IDeleteAppointmentModalProps | null>(null)
+  const [confirmAppointmentModal, setConfirmAppointmentModal] =
+    useState<IConfirmAppointmentModalProps | null>(null)
   const columns = [
     {
       title: 'Horário',
@@ -212,7 +217,16 @@ export const Schedule = (): JSX.Element => {
                   ? 'Ainda não há uma consulta agendada para este horário'
                   : 'Esta consulta ainda não pode ser confirmada',
               disabled: appointment.status !== 'pending',
-              onClick: () => console.log('clicked to confirm', appointment),
+              onClick: () =>
+                setConfirmAppointmentModal({
+                  isVisible: true,
+                  datetime: `${watchedDate
+                    ?.split('-')
+                    ?.reverse()
+                    ?.join('/')} às ${appointment.time}`,
+                  id: appointment?.id || -1,
+                  patientName: appointment.patient_name || '',
+                }),
             },
             {
               id: 'delete',
@@ -421,6 +435,20 @@ export const Schedule = (): JSX.Element => {
         }
         id={deleteAppointmentModal?.id}
         patientName={deleteAppointmentModal?.patientName}
+      />
+
+      <ConfirmAppointmentModal
+        datetime={confirmAppointmentModal?.datetime || ''}
+        isVisible={confirmAppointmentModal?.isVisible || false}
+        onCancel={() => setConfirmAppointmentModal(null)}
+        refetchAppointments={() =>
+          fetchAppointmentsAsync({
+            date: watchedDate,
+            doctor: watchedDoctor.value,
+          })
+        }
+        id={confirmAppointmentModal?.id}
+        patientName={confirmAppointmentModal?.patientName}
       />
 
       <Form>

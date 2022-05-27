@@ -75,7 +75,7 @@ export const getAppointmentStatus = (
     case 'cancelled':
       return 'Cancelada'
     case 'confirmed':
-      return 'Paciente Consultado'
+      return 'Consulta Confirmada'
     case 'pending':
       return 'Aguardando Paciente'
     default:

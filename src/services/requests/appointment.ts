@@ -28,11 +28,16 @@ interface IStoreOrUpdateAppointmentResponse {
 
 interface IDeleteAppointmentResponse {
   success: boolean
-  error?: IError | null
+  error?: IError | null | undefined
 }
 
 interface IDeleteAppointmentAPIResponse {
   success: boolean
+}
+
+interface IConfirmAppointmentResponse {
+  appointment: IAppointment | null
+  error?: IError | null | undefined
 }
 
 const isInstance = (data: any): data is IFetchAppointmentsAPIResponse => {
@@ -99,5 +104,21 @@ export const deleteAppointment = async (
     return { success: response.data.success, error: null }
   } catch (err) {
     return { success: false, error: handleError(err) }
+  }
+}
+
+export const confirmAppointment = async (
+  id: number,
+  data: Partial<TAppointmentData>
+): Promise<IConfirmAppointmentResponse> => {
+  try {
+    const response: AxiosResponse<IAppointment> = await api.put(
+      `/appointment/${id}`,
+      data
+    )
+
+    return { appointment: response.data, error: null }
+  } catch (err) {
+    return { appointment: null, error: handleError(err) }
   }
 }

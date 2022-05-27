@@ -11,3 +11,7 @@ export const InfoMessage = styled.h3`
 export const Form = styled.form`
   margin-bottom: 10px;
 `
+
+export const Strong = styled.strong`
+  font-weight: bold;
+`

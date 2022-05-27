@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { Modal, notification } from 'antd'
 
 import { Strong } from './styles'
-import { deleteAppointment } from '../../../services/requests/appointment'
+import { confirmAppointment } from '../../services/requests/appointment'
 
-interface IDeleteAppointmentModalProps {
+interface IConfirmAppointmentModalProps {
   /** @default false */
   isVisible: boolean
   /** @default undefined */
@@ -16,29 +16,31 @@ interface IDeleteAppointmentModalProps {
   onCancel: (e?: React.MouseEvent<HTMLElement, MouseEvent>) => void
 }
 
-export const DeleteAppointmentModal = ({
+export const ConfirmAppointmentModal = ({
   id,
   isVisible = false,
   datetime,
   patientName = '',
   onCancel,
   refetchAppointments,
-}: IDeleteAppointmentModalProps) => {
-  const [isDeleting, setIsDeleting] = useState(false)
+}: IConfirmAppointmentModalProps) => {
+  const [isConfirming, setIsConfirming] = useState(false)
 
-  const onDelete = async () => {
+  const onConfirm = async () => {
     if (!id) {
       return null
     }
 
-    setIsDeleting(true)
+    setIsConfirming(true)
 
-    const response = await deleteAppointment(id)
+    const response = await confirmAppointment(id, { status: 'confirmed' })
 
-    setIsDeleting(false)
+    setIsConfirming(false)
 
-    if (response.success) {
-      notification.success({ message: 'A consulta foi excluída com sucesso!' })
+    if (response.appointment) {
+      notification.success({
+        message: 'A consulta foi confirmada com sucesso!',
+      })
       onCancel()
       refetchAppointments()
     }
@@ -51,15 +53,14 @@ export const DeleteAppointmentModal = ({
   return (
     <Modal
       visible={isVisible}
-      confirmLoading={isDeleting}
-      onOk={onDelete}
+      confirmLoading={isConfirming}
+      onOk={onConfirm}
       onCancel={onCancel}
-      title="Excluir Consulta"
+      title="Confirmar Consulta"
       cancelText="Cancelar"
-      okText="Sim, excluir"
-      okButtonProps={{ danger: true }}>
+      okText="Sim, confirmar">
       <p>
-        Você tem certeza que pretende excluir permanentemente a consulta do dia{' '}
+        Você tem certeza que pretende confirmar a consulta do dia{' '}
         <Strong>{datetime}</Strong> do paciente <Strong>{patientName}</Strong>?
       </p>
     </Modal>
