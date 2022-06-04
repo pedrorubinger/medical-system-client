@@ -38,7 +38,7 @@ export interface IAppointmentDrawerData {
   insurance?: IInsurance[] | undefined
   payment_method?: IPaymentMethod[] | undefined
   specialty?: ISpecialty[] | undefined
-  last_appointment_datetime?: string | undefined
+  last_appointment_datetime?: string | undefined | null
 }
 
 interface IAppointmentDrawerProps {

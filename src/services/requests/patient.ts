@@ -18,7 +18,7 @@ export interface IFetchPatientsParams
 }
 
 interface IFetchPatientsAPIResponse {
-  meta?: IPaginationMeta
+  meta?: IPaginationMeta | undefined | null
   data: IPatient[]
 }
 

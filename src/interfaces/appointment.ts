@@ -9,9 +9,9 @@ export interface IAppointment {
   id: number
   datetime: string
   is_follow_up: boolean
-  last_appointment_datetime?: string
-  notes?: string
-  exam_request?: string
+  last_appointment_datetime?: string | undefined | null
+  notes?: string | undefined | null
+  exam_request?: string | undefined | null
   status: TAppointmentStatus
   is_private: boolean
   patient_id: number
@@ -51,4 +51,12 @@ export interface IScheduledAppointment {
   doctor_name: string
   created_at: string
   updated_at: string
+}
+
+export interface IMyAppointment extends Omit<IAppointment, 'patient'> {
+  notes?: string | undefined | null
+  exam_request?: string | undefined | null
+  patient: IPatient
+  patient_name: string
+  insurance_name: string
 }

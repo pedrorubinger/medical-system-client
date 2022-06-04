@@ -159,19 +159,19 @@ export const PrivateRoutes: IPrivateRoute[] = [
     ),
   },
   {
-    name: 'Meus Pacientes',
+    name: 'Acompanhamento',
     permissions: ['doctor'],
-    path: '/my-patients',
-    title: 'Clique para ver informações dos seus pacientes',
+    path: '/my-appointments',
+    title: 'Clique para ver informações das suas consultas e seus pacientes',
     show: true,
     icon: <FiUsers />,
     route: (
       <Route
-        key="my-patients"
-        path="/my-patients"
+        key="my-appointments"
+        path="/my-appointments"
         element={
           <PrivateRouteWrapper>
-            <Pages.MyPatients />
+            <Pages.MyAppointments />
           </PrivateRouteWrapper>
         }
       />

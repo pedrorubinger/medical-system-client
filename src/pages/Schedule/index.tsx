@@ -53,7 +53,7 @@ interface IRecord {
   insurance_id?: number | undefined | null
   insurance_name?: string | undefined
   is_private?: boolean | undefined
-  last_appointment_datetime?: string | undefined
+  last_appointment_datetime?: string | undefined | null
   status?: TAppointmentStatus
 }
 

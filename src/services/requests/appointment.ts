@@ -4,9 +4,16 @@ import { AxiosResponse } from 'axios'
 import { api } from '../api'
 import { handleError } from '../../utils/helpers/errors'
 import { IError } from '../../interfaces/error'
-import { IAppointment, TAppointmentData } from '../../interfaces/appointment'
+import { IPagination, IPaginationMeta, ISorting } from '../../interfaces/api'
+import {
+  IAppointment,
+  IMyAppointment,
+  TAppointmentData,
+} from '../../interfaces/appointment'
 
-export interface IFetchAppointmentsParams {
+export interface IFetchAppointmentsParams
+  extends Partial<IPagination>,
+    Partial<ISorting> {
   datetime?: string | null | undefined
   date?: string | null | undefined
   doctor?: number | null | undefined
@@ -14,10 +21,33 @@ export interface IFetchAppointmentsParams {
 
 interface IFetchAppointmentsAPIResponse {
   data: IAppointment[]
+  /** @default undefined */
+  meta?: IPaginationMeta | undefined | null
 }
 
 interface IFetchAppointmentsResponse {
   data: IAppointment[] | null
+  meta: IPaginationMeta | null
+  error: IError | null
+}
+
+export interface IFetchMyAppointmentsParams
+  extends Partial<IPagination>,
+    Partial<ISorting> {
+  datetime?: string | null | undefined
+  patient_name?: string | null | undefined
+  doctor?: number | null | undefined
+}
+
+interface IFetchMyAppointmentsAPIResponse {
+  data: IMyAppointment[]
+  /** @default undefined */
+  meta?: IPaginationMeta | undefined | null
+}
+
+interface IFetchMyAppointmentsResponse {
+  data: IMyAppointment[] | null
+  meta: IPaginationMeta | null
   error: IError | null
 }
 
@@ -40,7 +70,9 @@ interface IConfirmAppointmentResponse {
   error?: IError | null | undefined
 }
 
-const isInstance = (data: any): data is IFetchAppointmentsAPIResponse => {
+const isInstance = (
+  data: any
+): data is IFetchAppointmentsAPIResponse | IFetchMyAppointmentsAPIResponse => {
   return 'meta' in data
 }
 
@@ -55,11 +87,35 @@ export const fetchAppointments = async (
     return isInstance(response.data)
       ? {
           data: response.data.data,
+          meta: response.data.meta || null,
           error: null,
         }
-      : { data: response.data, error: null }
+      : { data: response.data, error: null, meta: null }
   } catch (err) {
-    return { data: null, error: handleError(err) }
+    return { data: null, meta: null, error: handleError(err) }
+  }
+}
+
+export const fetchMyAppointments = async (
+  doctorId: number,
+  params?: IFetchMyAppointmentsParams
+): Promise<IFetchMyAppointmentsResponse> => {
+  try {
+    const response: AxiosResponse<
+      IFetchMyAppointmentsAPIResponse | IMyAppointment[]
+    > = await api.get('/appointment', {
+      params: { ...params, doctor: doctorId }, // status: 'confirmed'
+    })
+
+    return isInstance(response.data)
+      ? {
+          data: response.data.data,
+          meta: response.data.meta || null,
+          error: null,
+        }
+      : { data: response.data, error: null, meta: null }
+  } catch (err) {
+    return { data: null, meta: null, error: handleError(err) }
   }
 }
 
