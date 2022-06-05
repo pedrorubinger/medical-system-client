@@ -43,7 +43,6 @@ export const MyAppointments = (): JSX.Element => {
   const [records, setRecords] = useState<IMyAppointment[]>([])
   const [fetching, setFetching] = useState(false)
   const [searchFilters, setSearchFilters] = useState<IFilter>(initialFilters)
-  const [printDoc, setPrintDoc] = useState(false)
   const [pagination, setPagination] = useState<TablePaginationConfig>({
     ...initialPagination,
   })
@@ -195,9 +194,7 @@ export const MyAppointments = (): JSX.Element => {
         isVisible={!!appointmentDetailsModal}
         data={appointmentDetailsModal?.data}
         onCancel={() => setAppointmentDetailsModal(null)}
-        onPrint={() => setPrintDoc(true)}
       />
-      {/* {!!printDoc && <AppointmentDocument />} */}
     </PageContent>
   )
 }

@@ -1,46 +1,35 @@
-import { Col, Modal, Row } from 'antd'
+import { Col, Collapse, Modal, Row, Typography } from 'antd'
 
-import { Button, ButtonContainer } from './styles'
+import { CollapseInfoContainer } from './styles'
 import { IMyAppointment } from '../../interfaces/appointment'
 import { getDrawerWidth } from '../../utils/helpers/formatters'
 import { ReadOnly } from '../../components/UI/ReadOnly'
+import { AppointmentDetailsDocument } from '../../components/UI/AppointmentDetailsDocument'
 
 interface IMyAppointmentDetailModalProps {
   /** @default false */
   isVisible: boolean
   data?: IMyAppointment
   onCancel: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void
-  onPrint: () => void
 }
 
 export const MyAppointmentDetailModal = ({
   isVisible = false,
   data,
   onCancel,
-  onPrint,
 }: IMyAppointmentDetailModalProps) => {
   if (!data) {
     return null
   }
 
-  console.log('data:', data)
-
   return (
     <Modal
-      footer={
-        <ButtonContainer>
-          <Button
-            type="button"
-            title="Clique para imprimir essas informações"
-            onClick={onPrint}>
-            Imprimir
-          </Button>
-        </ButtonContainer>
-      }
+      footer={null}
       visible={isVisible}
       width={getDrawerWidth(!data?.exam_request || !data?.notes ? 900 : 800)}
       onCancel={onCancel}
-      title="Detalhes da Consulta">
+      title="Detalhes da Consulta"
+      destroyOnClose>
       <Row gutter={24}>
         <Col span={12} sm={12} xs={24}>
           <ReadOnly label="Nome" value={data.patient.name} paperMode />
@@ -169,6 +158,24 @@ export const MyAppointmentDetailModal = ({
           />
         </Col>
       </Row>
+
+      <Collapse defaultActiveKey={['1']}>
+        <Collapse.Panel header="Gerar Arquivo" key="0">
+          <CollapseInfoContainer>
+            <Typography.Text>
+              Para poder imprimir os detalhes da consulta, você precisa gerar um
+              arquivo <Typography.Text strong>&quot;.pdf&quot;</Typography.Text>
+              . Escolha as informações de consulta que aparecerão no arquivo e
+              clique no botão <Typography.Text strong>Download</Typography.Text>
+              . O arquivo será baixado automaticamente e, então, você poderá
+              imprimi-lo. Você poderá gerar e baixar este arquivo quantas vezes
+              desejar, escolhendo as informações que nele aparecerão.
+            </Typography.Text>
+          </CollapseInfoContainer>
+
+          <AppointmentDetailsDocument />
+        </Collapse.Panel>
+      </Collapse>
     </Modal>
   )
 }
