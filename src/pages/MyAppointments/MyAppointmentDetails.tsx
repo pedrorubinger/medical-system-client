@@ -86,7 +86,7 @@ export const MyAppointmentDetailModal = ({
             label="Data da Última Consulta"
             value={
               data?.last_appointment_datetime
-                ? new Date(data.last_appointment_datetime).toDateString()
+                ? new Date().toDateString()
                 : 'Nenhum registro'
             }
             paperMode
@@ -133,14 +133,6 @@ export const MyAppointmentDetailModal = ({
           <ReadOnly
             label="Pedido de Exame(s)"
             value={data.exam_request || 'Não informado'}
-            // value={`
-            //   TGO (AST) e TGP (ALT)
-            //   Colesterol
-            //   TSH e T4 livre
-            //   Ureia e creatinina
-            //   Eletrocardiograma
-            //   Exame de Urina
-            // `}
             paperMode
           />
         </Col>
@@ -150,10 +142,7 @@ export const MyAppointmentDetailModal = ({
         <Col span={24} sm={24} xs={24}>
           <ReadOnly
             label="Anotações"
-            // value={data.notes || 'Não informado'}
-            value={`
-              Lorem ipsum dolor sit amet, consectetur 69mg adipiscing elit. Donec congue elit ac urna blandit rutrum. Ut sit amet ligula et tellus feugiat tempus id a massa. Donec mauris justo, vulputate nec lacus vitae, gravida imperdiet ipsum. Donec ullamcorper metus augue, at pellentesque enim hendrerit id. In eget arcu non nisl varius luctus. Cras commodo dictum tellus et fringilla. Aenean turpis orci, elementum eu tincidunt eget, pellentesque eu sem. Nulla sagittis sed turpis a feugiat. Aliquam quis ipsum porttitor, tincidunt lectus at, fermentum dui. Nullam dictum lobortis nulla. Phasellus pulvinar commodo porta. Maecenas consequat ante erat, sed sollicitudin ex eleifend quis. Donec a mollis nunc, ac feugiat ipsum. Suspendisse potenti. Donec et nisl sit amet leo cursus aliquam. Nam sit amet congue erat. Nullam auctor porta augue, vitae elementum eros tincidunt ac. Vestibulum ornare varius neque nec condimentum. Fusce fringilla accumsan justo nec volutpat. Maecenas dignissim posuere pulvinar. Suspendisse potenti. Suspendisse tristique eget diam non porta. Cras lacus turpis, luctus a tortor sed, pulvinar interdum augue. Vestibulum vel purus mattis, blandit risus at, sagittis urna. Donec risus nulla, sodales sed feugiat vel, gravida et nunc. Duis aliquet eleifend sollicitudin. Nunc scelerisque scelerisque rutrum. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nam vehicula ultrices mi. Proin facilisis velit dui, sit amet pellentesque tortor aliquam et. Curabitur id tempus tortor. Nunc non metus vitae libero molestie cursus. Integer vitae nunc leo.
-            `}
+            value={data.notes || 'Não informado'}
             paperMode
           />
         </Col>
@@ -168,12 +157,16 @@ export const MyAppointmentDetailModal = ({
               . Escolha as informações de consulta que aparecerão no arquivo e
               clique no botão <Typography.Text strong>Download</Typography.Text>
               . O arquivo será baixado automaticamente e, então, você poderá
-              imprimi-lo. Você poderá gerar e baixar este arquivo quantas vezes
-              desejar, escolhendo as informações que nele aparecerão.
+              imprimi-lo. Caso o seu download não aconteça ao clicar no botão,
+              verifique as configurações do seu navegador referente ao download
+              de arquivos. Você também pode baixá-lo na seção{' '}
+              <Typography.Text strong>Prévia</Typography.Text> abaixo. Você
+              poderá gerar e baixar este arquivo quantas vezes desejar,
+              escolhendo as informações que nele aparecerão.
             </Typography.Text>
           </CollapseInfoContainer>
 
-          <AppointmentDetailsDocument />
+          <AppointmentDetailsDocument appointment={data} />
         </Collapse.Panel>
       </Collapse>
     </Modal>

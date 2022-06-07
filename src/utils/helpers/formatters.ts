@@ -1,3 +1,8 @@
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+
+dayjs.extend(relativeTime)
+
 import { TAppointmentStatus } from '../../interfaces/appointment'
 import {
   IParsedDaysScheduleSettings,
@@ -151,4 +156,13 @@ export const getUTCDate = (ISODate: string, plainDate = false) => {
   )
 
   return plainDate ? formattedDate : formattedDate.toISOString()
+}
+
+/**
+ * Gets time passed (in years) based in a provided date (YYYY-MM-DD)
+ * @param {string} date date in format YYYY-MM-DD
+ * @returns time passed since provided date (in years) or null if an invalid date string is provided
+ */
+export const getTimePassed = (date: string): number | null => {
+  return Number(dayjs().from(dayjs(date), true).replaceAll(/\D/g, '')) || null
 }
