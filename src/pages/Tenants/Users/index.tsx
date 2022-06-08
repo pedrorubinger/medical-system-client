@@ -236,6 +236,7 @@ export const ListTenantUsers = ({
       destroyOnClose>
       <CreateTenantUserDrawer
         tenantId={tenantId}
+        tenantName={tenantName}
         isVisible={drawer}
         onClose={() => setDrawer(false)}
         fetchUsers={async () => await fetchUsersAsync(initialFetchParams)}

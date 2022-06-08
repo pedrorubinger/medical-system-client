@@ -16,12 +16,14 @@ import { getDrawerWidth } from '../../../utils/helpers/formatters'
 interface ICreateTenantUserDrawerProps {
   isVisible: boolean
   tenantId: number
+  tenantName: string
   onClose: () => void
   fetchUsers: () => void
 }
 
 export const CreateTenantUserDrawer = ({
   tenantId,
+  tenantName,
   isVisible,
   onClose,
   fetchUsers,
@@ -59,6 +61,7 @@ export const CreateTenantUserDrawer = ({
       ...values,
       cpf: values.cpf.replaceAll(/\D/g, ''),
       role: values.role.value,
+      tenant_name: tenantName,
       tenant_id: tenantId,
       owner_tenant: false,
     })

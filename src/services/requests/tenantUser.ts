@@ -27,8 +27,9 @@ interface ITenantHeader {
 }
 
 interface IStoreTenantUserData extends IStoreUserData {
-  tenant_id?: number
   owner_tenant: boolean
+  tenant_name?: string
+  tenant_id?: number
 }
 
 interface IStoreOrUpdateTenantResponse {
@@ -49,10 +50,9 @@ export const storeTenantUser = async (
   data: IStoreTenantUserData
 ): Promise<IStoreOrUpdateTenantResponse> => {
   try {
-    const response: AxiosResponse<ITenant> = await api.post(
-      '/tenant_user',
-      data
-    )
+    const response: AxiosResponse<ITenant> = await api.post('/tenant_user', {
+      ...data,
+    })
 
     return { tenant: response.data, error: null }
   } catch (err) {
