@@ -164,7 +164,7 @@ export const Insurances = (): JSX.Element => {
         insuranceName={deletionModal?.insuranceName || ''}
       />
       <TableHeader
-        title="Convênios"
+        title="Convênios da Clínica"
         newRecordButton={{
           visible: true,
           onClick: () => setDrawer({ isVisible: true, type: 'create' }),

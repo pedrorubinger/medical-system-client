@@ -165,7 +165,7 @@ export const Specialties = (): JSX.Element => {
         specialtyName={deletionModal?.specialtyName || ''}
       />
       <TableHeader
-        title="Especialidades"
+        title="Especialidades da Clínica"
         newRecordButton={{
           visible: true,
           onClick: () => setDrawer({ isVisible: true, type: 'create' }),

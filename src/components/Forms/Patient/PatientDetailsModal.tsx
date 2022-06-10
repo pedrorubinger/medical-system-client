@@ -1,7 +1,7 @@
 import { Col, Modal, Row } from 'antd'
 import Axios from 'axios'
 
-import { IPatient } from '../../../interfaces/patient'
+import { ICompletePatient, IPatient } from '../../../interfaces/patient'
 import { ReadOnly } from '../../UI/ReadOnly'
 import { useEffect, useState } from 'react'
 import { getDrawerWidth } from '../../../utils/helpers/formatters'
@@ -9,8 +9,14 @@ import { getDrawerWidth } from '../../../utils/helpers/formatters'
 interface IPatientDetailsModalProps {
   /** @default false */
   isVisible: boolean
-  data?: IPatient
+  data?: ICompletePatient | IPatient
   onCancel: (e: React.MouseEvent<HTMLElement, MouseEvent>) => void
+}
+
+const hasCompletePatientData = (
+  data: ICompletePatient | IPatient
+): data is ICompletePatient => {
+  return 'allergies' in data
 }
 
 export const PatientDetailsModal = ({
@@ -48,6 +54,8 @@ export const PatientDetailsModal = ({
   if (!data) {
     return null
   }
+
+  const updatedAt = new Date(data.updated_at).toLocaleString()
 
   return (
     <Modal
@@ -142,6 +150,88 @@ export const PatientDetailsModal = ({
         </Row>
       )}
 
+      {!!hasCompletePatientData(data) && (
+        <>
+          <Row gutter={24}>
+            <Col span={12} sm={12} xs={24}>
+              <ReadOnly
+                label="Altura (metros)"
+                value={
+                  data?.height ? `${data.height || 1.68} m` : 'Não informado'
+                }
+                paperMode
+              />
+            </Col>
+
+            <Col span={12} sm={12} xs={24}>
+              <ReadOnly
+                label="Peso (quilos)"
+                value={
+                  data?.weight ? `${data.weight || 84.3} kg` : 'Não informado'
+                }
+                paperMode
+              />
+            </Col>
+          </Row>
+
+          {data?.illnesses || data?.allergies ? (
+            <>
+              <Row gutter={24}>
+                <Col span={12} sm={12} xs={24}>
+                  <ReadOnly
+                    label="Alergias"
+                    value={data?.allergies || 'Não consta'}
+                    paperMode
+                  />
+                </Col>
+              </Row>
+
+              <Row gutter={24}>
+                <Col span={24} sm={24} xs={24}>
+                  <ReadOnly
+                    label="Doenças"
+                    value={data?.illnesses || 'Não consta'}
+                    paperMode
+                  />
+                </Col>
+              </Row>
+            </>
+          ) : (
+            <>
+              <Row gutter={24}>
+                <Col span={12} sm={12} xs={24}>
+                  <ReadOnly
+                    label="Alergias"
+                    value={data?.allergies || 'Não consta'}
+                    paperMode
+                  />
+                </Col>
+
+                <Col span={12} sm={12} xs={24}>
+                  <ReadOnly
+                    label="Doenças"
+                    value={data?.illnesses || 'Não consta'}
+                    paperMode
+                  />
+                </Col>
+              </Row>
+            </>
+          )}
+
+          {!!data?.notes && (
+            <Row gutter={24}>
+              <Col span={12} sm={12} xs={24}>
+                <ReadOnly
+                  label="Anotações Gerais"
+                  value={data?.notes || 'Não consta'}
+                  paperMode
+                />
+              </Col>
+            </Row>
+          )}
+        </>
+      )}
+
       <Row gutter={24}>
         <Col span={12} sm={12} xs={24}>
           <ReadOnly
@@ -152,11 +242,7 @@ export const PatientDetailsModal = ({
         </Col>
 
         <Col span={12} sm={12} xs={24}>
-          <ReadOnly
-            label="Última Atualização"
-            value={new Date(data.updated_at).toLocaleString()}
-            paperMode
-          />
+          <ReadOnly label="Última Atualização" value={updatedAt} paperMode />
         </Col>
       </Row>
     </Modal>

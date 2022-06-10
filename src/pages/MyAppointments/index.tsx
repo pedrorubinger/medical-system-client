@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 import { Table, TablePaginationConfig } from 'antd'
 import { FilterValue } from 'antd/lib/table/interface'
 
@@ -13,7 +14,6 @@ import {
 } from '../../services/requests/appointment'
 import { IMyAppointment } from '../../interfaces/appointment'
 import { RootState } from '../../store'
-import { useSelector } from 'react-redux'
 import { InfoMessage } from './styles'
 import { MyAppointmentDetailModal } from './MyAppointmentDetails'
 
@@ -149,8 +149,7 @@ export const MyAppointments = (): JSX.Element => {
     <PageContent>
       <TableHeader title="Minhas Consultas" />
       <InfoMessage>
-        Na tabela abaixo você pode acompanhar as consultas e os pacientes
-        atendidos por você.
+        Na tabela abaixo você pode acompanhar as consultas atendidas por você.
       </InfoMessage>
       <Table
         rowKey="id"

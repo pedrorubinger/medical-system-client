@@ -4,7 +4,11 @@ import { AxiosResponse } from 'axios'
 import { api } from '../api'
 import { handleError } from '../../utils/helpers/errors'
 import { IError } from '../../interfaces/error'
-import { IPatient, TPatientData } from '../../interfaces/patient'
+import {
+  ICompletePatient,
+  IPatient,
+  TPatientData,
+} from '../../interfaces/patient'
 import { IPagination, IPaginationMeta, ISorting } from '../../interfaces/api'
 
 export interface IFetchPatientsParams
@@ -28,6 +32,17 @@ interface IFetchPatientsResponse {
   error: IError | null
 }
 
+interface IFetchMyPatientsResponse {
+  meta: IPaginationMeta | null
+  data: ICompletePatient[] | null
+  error: IError | null
+}
+
+interface IFetchMyPatientsAPIResponse {
+  meta?: IPaginationMeta | undefined | null
+  data: ICompletePatient[]
+}
+
 interface IStoreOrUpdatePatientResponse {
   patient: IPatient | null
   error: IError | null
@@ -42,7 +57,9 @@ interface IDeletePatientAPIResponse {
   success: boolean
 }
 
-const isInstance = (data: any): data is IFetchPatientsAPIResponse => {
+const isInstance = (
+  data: any
+): data is IFetchPatientsAPIResponse | IFetchMyPatientsAPIResponse => {
   return 'meta' in data
 }
 
@@ -52,6 +69,27 @@ export const fetchPatients = async (
   try {
     const response: AxiosResponse<IFetchPatientsAPIResponse | IPatient[]> =
       await api.get('/patient', { params: { ...params } })
+
+    return isInstance(response.data)
+      ? {
+          data: response.data.data,
+          meta: response.data.meta || null,
+          error: null,
+        }
+      : { data: response.data, error: null, meta: null }
+  } catch (err) {
+    return { data: null, meta: null, error: handleError(err) }
+  }
+}
+
+export const fetchMyPatients = async (
+  doctorId: number,
+  params?: IFetchPatientsParams
+): Promise<IFetchMyPatientsResponse> => {
+  try {
+    const response: AxiosResponse<
+      IFetchMyPatientsAPIResponse | ICompletePatient[]
+    > = await api.get('/my-patients', { params: { ...params, doctorId } })
 
     return isInstance(response.data)
       ? {

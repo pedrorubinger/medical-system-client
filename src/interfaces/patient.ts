@@ -25,3 +25,15 @@ export type TPatientData = Omit<
   IPatient,
   'id' | 'created_at' | 'updated_at' | 'address'
 > & { address?: IAddressData }
+
+export interface IMyPatient {
+  notes?: string
+  allergies?: string
+  illnesses?: string
+  height?: number
+  weight?: number
+  doctor_id: number
+  patient_id: number
+}
+
+export interface ICompletePatient extends IPatient, IMyPatient {}
