@@ -17,6 +17,8 @@ export const ERROR_MESSAGES: { [key: string]: string } = {
     'Você não tem permissão para excluir esse usuário!',
   MISSING_TENANT_ID:
     'A requisição falhou pois não foi possível identificar a clínica!',
+  MISSING_PATIENT_AND_DOCTOR_ID:
+    'Não foi possível identificar o paciente ou o médico! Por favor, tente novamente depois.',
   ACCESS_DENIED_TENANT_IS_INACTIVE:
     'Você não está autorizado a realizar essa operação! Por favor, entre em contato conosco.',
   PAYMENT_METHOD_NOT_FOUND: 'Esse método de pagamento não foi encontrado!',

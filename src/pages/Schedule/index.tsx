@@ -11,7 +11,9 @@ import {
 } from '../../services/requests/appointment'
 import { fetchUsersDoctors } from '../../services/requests/user'
 import {
+  getDisabledStatusTitle,
   getFormattedDoctorSchedule,
+  getTimeDifference,
   getUTCDate,
 } from '../../utils/helpers/formatters'
 import { dateIsInRange } from '../../utils/helpers/validators'
@@ -53,7 +55,6 @@ interface IRecord {
   insurance_id?: number | undefined | null
   insurance_name?: string | undefined
   is_private?: boolean | undefined
-  last_appointment_datetime?: string | undefined | null
   status?: TAppointmentStatus
 }
 
@@ -104,6 +105,9 @@ export const Schedule = (): JSX.Element => {
   })
   const watchedDoctor = watch('doctor')
   const watchedDate = watch('date')
+  const timeDiffInDays = watchedDate
+    ? getTimeDifference('day', watchedDate)
+    : -1
   const [doctorsList, setDoctorsList] = useState<IScheduleDoctorOption[]>([])
   const [records, setRecords] = useState<any>([])
   const [isMounted, setIsMounted] = useState(false)
@@ -146,93 +150,94 @@ export const Schedule = (): JSX.Element => {
       title: 'Ações',
       dataIndex: 'actions',
       key: 'actions',
-      render: (_: undefined, appointment: IRecord) => (
-        <TableActions
-          options={[
-            {
-              id: 'add',
-              overlay: 'Clique para marcar uma consulta neste horário',
-              disabledTitle:
-                appointment.status === 'off'
-                  ? 'Ainda não há uma consulta agendada para este horário'
-                  : 'Este horário já está ocupado',
-              disabled:
-                !watchedDate ||
-                !!appointment.status ||
-                appointment.status === 'cancelled',
-              onClick: () =>
-                setAppointmentDrawer({
-                  isVisible: true,
-                  data: {
-                    last_appointment_datetime:
-                      appointment.last_appointment_datetime,
-                    appointment_follow_up_limit:
-                      watchedDoctor.appointment_follow_up_limit,
-                    private_appointment_price:
-                      watchedDoctor.private_appointment_price,
-                    datetime: `${watchedDate} ${appointment.time}`,
-                    doctor: watchedDoctor,
-                    insurance: watchedDoctor.insurances,
-                    specialty: watchedDoctor.specialties,
-                    payment_method: watchedDoctor.payment_methods,
-                  },
-                }),
-            },
-            {
-              id: 'info',
-              overlay: 'Detalhes da consulta',
-              disabledTitle:
-                'Ainda não há uma consulta agendada para este horário',
-              disabled: !appointment.status || appointment.status === 'off',
-              onClick: () =>
-                setAppointmentDetailsModal({
-                  isVisible: true,
-                  data: appointment,
-                }),
-            },
-            {
-              id: 'check',
-              overlay: 'Confirmar consulta',
-              disabledTitle:
-                !appointment.status || appointment.status === 'off'
-                  ? 'Ainda não há uma consulta agendada para este horário'
-                  : 'Esta consulta ainda não pode ser confirmada',
-              disabled: appointment.status !== 'pending',
-              onClick: () =>
-                setConfirmAppointmentModal({
-                  isVisible: true,
-                  datetime: `${watchedDate
-                    ?.split('-')
-                    ?.reverse()
-                    ?.join('/')} às ${appointment.time}`,
-                  id: appointment?.id || -1,
-                  patientName: appointment.patient_name || '',
-                }),
-            },
-            {
-              id: 'delete',
-              overlay: 'Cancelar e excluir consulta',
-              disabledTitle:
-                !appointment.status || appointment.status === 'off'
-                  ? 'Ainda não há uma consulta agendada para este horário'
-                  : 'Esta consulta já está confirmada e não pode ser excluída',
-              disabled:
-                !appointment.status ||
-                ['confirmed', 'off'].includes(appointment.status),
-              onClick: () =>
-                setDeleteAppointmentModal({
-                  isVisible: true,
-                  datetime: `${watchedDate
-                    ?.split('-')
-                    ?.reverse()
-                    ?.join('/')} às ${appointment.time}`,
-                  id: appointment?.id || -1,
-                  patientName: appointment.patient_name || '',
-                }),
-            },
-          ]}
-        />
-      ),
+      render: (_: undefined, appointment: IRecord) => {
+        return (
+          <TableActions
+            options={[
+              {
+                id: 'add',
+                overlay: 'Clique para marcar uma consulta neste horário',
+                disabledTitle:
+                  appointment.status === 'off'
+                    ? 'Ainda não há uma consulta agendada para este horário'
+                    : 'Este horário já está ocupado',
+                disabled:
+                  !watchedDate ||
+                  !!appointment.status ||
+                  appointment.status === 'cancelled',
+                onClick: () =>
+                  setAppointmentDrawer({
+                    isVisible: true,
+                    data: {
+                      appointment_follow_up_limit:
+                        watchedDoctor.appointment_follow_up_limit,
+                      private_appointment_price:
+                        watchedDoctor.private_appointment_price,
+                      datetime: `${watchedDate} ${appointment.time}`,
+                      doctor: watchedDoctor,
+                      insurance: watchedDoctor.insurances,
+                      specialty: watchedDoctor.specialties,
+                      payment_method: watchedDoctor.payment_methods,
+                    },
+                  }),
+              },
+              {
+                id: 'info',
+                overlay: 'Detalhes da consulta',
+                disabledTitle:
+                  'Ainda não há uma consulta agendada para este horário',
+                disabled: !appointment.status || appointment.status === 'off',
+                onClick: () =>
+                  setAppointmentDetailsModal({
+                    isVisible: true,
+                    data: appointment,
+                  }),
+              },
+              {
+                id: 'check',
+                overlay: 'Confirmar consulta',
+                disabledTitle: getDisabledStatusTitle(
+                  appointment.status,
+                  timeDiffInDays
+                ),
+                disabled:
+                  appointment.status !== 'pending' || timeDiffInDays < 0,
+                onClick: () =>
+                  setConfirmAppointmentModal({
+                    isVisible: true,
+                    datetime: `${watchedDate
+                      ?.split('-')
+                      ?.reverse()
+                      ?.join('/')} às ${appointment.time}`,
+                    id: appointment?.id || -1,
+                    patientName: appointment.patient_name || '',
+                  }),
+              },
+              {
+                id: 'delete',
+                overlay: 'Cancelar e excluir consulta',
+                disabledTitle:
+                  !appointment.status || appointment.status === 'off'
+                    ? 'Ainda não há uma consulta agendada para este horário'
+                    : 'Esta consulta já está confirmada e não pode ser excluída',
+                disabled:
+                  !appointment.status ||
+                  ['confirmed', 'off'].includes(appointment.status),
+                onClick: () =>
+                  setDeleteAppointmentModal({
+                    isVisible: true,
+                    datetime: `${watchedDate
+                      ?.split('-')
+                      ?.reverse()
+                      ?.join('/')} às ${appointment.time}`,
+                    id: appointment?.id || -1,
+                    patientName: appointment.patient_name || '',
+                  }),
+              },
+            ]}
+          />
+        )
+      },
     },
   ]
 
@@ -304,8 +309,6 @@ export const Schedule = (): JSX.Element => {
                 is_follow_up: scheduledAppointment.is_follow_up || false,
                 payment_method_id: scheduledAppointment?.payment_method_id,
                 payment_method_name: scheduledAppointment?.payment_method?.name,
-                last_appointment_datetime:
-                  scheduledAppointment?.last_appointment_datetime,
                 doctor_id: scheduledAppointment?.doctor_id,
                 doctor_name: watchedDoctor?.label,
                 created_at: scheduledAppointment.created_at,
@@ -341,8 +344,6 @@ export const Schedule = (): JSX.Element => {
           specialties: userDoctor.doctor?.specialty,
           label: userDoctor.name,
           value: userDoctor.doctor.id,
-          last_appointment_datetime:
-            userDoctor.doctor.last_appointment_datetime,
           appointment_follow_up_limit:
             userDoctor.doctor.appointment_follow_up_limit,
           private_appointment_price:

@@ -175,6 +175,21 @@ export const getTimePassed = (date: string): number | null => {
 }
 
 /**
+ * Gets time difference between two dates.
+ * @param {'month' | 'day'} unit time unity.
+ * @param {string} to - date string reference (from -> to)
+ * @param {string} from - date string reference (from -> to). Today's date is defined as default value.
+ * @returns the difference between the provided dates.
+ */
+export const getTimeDifference = (
+  unit: 'month' | 'day',
+  to: string,
+  from?: string
+): number => {
+  return Number(dayjs(from || new Date()).diff(to, unit))
+}
+
+/**
  * Formats decimal values separator.
  * @param {string | number} value target value.
  * @param {IFormatDecimalSeparatorOptions} options separator options.
@@ -209,4 +224,37 @@ export const getDateInText = (date: string) => {
   const time = formattedFullDate?.split(' ')?.[1]?.slice(0, 5)
 
   return `${formattedDate} às ${time}`
+}
+
+/**
+ * Gets the disabled status message for icons and buttons title/tooltips.
+ * @param {TAppointmentStatus | undefined} status appointment status.
+ * @param {number | undefined} timeDiffInDays diferença de tempo em dias.
+ * @returns the appropriate tooltip message based in the provided params.
+ */
+export const getDisabledStatusTitle = (
+  status: TAppointmentStatus | undefined,
+  timeDiffInDays?: number | undefined
+) => {
+  if (!status) {
+    return 'Ainda não há uma consulta agendada para este horário'
+  }
+
+  if (status === 'off') {
+    return 'Este horário está indisponível'
+  }
+
+  if (status === 'confirmed') {
+    return 'Esta consulta já foi confirmada'
+  }
+
+  if (status === 'cancelled') {
+    return 'Esta consulta foi cancelada'
+  }
+
+  if (timeDiffInDays && timeDiffInDays < 0) {
+    return 'O dia da consulta ainda não chegou'
+  }
+
+  return 'Ainda não é possível confirmar esta consulta'
 }

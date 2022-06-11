@@ -67,18 +67,6 @@ export const AppointmentDetailsModal = ({
       <Row gutter={24}>
         <Col span={12} sm={12} xs={24}>
           <ReadOnly
-            label="Data da Última Consulta"
-            value={
-              data?.last_appointment_datetime
-                ? new Date(data.last_appointment_datetime).toDateString()
-                : 'Nenhum registro'
-            }
-            paperMode
-          />
-        </Col>
-
-        <Col span={12} sm={12} xs={24}>
-          <ReadOnly
             label="Consulta de Retorno"
             value={data?.is_follow_up ? 'Sim' : 'Não'}
             paperMode

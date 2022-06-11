@@ -116,13 +116,13 @@ export const Admins = () => {
       render: (cpf: string) => formatCPF(cpf),
     },
     {
-      title: 'E-mail',
+      title: 'Email',
       dataIndex: 'email',
       key: 'email',
       sorter: (a: IUser, b: IUser) => a.email.localeCompare(b.email),
       ...getFilterProps({
         dataIndex: 'email',
-        inputOptions: { placeholder: 'E-mail' },
+        inputOptions: { placeholder: 'Email' },
       }),
       filteredValue: searchFilters.email as unknown as FilterValue,
     },

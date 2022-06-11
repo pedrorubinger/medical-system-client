@@ -82,7 +82,7 @@ export const Login = (): JSX.Element => {
                 defaultValue=""
                 render={({ field }) => (
                   <Input
-                    label="E-mail"
+                    label="Email"
                     placeholder="Digite seu e-mail"
                     error={errors?.email?.message}
                     required

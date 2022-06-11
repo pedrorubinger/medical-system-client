@@ -9,7 +9,6 @@ export interface IAppointment {
   id: number
   datetime: string
   is_follow_up: boolean
-  last_appointment_datetime?: string | undefined | null
   notes?: string | undefined | null
   exam_request?: string | undefined | null
   status: TAppointmentStatus
@@ -44,7 +43,6 @@ export interface IScheduledAppointment {
   patient_phone: string
   specialty_id?: number | null | undefined
   specialty_name?: string | undefined
-  last_appointment_datetime?: string | null | undefined
   payment_method_id?: number | null | undefined
   payment_method_name?: string | null | undefined
   doctor_id: number

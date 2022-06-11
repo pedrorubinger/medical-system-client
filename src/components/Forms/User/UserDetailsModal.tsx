@@ -58,7 +58,7 @@ export const UserDetailsModal = ({
         </Col>
 
         <Col span={12} sm={12} xs={24}>
-          <ReadOnly label="E-mail" value={data.email} paperMode />
+          <ReadOnly label="Email" value={data.email} paperMode />
         </Col>
       </Row>
 

@@ -9,7 +9,9 @@ import { TableHeader } from '../../../components/UI/TableHeader'
 
 import {
   getDateInText,
+  getDisabledStatusTitle,
   getDrawerWidth,
+  getTimeDifference,
 } from '../../../utils/helpers/formatters'
 import {
   IMyAppointment,
@@ -120,18 +122,6 @@ export const MyAppointmentsDrawer = ({
     [patientId]
   )
 
-  const getDisabledStatusTitle = (status: TAppointmentStatus) => {
-    if (status === 'confirmed') {
-      return 'Esta consulta já foi confirmada'
-    }
-
-    if (status === 'cancelled') {
-      return 'Esta consulta foi cancelada'
-    }
-
-    return 'Ainda não é possível confirmar esta consulta'
-  }
-
   const columns = [
     {
       title: 'Data da Consulta',
@@ -167,45 +157,53 @@ export const MyAppointmentsDrawer = ({
       title: 'Ações',
       dataIndex: 'actions',
       key: 'actions',
-      render: (_: string, appointment: IMyAppointment) => (
-        <TableActions
-          options={[
-            {
-              id: 'info',
-              overlay: 'Detalhes da consulta',
-              onClick: () =>
-                setAppointmentDetailsModal({
-                  isVisible: true,
-                  data: appointment,
-                }),
-            },
-            {
-              id: 'check',
-              overlay: 'Confirmar consulta',
-              disabledTitle: getDisabledStatusTitle(appointment.status),
-              disabled: appointment.status !== 'pending',
-              onClick: () =>
-                setConfirmAppointmentModal({
-                  isVisible: true,
-                  datetime: getDateInText(appointment.datetime),
-                  id: appointment?.id || -1,
-                  patientName: appointment.patient_name || '',
-                }),
-            },
-            {
-              id: 'edit',
-              overlay: 'Preencher os dados desta consulta',
-              disabled: appointment?.status !== 'confirmed',
-              disabledTitle: 'Confirme a consulta para preencher seus dados',
-              onClick: () =>
-                setEditAppointmentDrawer({
-                  isVisible: true,
-                  data: appointment,
-                }),
-            },
-          ]}
-        />
-      ),
+      render: (_: string, appointment: IMyAppointment) => {
+        const timeDiffInDays = getTimeDifference('day', appointment.datetime)
+
+        return (
+          <TableActions
+            options={[
+              {
+                id: 'info',
+                overlay: 'Detalhes da consulta',
+                onClick: () =>
+                  setAppointmentDetailsModal({
+                    isVisible: true,
+                    data: appointment,
+                  }),
+              },
+              {
+                id: 'check',
+                overlay: 'Confirmar consulta',
+                disabledTitle: getDisabledStatusTitle(
+                  appointment.status,
+                  timeDiffInDays
+                ),
+                disabled:
+                  appointment.status !== 'pending' || timeDiffInDays < 0,
+                onClick: () =>
+                  setConfirmAppointmentModal({
+                    isVisible: true,
+                    datetime: getDateInText(appointment.datetime),
+                    id: appointment?.id || -1,
+                    patientName: appointment.patient_name || '',
+                  }),
+              },
+              {
+                id: 'edit',
+                overlay: 'Preencher os dados desta consulta',
+                disabled: appointment?.status !== 'confirmed',
+                disabledTitle: 'Confirme a consulta para preencher seus dados',
+                onClick: () =>
+                  setEditAppointmentDrawer({
+                    isVisible: true,
+                    data: appointment,
+                  }),
+              },
+            ]}
+          />
+        )
+      },
     },
   ]
 

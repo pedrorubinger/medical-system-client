@@ -130,7 +130,7 @@ export const UserForm = ({
             defaultValue=""
             render={({ field }) => (
               <Input
-                label="E-mail"
+                label="Email"
                 placeholder="Digite o e-mail"
                 error={errors?.email?.message}
                 required

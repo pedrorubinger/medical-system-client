@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Checkbox, Col, Drawer, notification, Row, Typography } from 'antd'
 import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -7,22 +7,24 @@ import * as Yup from 'yup'
 
 import { Button, Form, LinkButton, InfoMessage, CheckboxRow } from './styles'
 import { fetchPatients } from '../../../services/requests/patient'
+import {
+  findLastAppointment,
+  storeAppointment,
+} from '../../../services/requests/appointment'
 import { IInsurance } from '../../../interfaces/insurance'
 import { IPaymentMethod } from '../../../interfaces/paymentMethod'
 import { ISpecialty } from '../../../interfaces/specialty'
+import { TAppointmentStatus } from '../../../interfaces/appointment'
+import {
+  formatBrCurrency,
+  getDateInText,
+  getDrawerWidth,
+  getTimeDifference,
+} from '../../../utils/helpers/formatters'
+import { setFieldErrors } from '../../../utils/helpers/errors'
 import { Input } from '../../../components/UI/Input'
 import { ReadOnly } from '../../../components/UI/ReadOnly'
 import { PatientDrawer } from '../../Patients/Drawer'
-import {
-  formatBrCurrency,
-  getDrawerWidth,
-} from '../../../utils/helpers/formatters'
-import { setFieldErrors } from '../../../utils/helpers/errors'
-import {
-  storeAppointment,
-  // updateAppointment,
-} from '../../../services/requests/appointment'
-import { TAppointmentStatus } from '../../../interfaces/appointment'
 
 interface ISelectOption {
   value: number
@@ -38,7 +40,6 @@ export interface IAppointmentDrawerData {
   insurance?: IInsurance[] | undefined
   payment_method?: IPaymentMethod[] | undefined
   specialty?: ISpecialty[] | undefined
-  last_appointment_datetime?: string | undefined | null
 }
 
 interface IAppointmentDrawerProps {
@@ -129,6 +130,10 @@ export const AppointmentDrawer = ({
   const [insurances, setInsurances] = useState<ISelectOption[]>([])
   const [specialties, setSpecialties] = useState<ISelectOption[]>([])
   const [paymentMethods, setPaymentMethods] = useState<ISelectOption[]>([])
+  const [isFetchingLastAppointment, setIsFetchingLastAppointment] =
+    useState(false)
+  const [lastAppointmentDate, setLastAppointmentDate] =
+    useState('Nenhum registro')
   const [includePatientDrawer, setIncludePatientDrawer] =
     useState<IIncludePatientDrawerProps | null>(null)
 
@@ -137,6 +142,47 @@ export const AppointmentDrawer = ({
     reset(defaultValues)
     onClose()
   }
+
+  const findLastAppointmentDateAsync = useCallback(
+    async (patientId: number, doctorId: number) => {
+      setIsFetchingLastAppointment(true)
+
+      const response = await findLastAppointment(patientId, doctorId)
+
+      if (!response.error) {
+        if (response.data && response.data?.datetime) {
+          const diffInDays = getTimeDifference('day', response.data.datetime)
+          const formattedDate = getDateInText(response.data.datetime)
+
+          const getDiffInDaysLabel = () => {
+            if (diffInDays <= 0 || !data?.appointment_follow_up_limit) {
+              return ''
+            }
+
+            if (diffInDays === 1) {
+              return `(ontem)`
+            }
+
+            if (diffInDays >= Number(data.appointment_follow_up_limit)) {
+              setValue('is_follow_up', false)
+              return `(há mais de ${data.appointment_follow_up_limit} dias atrás)`
+            } else {
+              setValue('is_follow_up', true)
+            }
+
+            return `(${diffInDays} dias atrás)`
+          }
+
+          setLastAppointmentDate(`${formattedDate} ${getDiffInDaysLabel()}`)
+        } else {
+          setLastAppointmentDate('Nenhum registro')
+        }
+      }
+
+      setIsFetchingLastAppointment(false)
+    },
+    [data]
+  )
 
   const onSubmit = async (values: IAppointmentFormValues): Promise<void> => {
     if (!data?.datetime || !selectedPatient?.value) {
@@ -151,7 +197,6 @@ export const AppointmentDrawer = ({
       patient_id: selectedPatient.value,
       datetime: data.datetime,
       is_follow_up: !!values.is_follow_up,
-      last_appointment_datetime: data?.last_appointment_datetime,
       is_private: !values.insurance?.value || values.insurance?.value === -1,
       doctor_id: data?.doctor.value,
       status: 'pending' as TAppointmentStatus,
@@ -168,12 +213,6 @@ export const AppointmentDrawer = ({
           ? null
           : values.payment_method.value,
     }
-
-    console.log('submitted:', payload)
-
-    // const response = isCreating
-    //   ? await storeAppointment(payload)
-    //   : await updateAppointment(datapayload)
 
     const response = await storeAppointment(payload)
 
@@ -500,7 +539,9 @@ export const AppointmentDrawer = ({
           {/* TO DO: Calculate the difference in days between last appointment and current day... */}
           <ReadOnly
             label="Data da Última Consulta"
-            value={data?.last_appointment_datetime || 'Nenhuma'}
+            value={
+              isFetchingLastAppointment ? 'Verificando...' : lastAppointmentDate
+            }
             required
           />
         </Col>
@@ -545,6 +586,12 @@ export const AppointmentDrawer = ({
       </Row>
     </>
   )
+
+  useEffect(() => {
+    if (isVisible && watchedPatient?.value && data?.doctor?.value) {
+      findLastAppointmentDateAsync(watchedPatient.value, data.doctor.value)
+    }
+  }, [watchedPatient, data])
 
   useEffect(() => {
     const insurancesArr = addNoneOpt(

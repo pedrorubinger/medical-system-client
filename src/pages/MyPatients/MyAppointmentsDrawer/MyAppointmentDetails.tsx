@@ -47,7 +47,7 @@ export const MyAppointmentDetailModal = ({
       <Row gutter={24}>
         <Col span={12} sm={12} xs={24}>
           <ReadOnly
-            label="E-mail"
+            label="Email"
             value={data.patient.email || 'Não informado'}
             paperMode
           />
@@ -81,18 +81,6 @@ export const MyAppointmentDetailModal = ({
       </Row>
 
       <Row gutter={24}>
-        <Col span={12} sm={12} xs={24}>
-          <ReadOnly
-            label="Data da Última Consulta"
-            value={
-              data?.last_appointment_datetime
-                ? new Date().toDateString()
-                : 'Nenhum registro'
-            }
-            paperMode
-          />
-        </Col>
-
         <Col span={12} sm={12} xs={24}>
           <ReadOnly
             label="Consulta de Retorno"

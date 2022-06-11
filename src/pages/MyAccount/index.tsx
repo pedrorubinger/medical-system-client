@@ -130,7 +130,7 @@ export const MyAccount = (): JSX.Element => {
                 control={control}
                 render={({ field }) => (
                   <Input
-                    label="E-mail"
+                    label="Email"
                     placeholder="Digite o seu e-mail"
                     error={errors?.email?.message}
                     required

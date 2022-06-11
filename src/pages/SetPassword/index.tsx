@@ -115,7 +115,7 @@ export const SetPassword = (): JSX.Element => {
         <Form onSubmit={handleSubmit(onSubmit)}>
           <Row>
             <Col span={24}>
-              <ReadOnly label="E-mail" value={user?.email || ''} />
+              <ReadOnly label="Email" value={user?.email || ''} />
             </Col>
           </Row>
 

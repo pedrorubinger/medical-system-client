@@ -6,6 +6,18 @@ import { ErrorOption } from 'react-hook-form'
 import { IBadRequestError, IError } from '../../interfaces/error'
 import { BAD_REQUEST_MESSAGES, ERROR_MESSAGES } from '../constants/errors'
 
+const getErrorMessage = (err: any, errStatus: any) => {
+  if (ERROR_MESSAGES?.[err.data?.code]) {
+    return ERROR_MESSAGES?.[err.data?.code]
+  }
+
+  if (errStatus === 500) {
+    return ERROR_MESSAGES.INTERNAL_ERROR_MSG
+  }
+
+  return err.data?.message || ERROR_MESSAGES.INTERNAL_ERROR_MSG
+}
+
 export const handleError = (
   err: AxiosError | any,
   notificate = true
@@ -32,10 +44,7 @@ export const handleError = (
       errorObject.message = 'Alguns campos requerem sua atenção!'
     } else {
       errorObject.code = err.data?.code
-      errorObject.message =
-        ERROR_MESSAGES?.[err.data?.code] || errStatus === 500
-          ? ERROR_MESSAGES.INTERNAL_ERROR_MSG
-          : err.data?.message || ERROR_MESSAGES.INTERNAL_ERROR_MSG
+      errorObject.message = getErrorMessage(err, errStatus)
     }
   }
 

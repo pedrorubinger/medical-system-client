@@ -31,6 +31,11 @@ interface IFetchAppointmentsResponse {
   error: IError | null
 }
 
+interface IFindLastAppointmentResponse {
+  data: IAppointment | null
+  error: IError | null
+}
+
 export interface IFetchMyAppointmentsParams
   extends Partial<IPagination>,
     Partial<ISorting> {
@@ -117,6 +122,22 @@ export const fetchMyAppointments = async (
       : { data: response.data, error: null, meta: null }
   } catch (err) {
     return { data: null, meta: null, error: handleError(err) }
+  }
+}
+
+export const findLastAppointment = async (
+  patientId: number,
+  doctorId: number
+): Promise<IFindLastAppointmentResponse> => {
+  try {
+    const response: AxiosResponse<IAppointment | null> = await api.get(
+      '/last-appointment',
+      { params: { patientId, doctorId } }
+    )
+
+    return { data: response.data, error: null }
+  } catch (err) {
+    return { data: null, error: handleError(err) }
   }
 }
 

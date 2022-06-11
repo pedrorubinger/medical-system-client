@@ -77,7 +77,7 @@ const checkboxOptions: ICheckboxOption[] = [
   { label: 'Nome do Paciente', value: 'name' },
   { label: 'Data de Nascimento', value: 'birthdate' },
   { label: 'Idade', value: 'age' },
-  { label: 'E-mail', value: 'email' },
+  { label: 'Email', value: 'email' },
   { label: 'Telefone', value: 'primary_phone' },
   { label: 'Data da Consulta', value: 'datetime' },
   { label: 'Data da Última Atualização', value: 'updated_at' },

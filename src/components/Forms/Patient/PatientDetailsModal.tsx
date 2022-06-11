@@ -71,7 +71,7 @@ export const PatientDetailsModal = ({
 
         <Col span={12} sm={12} xs={24}>
           <ReadOnly
-            label="E-mail"
+            label="Email"
             value={data.email || 'Não informado'}
             paperMode
           />

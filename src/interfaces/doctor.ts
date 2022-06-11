@@ -21,7 +21,6 @@ export interface IDoctor {
   payment_method: IPaymentMethod[]
   private_appointment_price: number
   appointment_follow_up_limit: number
-  last_appointment_datetime?: string
   updated_at: string
   user?: IUser
 }
