@@ -8,7 +8,7 @@ interface ITitleProps {
 
 export const TableHeaderContainer = styled.div`
   display: flex;
-  margin-bottom: 15px;
+  margin-bottom: 8px;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;

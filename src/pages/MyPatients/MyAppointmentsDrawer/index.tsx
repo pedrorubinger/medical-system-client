@@ -161,11 +161,13 @@ export const MyAppointmentsDrawer = ({
         Na tabela abaixo você pode acompanhar as consultas atendidas por você
         para este paciente.
       </InfoMessage>
+
       <RefreshButton
         isFetching={isFetching}
         onFetch={() => fetchMyAppointmentsAsync(initialFetchParams)}
         disabled={isFetching}
       />
+
       <Table
         rowKey="id"
         dataSource={records}
