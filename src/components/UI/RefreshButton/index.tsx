@@ -10,6 +10,7 @@ interface IRefreshButtonProps {
   title?: string | undefined
   children?: React.ReactChildren
   disabled?: boolean
+  style?: React.CSSProperties | undefined
   onFetch: React.MouseEventHandler<HTMLButtonElement> | undefined
 }
 
@@ -19,14 +20,18 @@ export const RefreshButton = ({
   title = 'Clique para buscar a listagem mais atualizada',
   isFetchingTitle = 'Buscando dados...',
   disabled,
+  style,
   onFetch,
+  ...rest
 }: IRefreshButtonProps) => {
   return (
     <Button
       color="white"
       title={isFetching ? isFetchingTitle : title}
       disabled={disabled || isFetching}
-      onClick={onFetch}>
+      style={style}
+      onClick={onFetch}
+      {...rest}>
       {children || 'Atualizar'} <FiRefreshCcw size={10} />
     </Button>
   )

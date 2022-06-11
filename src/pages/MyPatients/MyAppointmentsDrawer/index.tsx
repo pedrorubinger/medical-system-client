@@ -231,8 +231,8 @@ export const MyAppointmentsDrawer = ({
 
       <RefreshButton
         isFetching={isFetching}
-        onFetch={() => fetchMyAppointmentsAsync(initialFetchParams)}
         disabled={isFetching}
+        onFetch={() => fetchMyAppointmentsAsync(initialFetchParams)}
       />
 
       <Table

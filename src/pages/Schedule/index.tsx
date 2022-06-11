@@ -21,7 +21,7 @@ import { IPaymentMethod } from '../../interfaces/paymentMethod'
 import { ISpecialty } from '../../interfaces/specialty'
 import { IScheduleDaysOff } from '../../interfaces/scheduleDaysOff'
 import { IParsedDaysScheduleSettings } from '../../interfaces/scheduleSettings'
-import { Form, InfoMessage } from './styles'
+import { Form, InfoMessage, RefreshButton } from './styles'
 import { PageContent } from '../../components/UI/PageContent'
 import { TableActions } from '../../components/UI/TableActions'
 import { TableHeader } from '../../components/UI/TableHeader'
@@ -327,40 +327,42 @@ export const Schedule = (): JSX.Element => {
     [watchedDate, watchedDoctor]
   )
 
+  const fetchDoctorsListAsync = useCallback(async () => {
+    setIsFetching(true)
+
+    const response = await fetchUsersDoctors()
+
+    if (response.data) {
+      const doctors = response.data
+      const formattedDoctorsList: IScheduleDoctorOption[] = doctors.map(
+        (userDoctor) => ({
+          payment_methods: userDoctor.doctor?.payment_method,
+          insurances: userDoctor.doctor?.insurance,
+          specialties: userDoctor.doctor?.specialty,
+          label: userDoctor.name,
+          value: userDoctor.doctor.id,
+          last_appointment_datetime:
+            userDoctor.doctor.last_appointment_datetime,
+          appointment_follow_up_limit:
+            userDoctor.doctor.appointment_follow_up_limit,
+          private_appointment_price:
+            userDoctor.doctor.private_appointment_price,
+          scheduleSettings: getFormattedDoctorSchedule(
+            userDoctor.doctor.schedule_settings
+          ),
+          schedule_days_off: userDoctor.doctor.schedule_days_off,
+        })
+      )
+
+      setValue('doctor', formattedDoctorsList?.[0])
+      setDoctorsList(formattedDoctorsList)
+    }
+
+    setIsFetching(false)
+  }, [])
+
   useEffect(() => {
-    ;(async () => {
-      setIsFetching(true)
-
-      const response = await fetchUsersDoctors()
-
-      if (response.data) {
-        const doctors = response.data
-        const formattedDoctorsList: IScheduleDoctorOption[] = doctors.map(
-          (userDoctor) => ({
-            payment_methods: userDoctor.doctor?.payment_method,
-            insurances: userDoctor.doctor?.insurance,
-            specialties: userDoctor.doctor?.specialty,
-            label: userDoctor.name,
-            value: userDoctor.doctor.id,
-            last_appointment_datetime:
-              userDoctor.doctor.last_appointment_datetime,
-            appointment_follow_up_limit:
-              userDoctor.doctor.appointment_follow_up_limit,
-            private_appointment_price:
-              userDoctor.doctor.private_appointment_price,
-            scheduleSettings: getFormattedDoctorSchedule(
-              userDoctor.doctor.schedule_settings
-            ),
-            schedule_days_off: userDoctor.doctor.schedule_days_off,
-          })
-        )
-
-        setValue('doctor', formattedDoctorsList?.[0])
-        setDoctorsList(formattedDoctorsList)
-      }
-
-      setIsFetching(false)
-    })()
+    fetchDoctorsListAsync()
 
     return () => {
       setIsMounted(false)
@@ -499,6 +501,12 @@ export const Schedule = (): JSX.Element => {
               ? 'Buscando dados...'
               : 'Não há horários disponíveis nesta data',
         }}
+      />
+      <RefreshButton
+        isFetching={isFetching}
+        disabled={isFetching}
+        title="Clique para atualizar a lista de médicos e suas respectivas agendas"
+        onFetch={() => fetchDoctorsListAsync()}
       />
     </PageContent>
   )
