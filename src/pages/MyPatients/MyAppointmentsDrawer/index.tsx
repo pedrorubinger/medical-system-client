@@ -172,7 +172,7 @@ export const MyAppointmentsDrawer = ({
           options={[
             {
               id: 'info',
-              overlay: 'Clique para ver detalhes desta consulta',
+              overlay: 'Detalhes da consulta',
               onClick: () =>
                 setAppointmentDetailsModal({
                   isVisible: true,
@@ -181,7 +181,7 @@ export const MyAppointmentsDrawer = ({
             },
             {
               id: 'check',
-              overlay: 'Clique para confirmar esta consulta',
+              overlay: 'Confirmar consulta',
               disabledTitle: getDisabledStatusTitle(appointment.status),
               disabled: appointment.status !== 'pending',
               onClick: () =>
@@ -194,7 +194,7 @@ export const MyAppointmentsDrawer = ({
             },
             {
               id: 'edit',
-              overlay: 'Clique para preencher os dados desta consulta',
+              overlay: 'Preencher os dados desta consulta',
               disabled: appointment?.status !== 'confirmed',
               disabledTitle: 'Confirme a consulta para preencher seus dados',
               onClick: () =>

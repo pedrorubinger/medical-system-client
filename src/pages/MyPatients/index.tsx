@@ -148,7 +148,7 @@ export const MyPatients = (): JSX.Element => {
           options={[
             {
               id: 'info',
-              overlay: 'Clique para ver detalhes deste paciente',
+              overlay: 'Ver detalhes do paciente',
               onClick: () =>
                 setPatientDetailsModal({
                   isVisible: true,
@@ -157,7 +157,7 @@ export const MyPatients = (): JSX.Element => {
             },
             {
               id: 'edit',
-              overlay: 'Clique para editar os dados deste paciente',
+              overlay: 'Editar dados deste paciente',
               onClick: () =>
                 setEditPatientDrawer({
                   isVisible: true,
@@ -169,7 +169,7 @@ export const MyPatients = (): JSX.Element => {
             },
             {
               id: 'book',
-              overlay: 'Clique para ver as consultas deste paciente',
+              overlay: 'Ver as consultas do paciente',
               onClick: () =>
                 setMyAppointmentsDrawer({
                   isVisible: true,

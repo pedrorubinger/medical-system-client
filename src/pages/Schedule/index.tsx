@@ -180,7 +180,7 @@ export const Schedule = (): JSX.Element => {
             },
             {
               id: 'info',
-              overlay: 'Clique para ver detalhes desta consulta',
+              overlay: 'Detalhes da consulta',
               disabledTitle:
                 'Ainda não há uma consulta agendada para este horário',
               disabled: !appointment.status || appointment.status === 'off',
@@ -192,7 +192,7 @@ export const Schedule = (): JSX.Element => {
             },
             {
               id: 'check',
-              overlay: 'Clique para confirmar esta consulta',
+              overlay: 'Confirmar consulta',
               disabledTitle:
                 !appointment.status || appointment.status === 'off'
                   ? 'Ainda não há uma consulta agendada para este horário'
@@ -211,7 +211,7 @@ export const Schedule = (): JSX.Element => {
             },
             {
               id: 'delete',
-              overlay: 'Clique para cancelar e excluir esta consulta',
+              overlay: 'Cancelar e excluir consulta',
               disabledTitle:
                 !appointment.status || appointment.status === 'off'
                   ? 'Ainda não há uma consulta agendada para este horário'

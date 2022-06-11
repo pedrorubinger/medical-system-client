@@ -125,7 +125,7 @@ export const EditMyPatientDrawer = ({
 
   const getButtonTitle = () => {
     if (allFieldsAreEmpty) {
-      return 'Preencha ao menos um dos campos abaixo para poder salvar os dados'
+      return 'Preencha ao menos um dos campos acima para poder salvar os dados'
     }
 
     if (isSubmitting) {
