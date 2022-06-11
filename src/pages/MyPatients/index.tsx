@@ -36,8 +36,7 @@ type EditPatientDrawerProps = IPatientDetailsModalProps & {
 
 interface IMyAppointmentsDrawerProps {
   isVisible: boolean
-  patientName: string
-  patientId: number
+  patient: ICompletePatient
 }
 
 const initialPagination = { current: 1, pageSize: 5 }
@@ -174,8 +173,7 @@ export const MyPatients = (): JSX.Element => {
               onClick: () =>
                 setMyAppointmentsDrawer({
                   isVisible: true,
-                  patientName: patient.name,
-                  patientId: patient.id,
+                  patient,
                 }),
             },
           ]}
@@ -254,9 +252,11 @@ export const MyPatients = (): JSX.Element => {
       />
       <MyAppointmentsDrawer
         isVisible={myAppointmentsDrawer?.isVisible}
-        patientName={myAppointmentsDrawer?.patientName}
-        patientId={myAppointmentsDrawer?.patientId}
+        patient={myAppointmentsDrawer?.patient}
         onClose={() => setMyAppointmentsDrawer(null)}
+        setPatientDetailsModal={(data: ICompletePatient) =>
+          setPatientDetailsModal({ data, isVisible: true })
+        }
       />
     </PageContent>
   )

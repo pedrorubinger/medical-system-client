@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useCallback, useEffect, useState } from 'react'
-import { Col, Row, Table, Tag } from 'antd'
+import { Col, Row, Table } from 'antd'
 import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
@@ -11,7 +11,6 @@ import {
 } from '../../services/requests/appointment'
 import { fetchUsersDoctors } from '../../services/requests/user'
 import {
-  getAppointmentStatus,
   getFormattedDoctorSchedule,
   getUTCDate,
 } from '../../utils/helpers/formatters'
@@ -31,6 +30,7 @@ import { AppointmentDrawer, IAppointmentDrawerData } from './Drawer'
 import { AppointmentDetailsModal } from './AppointmentDetailsModal'
 import { DeleteAppointmentModal } from './DeleteAppointmentModal'
 import { ConfirmAppointmentModal } from './ConfirmAppointmentModal'
+import { getAppointmentColor } from '../../utils/helpers/elements'
 
 interface IScheduleDoctorOption {
   insurances?: IInsurance[] | undefined
@@ -139,27 +139,7 @@ export const Schedule = (): JSX.Element => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (status: TAppointmentStatus | undefined) => {
-        let color = '#3ed862'
-
-        if (status === 'off') {
-          color = '#cccccc'
-        }
-
-        if (status === 'pending') {
-          color = '#fcd55f'
-        }
-
-        if (status === 'confirmed') {
-          color = '#4370d8'
-        }
-
-        return (
-          <Tag color={color} key={status}>
-            {getAppointmentStatus(status)}
-          </Tag>
-        )
-      },
+      render: (status: TAppointmentStatus) => getAppointmentColor(status),
     },
     {
       title: 'Ações',

@@ -8,15 +8,21 @@ import { TableActions } from '../../../components/UI/TableActions'
 import { TableHeader } from '../../../components/UI/TableHeader'
 
 import { getDrawerWidth } from '../../../utils/helpers/formatters'
-import { IMyAppointment } from '../../../interfaces/appointment'
+import {
+  IMyAppointment,
+  TAppointmentStatus,
+} from '../../../interfaces/appointment'
 import { RootState } from '../../../store'
 import {
   fetchMyAppointments,
   IFetchMyAppointmentsParams,
 } from '../../../services/requests/appointment'
+import { ICompletePatient } from '../../../interfaces/patient'
 import { InfoMessage } from './styles'
 import { MyAppointmentDetailModal } from './MyAppointmentDetails'
 import { RefreshButton } from '../../../components/UI/RefreshButton'
+import { getAppointmentColor } from '../../../utils/helpers/elements'
+import { EditAppointmentDrawer } from './EditAppointmentDrawer'
 
 interface IFilter {
   datetime: string | null
@@ -25,9 +31,9 @@ interface IFilter {
 interface IMyAppointmentsDrawerProps {
   /** @default false */
   isVisible?: boolean
-  patientName?: string
-  patientId?: number
+  patient?: ICompletePatient
   onClose: () => void
+  setPatientDetailsModal: (data: ICompletePatient) => void
 }
 
 interface IAppointmentDetailsModalProps {
@@ -46,12 +52,14 @@ const initialFilters: IFilter = {
 
 export const MyAppointmentsDrawer = ({
   isVisible = false,
-  patientName,
-  patientId,
+  patient,
   onClose,
+  setPatientDetailsModal,
 }: IMyAppointmentsDrawerProps): JSX.Element => {
   const user = useSelector((state: RootState) => state.AuthReducer)
   const doctor = user?.data?.doctor
+  const patientId = patient?.id
+  const patientName = patient?.name
   const [records, setRecords] = useState<IMyAppointment[]>([])
   const [isFetching, setIsFetching] = useState(false)
   const [searchFilters, setSearchFilters] = useState<IFilter>(initialFilters)
@@ -59,6 +67,8 @@ export const MyAppointmentsDrawer = ({
     ...initialPagination,
   })
   const [appointmentDetailsModal, setAppointmentDetailsModal] =
+    useState<IAppointmentDetailsModalProps | null>(null)
+  const [editAppointmentDrawer, setEditAppointmentDrawer] =
     useState<IAppointmentDetailsModalProps | null>(null)
 
   const fetchMyAppointmentsAsync = useCallback(
@@ -102,7 +112,13 @@ export const MyAppointmentsDrawer = ({
       title: 'Data da Consulta',
       dataIndex: 'datetime',
       key: 'datetime',
-      render: (date: string) => new Date(date).toLocaleString(),
+      render: (date: string) => {
+        const formattedFullDate = new Date(date).toLocaleString()
+        const formattedDate = formattedFullDate?.split(' ')?.[0]
+        const time = formattedFullDate?.split(' ')?.[1]?.slice(0, 5)
+
+        return `${formattedDate} às ${time}`
+      },
     },
     {
       title: 'Convênio',
@@ -110,10 +126,16 @@ export const MyAppointmentsDrawer = ({
       key: 'insurance_name',
     },
     {
-      title: 'É Retorno',
+      title: 'Retorno',
       dataIndex: 'is_follow_up',
       key: 'is_follow_up',
       render: (is_follow_up: boolean) => (is_follow_up ? 'Sim' : 'Não'),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status: TAppointmentStatus) => getAppointmentColor(status),
     },
     {
       title: 'Ações',
@@ -127,6 +149,15 @@ export const MyAppointmentsDrawer = ({
               overlay: 'Clique para ver detalhes desta consulta',
               onClick: () =>
                 setAppointmentDetailsModal({
+                  isVisible: true,
+                  data: appointment,
+                }),
+            },
+            {
+              id: 'edit',
+              overlay: 'Clique para editar esta consulta',
+              onClick: () =>
+                setEditAppointmentDrawer({
                   isVisible: true,
                   data: appointment,
                 }),
@@ -147,13 +178,15 @@ export const MyAppointmentsDrawer = ({
     <Drawer
       title="Atendimentos"
       visible={isVisible}
-      width={getDrawerWidth(650)}
+      width={getDrawerWidth(750)}
       onClose={onClose}
       destroyOnClose>
       <TableHeader
         title={
           patientName
-            ? `Consultas de ${patientName?.split(' ')?.[0]}`
+            ? `Consultas de ${patientName?.split(' ')?.[0]} ${
+                patientName?.split(' ')?.[1]
+              }`
             : 'Consultas do Paciente'
         }
       />
@@ -202,6 +235,15 @@ export const MyAppointmentsDrawer = ({
         isVisible={!!appointmentDetailsModal}
         data={appointmentDetailsModal?.data}
         onCancel={() => setAppointmentDetailsModal(null)}
+      />
+      <EditAppointmentDrawer
+        isVisible={editAppointmentDrawer?.isVisible || false}
+        data={editAppointmentDrawer?.data}
+        onClose={() => setEditAppointmentDrawer(null)}
+        fetchMyAppointments={() => fetchMyAppointmentsAsync(initialFetchParams)}
+        setPatientDetailsModal={() =>
+          patient ? setPatientDetailsModal(patient) : undefined
+        }
       />
     </Drawer>
   )

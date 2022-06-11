@@ -56,6 +56,7 @@ export interface IScheduledAppointment {
 export interface IMyAppointment extends Omit<IAppointment, 'patient'> {
   notes?: string | undefined | null
   exam_request?: string | undefined | null
+  prescription?: string | undefined | null
   patient: IPatient
   patient_name: string
   insurance_name: string
