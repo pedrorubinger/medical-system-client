@@ -16,6 +16,7 @@ import {
 } from '../../../services/requests/appointment'
 import { InfoMessage } from './styles'
 import { MyAppointmentDetailModal } from './MyAppointmentDetails'
+import { RefreshButton } from '../../../components/UI/RefreshButton'
 
 interface IFilter {
   datetime: string | null
@@ -52,7 +53,7 @@ export const MyAppointmentsDrawer = ({
   const user = useSelector((state: RootState) => state.AuthReducer)
   const doctor = user?.data?.doctor
   const [records, setRecords] = useState<IMyAppointment[]>([])
-  const [fetching, setFetching] = useState(false)
+  const [isFetching, setIsFetching] = useState(false)
   const [searchFilters, setSearchFilters] = useState<IFilter>(initialFilters)
   const [pagination, setPagination] = useState<TablePaginationConfig>({
     ...initialPagination,
@@ -62,7 +63,7 @@ export const MyAppointmentsDrawer = ({
 
   const fetchMyAppointmentsAsync = useCallback(
     async (params: IFetchMyAppointmentsParams) => {
-      setFetching(true)
+      setIsFetching(true)
 
       const response = await fetchMyAppointments(doctor.id, {
         ...params,
@@ -91,7 +92,7 @@ export const MyAppointmentsDrawer = ({
         }
       }
 
-      setFetching(false)
+      setIsFetching(false)
     },
     [patientId]
   )
@@ -160,10 +161,15 @@ export const MyAppointmentsDrawer = ({
         Na tabela abaixo você pode acompanhar as consultas atendidas por você
         para este paciente.
       </InfoMessage>
+      <RefreshButton
+        isFetching={isFetching}
+        onFetch={() => fetchMyAppointmentsAsync(initialFetchParams)}
+        disabled={isFetching}
+      />
       <Table
         rowKey="id"
         dataSource={records}
-        loading={fetching}
+        loading={isFetching}
         columns={columns}
         pagination={pagination}
         onChange={async (pagination, filters, sorter, meta) => {

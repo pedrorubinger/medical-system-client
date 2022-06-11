@@ -16,6 +16,7 @@ import { TableHeader } from '../../components/UI/TableHeader'
 import { EditMyPatientDrawer } from './Drawer'
 import { getTimePassed } from '../../utils/helpers/formatters'
 import { MyAppointmentsDrawer } from './MyAppointmentsDrawer'
+import { RefreshButton } from '../../components/UI/RefreshButton'
 
 interface IFilter {
   cpf: string | null
@@ -55,7 +56,7 @@ export const MyPatients = (): JSX.Element => {
   const user = useSelector((state: RootState) => state.AuthReducer)
   const doctor = user?.data?.doctor
   const [records, setRecords] = useState<ICompletePatient[]>([])
-  const [fetching, setFetching] = useState(false)
+  const [isFetching, setIsFetching] = useState(false)
   const [searchFilters, setSearchFilters] = useState<IFilter>(initialFilters)
   const [pagination, setPagination] = useState<TablePaginationConfig>({
     ...initialPagination,
@@ -69,7 +70,7 @@ export const MyPatients = (): JSX.Element => {
 
   const fetchMyPatientsAsync = useCallback(
     async (params: IFetchPatientsParams) => {
-      setFetching(true)
+      setIsFetching(true)
 
       const response = await fetchMyPatients(doctor.id, params)
 
@@ -87,7 +88,7 @@ export const MyPatients = (): JSX.Element => {
         }
       }
 
-      setFetching(false)
+      setIsFetching(false)
     },
     []
   )
@@ -194,10 +195,22 @@ export const MyPatients = (): JSX.Element => {
         Na tabela abaixo você pode acompanhar os pacientes que já foram
         atendidos por você.
       </InfoMessage>
+
+      <RefreshButton
+        title={
+          isFetching
+            ? 'Buscando dados...'
+            : 'Clique para buscar a lista de pacientes mais atualizada'
+        }
+        isFetching={isFetching}
+        disabled={isFetching}
+        onFetch={() => fetchMyPatientsAsync(initialFetchParams)}
+      />
+
       <Table
         rowKey="id"
         dataSource={records}
-        loading={fetching}
+        loading={isFetching}
         columns={columns}
         pagination={pagination}
         onChange={async (pagination, filters, sorter, meta) => {
