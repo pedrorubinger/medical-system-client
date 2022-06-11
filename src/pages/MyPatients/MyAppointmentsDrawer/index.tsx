@@ -29,7 +29,7 @@ import { EditAppointmentDrawer } from './EditAppointmentDrawer'
 import { ConfirmAppointmentModal } from '../../Schedule/ConfirmAppointmentModal'
 
 interface IFilter {
-  datetime: string | null
+  date: string | null
 }
 
 interface IMyAppointmentsDrawerProps {
@@ -58,7 +58,7 @@ const initialFetchParams = {
   perPage: initialPagination.pageSize,
 }
 const initialFilters: IFilter = {
-  datetime: null,
+  date: null,
 }
 
 export const MyAppointmentsDrawer = ({
@@ -138,6 +138,13 @@ export const MyAppointmentsDrawer = ({
       dataIndex: 'datetime',
       key: 'datetime',
       render: (date: string) => getDateInText(date),
+      sorter: (a: IMyAppointment, b: IMyAppointment) =>
+        a.datetime.localeCompare(b.datetime),
+      ...getFilterProps({
+        dataIndex: 'datetime',
+        inputOptions: { placeholder: 'Data', inputType: 'date' },
+      }),
+      filteredValue: searchFilters.date as unknown as FilterValue,
     },
     {
       title: 'Convênio',
@@ -232,7 +239,10 @@ export const MyAppointmentsDrawer = ({
       <RefreshButton
         isFetching={isFetching}
         disabled={isFetching}
-        onFetch={() => fetchMyAppointmentsAsync(initialFetchParams)}
+        onFetch={async () => {
+          setSearchFilters(initialFilters)
+          await fetchMyAppointmentsAsync(initialFetchParams)
+        }}
       />
 
       <Table
@@ -247,7 +257,7 @@ export const MyAppointmentsDrawer = ({
 
           if (meta.action === 'filter') {
             search = {
-              datetime: (filters?.datetime as unknown as string) || null,
+              date: (filters?.datetime as unknown as string) || null,
             }
 
             setSearchFilters(search)

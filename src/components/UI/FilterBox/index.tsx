@@ -33,6 +33,8 @@ export interface IInputOptions {
   placeholder?: string | undefined
   /** @default 'search' */
   filterType?: 'selection' | 'search'
+  /** @default 'text' */
+  inputType?: 'text' | 'date'
   selectionOptions?: IInputSelection
 }
 
@@ -105,6 +107,7 @@ const FilterBox = ({
 
     return (
       <Input
+        type={inputOptions?.inputType || 'text'}
         placeholder={inputOptions?.placeholder}
         name={dataIndex.toString()}
         value={selectedKeys[0]}

@@ -202,7 +202,10 @@ export const MyPatients = (): JSX.Element => {
         }
         isFetching={isFetching}
         disabled={isFetching}
-        onFetch={() => fetchMyPatientsAsync(initialFetchParams)}
+        onFetch={async () => {
+          setSearchFilters(initialFilters)
+          await fetchMyPatientsAsync(initialFetchParams)
+        }}
       />
 
       <Table
