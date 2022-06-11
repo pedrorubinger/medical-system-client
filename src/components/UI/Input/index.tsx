@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from 'react'
+import React, { ChangeEventHandler } from 'react'
 import { Spin } from 'antd'
 import CurrencyFormat from 'react-currency-format'
 import { ActionMeta } from 'react-select'
@@ -13,6 +13,7 @@ import {
   ErrorMessage,
   Select,
   StyledInput,
+  StyledTextArea,
 } from './styles'
 
 interface ISelectOption {
@@ -20,7 +21,9 @@ interface ISelectOption {
   label: string
 }
 
-interface IInputProps {
+export type SupportedHTMLElement = HTMLInputElement | HTMLTextAreaElement
+
+interface IInputProps<SupportedHTMLElement> {
   name: string
   /** @default false */
   isSelect?: boolean | undefined
@@ -35,7 +38,7 @@ interface IInputProps {
   options?: ISelectOption[]
   label?: string | undefined
   /** @default 'text' */
-  type?: React.HTMLInputTypeAttribute | undefined
+  type?: React.HTMLInputTypeAttribute | 'textarea' | undefined
   htmlFor?: string | undefined
   required?: boolean | undefined
   placeholder?: string | undefined
@@ -53,13 +56,17 @@ interface IInputProps {
   /** @default undefined */
   defaultAsyncOptions?: boolean | undefined
   /** @default undefined */
+  textAreaRows?: number | undefined
+  /** @default undefined */
+  textAreaCols?: number | undefined
+  /** @default undefined */
   loadAsyncOptions?: (
     inputValue: string,
     callback: (options: any) => void
   ) => Promise<void> | undefined
   /** @default undefined */
   onAsyncInputChange?: (newValue: string) => string | undefined
-  onChange?: React.ChangeEventHandler<HTMLInputElement> | undefined
+  onChange?: ChangeEventHandler<SupportedHTMLElement> | undefined
   selectOnChange?: (newValue: any, actionMeta: ActionMeta<unknown>) => void
 }
 
@@ -93,8 +100,10 @@ export const Input = React.forwardRef(
       defaultAsyncOptions,
       labelWithLoader = false,
       disabled = false,
+      textAreaRows,
+      textAreaCols,
       ...rest
-    }: IInputProps,
+    }: IInputProps<SupportedHTMLElement>,
     ref: React.ForwardedRef<HTMLInputElement>
   ) => {
     const LabelElement = !!label && (
@@ -217,6 +226,28 @@ export const Input = React.forwardRef(
             {...rest}
           />
           {!!error && <ErrorMessage>{error}</ErrorMessage>}
+        </Container>
+      )
+    }
+
+    if (type === 'textarea') {
+      return (
+        <Container>
+          {LabelElement}
+          <StyledTextArea
+            name={name}
+            placeholder={placeholder}
+            hasError={!!error || false}
+            autoFocus={autoFocus}
+            style={style}
+            value={value}
+            disabled={disabled}
+            onChange={onChange}
+            rows={textAreaRows}
+            cols={textAreaCols}
+            {...rest}
+          />
+          {!!error && !!showError && <ErrorMessage>{error}</ErrorMessage>}
         </Container>
       )
     }

@@ -3,6 +3,13 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 
 dayjs.extend(relativeTime)
 
+interface IFormatDecimalSeparatorOptions {
+  /** @default '.' */
+  currentSeparator?: ',' | '.'
+  /** @default ',' */
+  newSeparator?: ',' | '.'
+}
+
 import { TAppointmentStatus } from '../../interfaces/appointment'
 import {
   IParsedDaysScheduleSettings,
@@ -165,4 +172,28 @@ export const getUTCDate = (ISODate: string, plainDate = false) => {
  */
 export const getTimePassed = (date: string): number | null => {
   return Number(dayjs().from(dayjs(date), true).replaceAll(/\D/g, '')) || null
+}
+
+/**
+ * Formats decimal values separator.
+ * @param {string | number} value target value.
+ * @param {IFormatDecimalSeparatorOptions} options separator options.
+ * @returns a formatted value as string.
+ */
+export const formatDecimalSeparator = (
+  value: number | string,
+  options?: IFormatDecimalSeparatorOptions
+): string => {
+  if (!value) {
+    return ''
+  }
+
+  const stringfiedValue = value.toString()
+  const currentSeparator = options?.currentSeparator || '.'
+  const newSeparator = options?.newSeparator || ','
+  const removeInvalidChars = new RegExp('[^\\d' + newSeparator + ']', 'g') // /[^\d,]/g
+
+  return stringfiedValue
+    ?.replaceAll(currentSeparator, newSeparator)
+    ?.replaceAll(removeInvalidChars, '')
 }

@@ -177,7 +177,7 @@ export const PatientDetailsModal = ({
           {data?.illnesses || data?.allergies ? (
             <>
               <Row gutter={24}>
-                <Col span={12} sm={12} xs={24}>
+                <Col span={24} sm={24} xs={24}>
                   <ReadOnly
                     label="Alergias"
                     value={data?.allergies || 'Não consta'}
@@ -220,7 +220,7 @@ export const PatientDetailsModal = ({
 
           {!!data?.notes && (
             <Row gutter={24}>
-              <Col span={12} sm={12} xs={24}>
+              <Col span={24} sm={24} xs={24}>
                 <ReadOnly
                   label="Anotações Gerais"
                   value={data?.notes || 'Não consta'}

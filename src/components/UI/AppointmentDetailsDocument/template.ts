@@ -65,7 +65,7 @@ export const getAppointmentDetailsDocumentTemplate = (
     content.push({
       text: [
         { text: 'Idade: ', bold: true },
-        { text: '23 anos', bold: false },
+        { text: data.age, bold: false },
       ],
       margin: [0, 0, 0, 5],
     })

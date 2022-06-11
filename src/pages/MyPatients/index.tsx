@@ -3,19 +3,18 @@ import { useSelector } from 'react-redux'
 import { Table, TablePaginationConfig } from 'antd'
 import { FilterValue } from 'antd/lib/table/interface'
 
+import { RootState } from '../../store'
+import { InfoMessage } from './styles'
+import { IFetchPatientsParams } from '../../services/requests/patient'
+import { fetchMyPatients } from '../../services/requests/myPatient'
+import { ICompletePatient } from '../../interfaces/patient'
+import { PatientDetailsModal } from '../../components/Forms/Patient/PatientDetailsModal'
 import { getFilterProps } from '../../components/UI/FilterBox/Filter'
 import { PageContent } from '../../components/UI/PageContent'
 import { TableActions } from '../../components/UI/TableActions'
 import { TableHeader } from '../../components/UI/TableHeader'
-
-import { RootState } from '../../store'
-import { InfoMessage } from './styles'
-import {
-  fetchMyPatients,
-  IFetchPatientsParams,
-} from '../../services/requests/patient'
-import { PatientDetailsModal } from '../../components/Forms/Patient/PatientDetailsModal'
-import { ICompletePatient } from '../../interfaces/patient'
+import { EditMyPatientDrawer } from './Drawer'
+import { getTimePassed } from '../../utils/helpers/formatters'
 
 interface IFilter {
   cpf: string | null
@@ -27,6 +26,10 @@ interface IFilter {
 interface IPatientDetailsModalProps {
   isVisible: boolean
   data: ICompletePatient
+}
+
+type EditPatientDrawerProps = IPatientDetailsModalProps & {
+  data: ICompletePatient & { age: number }
 }
 
 const initialPagination = { current: 1, pageSize: 5 }
@@ -53,7 +56,7 @@ export const MyPatients = (): JSX.Element => {
   const [patientDetailsModal, setPatientDetailsModal] =
     useState<IPatientDetailsModalProps | null>(null)
   const [editPatientDrawer, setEditPatientDrawer] =
-    useState<IPatientDetailsModalProps | null>(null)
+    useState<EditPatientDrawerProps | null>(null)
 
   const fetchMyPatientsAsync = useCallback(
     async (params: IFetchPatientsParams) => {
@@ -149,7 +152,10 @@ export const MyPatients = (): JSX.Element => {
               onClick: () =>
                 setEditPatientDrawer({
                   isVisible: true,
-                  data: patient,
+                  data: {
+                    ...patient,
+                    age: getTimePassed(patient.birthdate) || 0,
+                  },
                 }),
             },
           ]}
@@ -207,6 +213,12 @@ export const MyPatients = (): JSX.Element => {
         isVisible={!!patientDetailsModal}
         data={patientDetailsModal?.data}
         onCancel={() => setPatientDetailsModal(null)}
+      />
+      <EditMyPatientDrawer
+        isVisible={editPatientDrawer?.isVisible || false}
+        data={editPatientDrawer?.data}
+        fetchPatients={() => fetchMyPatientsAsync(initialFetchParams)}
+        onClose={() => setEditPatientDrawer(null)}
       />
     </PageContent>
   )
