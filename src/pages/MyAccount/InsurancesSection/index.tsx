@@ -82,7 +82,7 @@ export const InsurancesSection = () => {
           options={[
             {
               id: 'edit',
-              overlay: 'Clique para editar o preço pago por este convênio',
+              overlay: 'Editar o preço pago por este convênio',
               onClick: () =>
                 setDrawer({
                   type: 'update',
@@ -97,7 +97,7 @@ export const InsurancesSection = () => {
             },
             {
               id: 'delete',
-              overlay: 'Clique para excluir este convênio',
+              overlay: 'Excluir convênio',
               onClick: () =>
                 setDeletionModal({
                   name: insurance.name,

@@ -199,14 +199,14 @@ export const ListTenantUsers = ({
           options={[
             {
               id: 'info',
-              overlay: 'Clique para ver detalhes deste usuário',
+              overlay: 'Ver detalhes deste usuário',
               onClick: () => setUserDetailsModal({ data: user }),
             },
             {
               id: 'delete',
               overlay: !canDeleteUser(user)
                 ? 'Não é possível excluir este usuário'
-                : 'Clique para excluir este usuário',
+                : 'Excluir usuário',
               disabled: !canDeleteUser(user),
               onClick: () =>
                 setDeletionModal({

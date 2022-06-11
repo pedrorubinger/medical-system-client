@@ -93,7 +93,7 @@ export const Tenants = (): JSX.Element => {
           options={[
             {
               id: 'users',
-              overlay: 'Clique para gerenciar os usuários dessa clínica',
+              overlay: 'Gerenciar os usuários dessa clínica',
               onClick: () =>
                 setListUsersDrawer({
                   isVisible: true,
@@ -104,8 +104,8 @@ export const Tenants = (): JSX.Element => {
             {
               id: 'repeat',
               overlay: tenant.is_active
-                ? 'Clique para tornar essa clínica inativa'
-                : 'Clique para tornar essa clínica ativa',
+                ? 'Tornar clínica inativa'
+                : 'Tornar clínica ativa',
               onClick: () =>
                 setModal({
                   isVisible: true,
@@ -117,7 +117,7 @@ export const Tenants = (): JSX.Element => {
             },
             {
               id: 'delete',
-              overlay: 'Clique para excluir essa clínica',
+              overlay: 'Excluir clínica',
               onClick: () =>
                 setModal({
                   isVisible: true,

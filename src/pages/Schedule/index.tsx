@@ -156,7 +156,7 @@ export const Schedule = (): JSX.Element => {
             options={[
               {
                 id: 'add',
-                overlay: 'Clique para marcar uma consulta neste horário',
+                overlay: 'Marcar consulta neste horário',
                 disabledTitle:
                   appointment.status === 'off'
                     ? 'Ainda não há uma consulta agendada para este horário'

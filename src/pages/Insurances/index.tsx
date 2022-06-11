@@ -123,13 +123,13 @@ export const Insurances = (): JSX.Element => {
           options={[
             {
               id: 'edit',
-              overlay: 'Clique para editar este convênio',
+              overlay: 'Editar convênio',
               onClick: () =>
                 setDrawer({ isVisible: true, type: 'update', data: insurance }),
             },
             {
               id: 'delete',
-              overlay: 'Clique para excluir este convênio',
+              overlay: 'Excluir convênio',
               onClick: () =>
                 setDeletionModal({
                   isVisible: true,

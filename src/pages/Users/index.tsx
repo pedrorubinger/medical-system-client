@@ -205,14 +205,14 @@ export const Users = (): JSX.Element => {
           options={[
             {
               id: 'info',
-              overlay: 'Clique para ver detalhes deste usuário',
+              overlay: 'Ver detalhes deste usuário',
               onClick: () => setUserDetailsModal({ data: user }),
             },
             {
               id: 'delete',
               overlay: !canDeleteUser(user)
                 ? 'Não é possível excluir este usuário pois ele também é um administrador'
-                : 'Clique para excluir este usuário',
+                : 'Excluir este usuário',
               disabled: !canDeleteUser(user),
               onClick: () =>
                 setDeletionModal({

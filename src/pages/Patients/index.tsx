@@ -145,19 +145,19 @@ export const Patients = (): JSX.Element => {
           options={[
             {
               id: 'info',
-              overlay: 'Clique para ver detalhes deste paciente',
+              overlay: 'Detalhes do paciente',
               onClick: () =>
                 setPatientDetailsModal({ isVisible: true, data: patient }),
             },
             {
               id: 'edit',
-              overlay: 'Clique para editar este paciente',
+              overlay: 'Editar paciente',
               onClick: () =>
                 setDrawer({ isVisible: true, type: 'update', data: patient }),
             },
             {
               id: 'delete',
-              overlay: 'Clique para excluir este paciente',
+              overlay: 'Excluir paciente',
               onClick: () =>
                 setDeletionModal({
                   id: patient.id,

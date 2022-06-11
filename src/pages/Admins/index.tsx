@@ -146,7 +146,7 @@ export const Admins = () => {
           options={[
             {
               id: 'info',
-              overlay: 'Clique para ver detalhes deste administrador',
+              overlay: 'Ver detalhes deste administrador',
               onClick: () => setUserDetailsModal({ data: user }),
             },
             {

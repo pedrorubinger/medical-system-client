@@ -126,7 +126,7 @@ export const PaymentMethods = (): JSX.Element => {
           options={[
             {
               id: 'edit',
-              overlay: 'Clique para editar este método de pagamento',
+              overlay: 'Editar método de pagamento',
               onClick: () =>
                 setDrawer({
                   isVisible: true,
@@ -136,7 +136,7 @@ export const PaymentMethods = (): JSX.Element => {
             },
             {
               id: 'delete',
-              overlay: 'Clique para excluir este método de pagamento',
+              overlay: 'Excluir método de pagamento',
               onClick: () =>
                 setDeletionModal({
                   isVisible: true,

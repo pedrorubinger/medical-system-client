@@ -124,13 +124,13 @@ export const Specialties = (): JSX.Element => {
           options={[
             {
               id: 'edit',
-              overlay: 'Clique para editar esta especialidade',
+              overlay: 'Editar especialidade',
               onClick: () =>
                 setDrawer({ isVisible: true, type: 'update', data: specialty }),
             },
             {
               id: 'delete',
-              overlay: 'Clique para excluir esta especialidade',
+              overlay: 'Excluir especialidade',
               onClick: () =>
                 setDeletionModal({
                   isVisible: true,

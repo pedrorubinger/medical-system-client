@@ -56,7 +56,7 @@ export const ScheduleDaysOff = () => {
           options={[
             {
               id: 'delete',
-              overlay: 'Clique para excluir esta folga/ausência',
+              overlay: 'Excluir folga/ausência',
               disabled:
                 Date.parse(datetime_end) < Date.parse(new Date().toString()),
               onClick: () => setDeletionModal({ isVisible: true, id }),

@@ -191,7 +191,8 @@ export const MyPatients = (): JSX.Element => {
       <TableHeader title="Meus Pacientes" />
       <InfoMessage>
         Na tabela abaixo você pode acompanhar os pacientes que já foram
-        atendidos por você.
+        atendidos por você. Eles aparecem aqui conforme as consultas são
+        marcadas.
       </InfoMessage>
 
       <RefreshButton
