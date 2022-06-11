@@ -44,6 +44,7 @@ export interface IStoreUserData {
   phone: string
   is_admin: boolean
   role: TRole
+  tenant_name?: string
 }
 
 interface IStoreOrUpdateUserResponse {

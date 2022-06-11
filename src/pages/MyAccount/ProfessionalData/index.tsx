@@ -70,7 +70,8 @@ export const ProfessionalData = ({ user }: IProfessionalDataProps) => {
     insurances: formatSelectOption(user?.doctor?.insurance),
     specialties: formatSelectOption(user?.doctor?.specialty),
     payment_methods: formatSelectOption(user?.doctor?.payment_method),
-    private_appointment_price: user?.doctor?.private_appointment_price,
+    private_appointment_price:
+      user?.doctor?.private_appointment_price || undefined,
     appointment_follow_up_limit: user?.doctor?.appointment_follow_up_limit,
   }
   const {

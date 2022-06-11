@@ -220,7 +220,8 @@ export const Input = React.forwardRef(
             decimalSeparator=","
             thousandSeparator="."
             prefix={'R$ '}
-            placeholder="R$"
+            placeholder="R$ 0,00"
+            precision="2"
             onChange={onChange}
             customInput={CurrencyInput}
             {...rest}
