@@ -7,7 +7,10 @@ import { getFilterProps } from '../../../components/UI/FilterBox/Filter'
 import { TableActions } from '../../../components/UI/TableActions'
 import { TableHeader } from '../../../components/UI/TableHeader'
 
-import { getDrawerWidth } from '../../../utils/helpers/formatters'
+import {
+  getDateInText,
+  getDrawerWidth,
+} from '../../../utils/helpers/formatters'
 import {
   IMyAppointment,
   TAppointmentStatus,
@@ -23,6 +26,7 @@ import { MyAppointmentDetailModal } from './MyAppointmentDetails'
 import { RefreshButton } from '../../../components/UI/RefreshButton'
 import { getAppointmentColor } from '../../../utils/helpers/elements'
 import { EditAppointmentDrawer } from './EditAppointmentDrawer'
+import { ConfirmAppointmentModal } from '../../Schedule/ConfirmAppointmentModal'
 
 interface IFilter {
   datetime: string | null
@@ -39,6 +43,13 @@ interface IMyAppointmentsDrawerProps {
 interface IAppointmentDetailsModalProps {
   isVisible: boolean
   data: IMyAppointment
+}
+
+interface IConfirmAppointmentModalProps {
+  isVisible: boolean
+  id: number
+  datetime: string
+  patientName: string
 }
 
 const initialPagination = { current: 1, pageSize: 5 }
@@ -70,6 +81,8 @@ export const MyAppointmentsDrawer = ({
     useState<IAppointmentDetailsModalProps | null>(null)
   const [editAppointmentDrawer, setEditAppointmentDrawer] =
     useState<IAppointmentDetailsModalProps | null>(null)
+  const [confirmAppointmentModal, setConfirmAppointmentModal] =
+    useState<IConfirmAppointmentModalProps | null>(null)
 
   const fetchMyAppointmentsAsync = useCallback(
     async (params: IFetchMyAppointmentsParams) => {
@@ -107,18 +120,24 @@ export const MyAppointmentsDrawer = ({
     [patientId]
   )
 
+  const getDisabledStatusTitle = (status: TAppointmentStatus) => {
+    if (status === 'confirmed') {
+      return 'Esta consulta já foi confirmada'
+    }
+
+    if (status === 'cancelled') {
+      return 'Esta consulta foi cancelada'
+    }
+
+    return 'Ainda não é possível confirmar esta consulta'
+  }
+
   const columns = [
     {
       title: 'Data da Consulta',
       dataIndex: 'datetime',
       key: 'datetime',
-      render: (date: string) => {
-        const formattedFullDate = new Date(date).toLocaleString()
-        const formattedDate = formattedFullDate?.split(' ')?.[0]
-        const time = formattedFullDate?.split(' ')?.[1]?.slice(0, 5)
-
-        return `${formattedDate} às ${time}`
-      },
+      render: (date: string) => getDateInText(date),
     },
     {
       title: 'Convênio',
@@ -154,8 +173,23 @@ export const MyAppointmentsDrawer = ({
                 }),
             },
             {
+              id: 'check',
+              overlay: 'Clique para confirmar esta consulta',
+              disabledTitle: getDisabledStatusTitle(appointment.status),
+              disabled: appointment.status !== 'pending',
+              onClick: () =>
+                setConfirmAppointmentModal({
+                  isVisible: true,
+                  datetime: getDateInText(appointment.datetime),
+                  id: appointment?.id || -1,
+                  patientName: appointment.patient_name || '',
+                }),
+            },
+            {
               id: 'edit',
-              overlay: 'Clique para editar esta consulta',
+              overlay: 'Clique para preencher os dados desta consulta',
+              disabled: appointment?.status !== 'confirmed',
+              disabledTitle: 'Confirme a consulta para preencher seus dados',
               onClick: () =>
                 setEditAppointmentDrawer({
                   isVisible: true,
@@ -235,6 +269,14 @@ export const MyAppointmentsDrawer = ({
         isVisible={!!appointmentDetailsModal}
         data={appointmentDetailsModal?.data}
         onCancel={() => setAppointmentDetailsModal(null)}
+      />
+      <ConfirmAppointmentModal
+        datetime={confirmAppointmentModal?.datetime || ''}
+        isVisible={confirmAppointmentModal?.isVisible || false}
+        id={confirmAppointmentModal?.id}
+        patientName={confirmAppointmentModal?.patientName}
+        onCancel={() => setConfirmAppointmentModal(null)}
+        refetchAppointments={() => fetchMyAppointmentsAsync(initialFetchParams)}
       />
       <EditAppointmentDrawer
         isVisible={editAppointmentDrawer?.isVisible || false}

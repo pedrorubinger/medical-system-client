@@ -116,6 +116,7 @@ export const Schedule = (): JSX.Element => {
     useState<IDeleteAppointmentModalProps | null>(null)
   const [confirmAppointmentModal, setConfirmAppointmentModal] =
     useState<IConfirmAppointmentModalProps | null>(null)
+
   const columns = [
     {
       title: 'Horário',

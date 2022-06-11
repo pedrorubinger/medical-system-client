@@ -197,3 +197,16 @@ export const formatDecimalSeparator = (
     ?.replaceAll(currentSeparator, newSeparator)
     ?.replaceAll(removeInvalidChars, '')
 }
+
+/**
+ * Gets date formatted in text (e.g.: 09/03/1999 às 00:36)
+ * @param {string} date date string
+ * @returns a formatted date
+ */
+export const getDateInText = (date: string) => {
+  const formattedFullDate = new Date(date).toLocaleString()
+  const formattedDate = formattedFullDate?.split(' ')?.[0]
+  const time = formattedFullDate?.split(' ')?.[1]?.slice(0, 5)
+
+  return `${formattedDate} às ${time}`
+}

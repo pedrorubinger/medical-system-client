@@ -22,8 +22,8 @@ import {
   getAppointmentDetailsDocumentTemplate,
   IAppointmentDetailsTemplateData,
 } from './template'
-import { IMyAppointment } from '../../../interfaces/appointment'
 import { RootState } from '../../../store'
+import { IMyAppointment } from '../../../interfaces/appointment'
 import { getTimePassed } from '../../../utils/helpers/formatters'
 
 type TPDFDataListProps =
@@ -34,13 +34,13 @@ type TPDFDataListProps =
   | 'primary_phone'
   | 'datetime'
   | 'updated_at'
-  | 'last_appointment_datetime'
   | 'is_follow_up'
   | 'insurance_name'
   | 'payment_method'
   | 'exam_request'
   | 'notes'
   | 'signature_field'
+  | 'prescription'
 
 interface ICheckboxOption {
   label: string
@@ -69,6 +69,7 @@ const initialPDFDataList: TPDFDataListProps[] = [
   'datetime',
   'insurance_name',
   'exam_request',
+  'prescription',
   'notes',
   'signature_field',
 ]
@@ -80,11 +81,11 @@ const checkboxOptions: ICheckboxOption[] = [
   { label: 'Telefone', value: 'primary_phone' },
   { label: 'Data da Consulta', value: 'datetime' },
   { label: 'Data da Última Atualização', value: 'updated_at' },
-  { label: 'Data da Última Consulta', value: 'last_appointment_datetime' },
   { label: 'Retorno', value: 'is_follow_up' },
   { label: 'Convênio/Particular', value: 'insurance_name' },
   { label: 'Método de Pagamento', value: 'payment_method' },
   { label: 'Pedido de Exame(s)', value: 'exam_request' },
+  { label: 'Prescrição de Medicamento(s)', value: 'prescription' },
   { label: 'Anotações', value: 'notes' },
   { label: 'Linha de Assinatura (Médico)', value: 'signature_field' },
 ]
@@ -129,8 +130,8 @@ export const AppointmentDetailsDocument = ({
       const linkEl = document.createElement('a')
       const now = new Date()
       const fileName = `Consulta_${
-        now.toISOString().split('T')[0]
-      }_${now.getTime()}.pdf`
+        appointment?.patient_name?.split(' ')?.[0]
+      }_${now.toISOString().split('T')[0]}_${now.getTime()}.pdf`
 
       linkEl.setAttribute('href', base64Document)
       linkEl.setAttribute('download', fileName)
@@ -188,11 +189,6 @@ export const AppointmentDetailsDocument = ({
           ? new Date(appointment.updated_at).toLocaleString()
           : 'Não identificado'
         : undefined,
-      last_appointment_datetime: list?.includes('last_appointment_datetime')
-        ? appointment?.last_appointment_datetime
-          ? new Date(appointment.last_appointment_datetime).toLocaleString()
-          : 'Nenhum registro'
-        : undefined,
       is_follow_up: list?.includes('is_follow_up')
         ? appointment?.is_follow_up
           ? 'Sim'
@@ -210,6 +206,9 @@ export const AppointmentDetailsDocument = ({
       signature_field: list?.includes('signature_field'),
       payment_method_name: list?.includes('payment_method')
         ? appointment?.payment_method?.name || 'Não informado'
+        : undefined,
+      prescription: list?.includes('prescription')
+        ? appointment?.prescription || 'Nenhuma'
         : undefined,
     }
   }

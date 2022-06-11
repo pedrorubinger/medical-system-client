@@ -132,7 +132,17 @@ export const MyAppointmentDetailModal = ({
         <Col span={24} sm={24} xs={24}>
           <ReadOnly
             label="Pedido de Exame(s)"
-            value={data.exam_request || 'Não informado'}
+            value={data.exam_request || 'Nenhum'}
+            paperMode
+          />
+        </Col>
+      </Row>
+
+      <Row gutter={24}>
+        <Col span={24} sm={24} xs={24}>
+          <ReadOnly
+            label="Prescrição de Medicamento(s)"
+            value={data.prescription || 'Nenhum'}
             paperMode
           />
         </Col>

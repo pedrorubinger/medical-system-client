@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { IMyAppointment } from '../../../interfaces/appointment'
 import { IPatient } from '../../../interfaces/patient'
+import { getDateInText } from '../../../utils/helpers/formatters'
 
 export interface IAppointmentDetailsTemplateData
   extends Partial<Omit<IMyAppointment, 'is_follow_up'>>,
@@ -44,7 +45,7 @@ export const getAppointmentDetailsDocumentTemplate = (
         { text: 'Nome do Paciente: ', bold: true },
         { text: `${data.patient_name}`, bold: false },
       ],
-      margin: [0, 20, 0, 5],
+      margin: [0, 20, 0, 8],
     })
   }
 
@@ -57,7 +58,7 @@ export const getAppointmentDetailsDocumentTemplate = (
           bold: false,
         },
       ],
-      margin: [0, 0, 0, 5],
+      margin: [0, 0, 0, 8],
     })
   }
 
@@ -70,7 +71,7 @@ export const getAppointmentDetailsDocumentTemplate = (
           bold: false,
         },
       ],
-      margin: [0, 0, 0, 5],
+      margin: [0, 0, 0, 8],
     })
   }
 
@@ -83,7 +84,7 @@ export const getAppointmentDetailsDocumentTemplate = (
           bold: false,
         },
       ],
-      margin: [0, 0, 0, 5],
+      margin: [0, 0, 0, 8],
     })
   }
 
@@ -96,7 +97,7 @@ export const getAppointmentDetailsDocumentTemplate = (
           bold: false,
         },
       ],
-      margin: [0, 0, 0, 5],
+      margin: [0, 0, 0, 8],
     })
   }
 
@@ -105,11 +106,11 @@ export const getAppointmentDetailsDocumentTemplate = (
       text: [
         { text: 'Data da Consulta: ', bold: true },
         {
-          text: data.datetime,
+          text: getDateInText(data.datetime),
           bold: false,
         },
       ],
-      margin: [0, 0, 0, 5],
+      margin: [0, 0, 0, 8],
     })
   }
 
@@ -117,22 +118,9 @@ export const getAppointmentDetailsDocumentTemplate = (
     content.push({
       text: [
         { text: 'Data da Última Atualização: ', bold: true },
-        { text: data.updated_at, bold: false },
+        { text: getDateInText(data.updated_at), bold: false },
       ],
-      margin: [0, 0, 0, 5],
-    })
-  }
-
-  if (data.last_appointment_datetime) {
-    content.push({
-      text: [
-        { text: 'Data da Última Consulta: ', bold: true },
-        {
-          text: data.last_appointment_datetime || 'Nenhum registro',
-          bold: false,
-        },
-      ],
-      margin: [0, 0, 0, 5],
+      margin: [0, 0, 0, 8],
     })
   }
 
@@ -142,7 +130,7 @@ export const getAppointmentDetailsDocumentTemplate = (
         { text: 'É Retorno: ', bold: true },
         { text: 'Não', bold: false },
       ],
-      margin: [0, 0, 0, 5],
+      margin: [0, 0, 0, 8],
     })
   }
 
@@ -152,7 +140,7 @@ export const getAppointmentDetailsDocumentTemplate = (
         { text: 'Convênio: ', bold: true },
         { text: data.insurance_name, bold: false },
       ],
-      margin: [0, 0, 0, 5],
+      margin: [0, 0, 0, 8],
     })
   }
 
@@ -160,9 +148,9 @@ export const getAppointmentDetailsDocumentTemplate = (
     content.push({
       text: [
         { text: 'Método de Pagamento: ', bold: true },
-        { text: data.payment_method_name, bold: false },
+        { text: data.payment_method_name || 'Não informado', bold: false },
       ],
-      margin: [0, 0, 0, 5],
+      margin: [0, 0, 0, 8],
     })
   }
 
@@ -171,11 +159,21 @@ export const getAppointmentDetailsDocumentTemplate = (
       text: [
         { text: 'Exames Solicitados: ', bold: true },
         {
-          text: data.exam_request || 'Não informado',
+          text: data.exam_request || 'Nenhum',
           bold: false,
         },
       ],
-      margin: [0, 0, 0, 5],
+      margin: [0, 0, 0, 8],
+    })
+  }
+
+  if (data.prescription) {
+    content.push({
+      text: [
+        { text: 'Prescrição de Medicamento(s): ', bold: true },
+        { text: data.prescription || 'Nenhuma' },
+      ],
+      margin: [0, 0, 0, 8],
     })
   }
 
@@ -189,7 +187,7 @@ export const getAppointmentDetailsDocumentTemplate = (
           bold: false,
         },
       ],
-      margin: [0, 0, 0, 5],
+      margin: [0, 0, 0, 8],
     })
   }
 
@@ -203,7 +201,7 @@ export const getAppointmentDetailsDocumentTemplate = (
           fontSize: 9,
         },
       ],
-      margin: [0, 60, 0, 5],
+      margin: [0, 60, 0, 8],
       style: 'fixed',
     })
   }
