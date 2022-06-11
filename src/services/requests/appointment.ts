@@ -36,6 +36,7 @@ export interface IFetchMyAppointmentsParams
     Partial<ISorting> {
   datetime?: string | null | undefined
   patient_name?: string | null | undefined
+  patientId?: number | null | undefined
   doctor?: number | null | undefined
 }
 

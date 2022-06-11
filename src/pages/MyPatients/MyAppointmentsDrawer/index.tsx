@@ -1,25 +1,32 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { Table, TablePaginationConfig } from 'antd'
+import { Drawer, Table, TablePaginationConfig } from 'antd'
 import { FilterValue } from 'antd/lib/table/interface'
 
-import { getFilterProps } from '../../components/UI/FilterBox/Filter'
-import { PageContent } from '../../components/UI/PageContent'
-import { TableActions } from '../../components/UI/TableActions'
-import { TableHeader } from '../../components/UI/TableHeader'
+import { getFilterProps } from '../../../components/UI/FilterBox/Filter'
+import { TableActions } from '../../../components/UI/TableActions'
+import { TableHeader } from '../../../components/UI/TableHeader'
 
+import { getDrawerWidth } from '../../../utils/helpers/formatters'
+import { IMyAppointment } from '../../../interfaces/appointment'
+import { RootState } from '../../../store'
 import {
   fetchMyAppointments,
   IFetchMyAppointmentsParams,
-} from '../../services/requests/appointment'
-import { IMyAppointment } from '../../interfaces/appointment'
-import { RootState } from '../../store'
+} from '../../../services/requests/appointment'
 import { InfoMessage } from './styles'
 import { MyAppointmentDetailModal } from './MyAppointmentDetails'
 
 interface IFilter {
   datetime: string | null
-  patient_name: string | null
+}
+
+interface IMyAppointmentsDrawerProps {
+  /** @default false */
+  isVisible?: boolean
+  patientName?: string
+  patientId?: number
+  onClose: () => void
 }
 
 interface IAppointmentDetailsModalProps {
@@ -34,10 +41,14 @@ const initialFetchParams = {
 }
 const initialFilters: IFilter = {
   datetime: null,
-  patient_name: null,
 }
 
-export const MyAppointments = (): JSX.Element => {
+export const MyAppointmentsDrawer = ({
+  isVisible = false,
+  patientName,
+  patientId,
+  onClose,
+}: IMyAppointmentsDrawerProps): JSX.Element => {
   const user = useSelector((state: RootState) => state.AuthReducer)
   const doctor = user?.data?.doctor
   const [records, setRecords] = useState<IMyAppointment[]>([])
@@ -53,7 +64,10 @@ export const MyAppointments = (): JSX.Element => {
     async (params: IFetchMyAppointmentsParams) => {
       setFetching(true)
 
-      const response = await fetchMyAppointments(doctor.id, params)
+      const response = await fetchMyAppointments(doctor.id, {
+        ...params,
+        patientId,
+      })
 
       if (response.data) {
         const appointments = response.data
@@ -79,22 +93,10 @@ export const MyAppointments = (): JSX.Element => {
 
       setFetching(false)
     },
-    []
+    [patientId]
   )
 
   const columns = [
-    {
-      title: 'Paciente',
-      dataIndex: 'patient_name',
-      key: 'patient_name',
-      sorter: (a: IMyAppointment, b: IMyAppointment) =>
-        a.patient_name.localeCompare(b.patient_name),
-      ...getFilterProps({
-        dataIndex: 'patient_name',
-        inputOptions: { placeholder: 'Nome' },
-      }),
-      filteredValue: searchFilters.patient_name as unknown as FilterValue,
-    },
     {
       title: 'Data da Consulta',
       dataIndex: 'datetime',
@@ -105,13 +107,6 @@ export const MyAppointments = (): JSX.Element => {
       title: 'Convênio',
       dataIndex: 'insurance_name',
       key: 'insurance_name',
-    },
-    {
-      title: 'Última Consulta',
-      dataIndex: 'last_appointment_datetime',
-      key: 'last_appointment_datetime',
-      render: (date: string) =>
-        date ? new Date(date).toLocaleString() : 'Nenhuma',
     },
     {
       title: 'É Retorno',
@@ -142,14 +137,28 @@ export const MyAppointments = (): JSX.Element => {
   ]
 
   useEffect(() => {
-    fetchMyAppointmentsAsync(initialFetchParams)
-  }, [])
+    if (isVisible) {
+      fetchMyAppointmentsAsync(initialFetchParams)
+    }
+  }, [isVisible])
 
   return (
-    <PageContent>
-      <TableHeader title="Minhas Consultas" />
+    <Drawer
+      title="Atendimentos"
+      visible={isVisible}
+      width={getDrawerWidth(650)}
+      onClose={onClose}
+      destroyOnClose>
+      <TableHeader
+        title={
+          patientName
+            ? `Consultas de ${patientName?.split(' ')?.[0]}`
+            : 'Consultas do Paciente'
+        }
+      />
       <InfoMessage>
-        Na tabela abaixo você pode acompanhar as consultas atendidas por você.
+        Na tabela abaixo você pode acompanhar as consultas atendidas por você
+        para este paciente.
       </InfoMessage>
       <Table
         rowKey="id"
@@ -164,14 +173,6 @@ export const MyAppointments = (): JSX.Element => {
           if (meta.action === 'filter') {
             search = {
               datetime: (filters?.datetime as unknown as string) || null,
-              patient_name:
-                (filters?.patient_name as unknown as string) || null,
-              // name: (filters?.name as unknown as string) || null,
-              // cpf: (filters?.cpf as unknown as string) || null,
-              // motherName: (filters?.motherName as unknown as string) || null,
-              // primaryPhone:
-              //   (filters?.primaryPhone as unknown as string) || null,
-              // email: (filters?.email as unknown as string) || null,
             }
 
             setSearchFilters(search)
@@ -194,6 +195,6 @@ export const MyAppointments = (): JSX.Element => {
         data={appointmentDetailsModal?.data}
         onCancel={() => setAppointmentDetailsModal(null)}
       />
-    </PageContent>
+    </Drawer>
   )
 }

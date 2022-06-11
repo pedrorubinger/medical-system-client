@@ -65,7 +65,10 @@ export const getAppointmentDetailsDocumentTemplate = (
     content.push({
       text: [
         { text: 'Idade: ', bold: true },
-        { text: data.age, bold: false },
+        {
+          text: `${data.age} ${data.age.toString() === '1' ? 'ano' : 'anos'}`,
+          bold: false,
+        },
       ],
       margin: [0, 0, 0, 5],
     })

@@ -15,6 +15,7 @@ import { TableActions } from '../../components/UI/TableActions'
 import { TableHeader } from '../../components/UI/TableHeader'
 import { EditMyPatientDrawer } from './Drawer'
 import { getTimePassed } from '../../utils/helpers/formatters'
+import { MyAppointmentsDrawer } from './MyAppointmentsDrawer'
 
 interface IFilter {
   cpf: string | null
@@ -30,6 +31,12 @@ interface IPatientDetailsModalProps {
 
 type EditPatientDrawerProps = IPatientDetailsModalProps & {
   data: ICompletePatient & { age: number }
+}
+
+interface IMyAppointmentsDrawerProps {
+  isVisible: boolean
+  patientName: string
+  patientId: number
 }
 
 const initialPagination = { current: 1, pageSize: 5 }
@@ -53,6 +60,8 @@ export const MyPatients = (): JSX.Element => {
   const [pagination, setPagination] = useState<TablePaginationConfig>({
     ...initialPagination,
   })
+  const [myAppointmentsDrawer, setMyAppointmentsDrawer] =
+    useState<IMyAppointmentsDrawerProps | null>(null)
   const [patientDetailsModal, setPatientDetailsModal] =
     useState<IPatientDetailsModalProps | null>(null)
   const [editPatientDrawer, setEditPatientDrawer] =
@@ -158,6 +167,16 @@ export const MyPatients = (): JSX.Element => {
                   },
                 }),
             },
+            {
+              id: 'book',
+              overlay: 'Clique para ver as consultas deste paciente',
+              onClick: () =>
+                setMyAppointmentsDrawer({
+                  isVisible: true,
+                  patientName: patient.name,
+                  patientId: patient.id,
+                }),
+            },
           ]}
         />
       ),
@@ -219,6 +238,12 @@ export const MyPatients = (): JSX.Element => {
         data={editPatientDrawer?.data}
         fetchPatients={() => fetchMyPatientsAsync(initialFetchParams)}
         onClose={() => setEditPatientDrawer(null)}
+      />
+      <MyAppointmentsDrawer
+        isVisible={myAppointmentsDrawer?.isVisible}
+        patientName={myAppointmentsDrawer?.patientName}
+        patientId={myAppointmentsDrawer?.patientId}
+        onClose={() => setMyAppointmentsDrawer(null)}
       />
     </PageContent>
   )

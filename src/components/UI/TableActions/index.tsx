@@ -1,6 +1,7 @@
 import { Tooltip } from 'antd'
 import { IconType } from 'react-icons'
 import {
+  FiBook,
   FiCheckCircle,
   FiEdit,
   FiInfo,
@@ -20,6 +21,7 @@ type TTableAction =
   | 'info'
   | 'repeat'
   | 'users'
+  | 'book'
 
 interface ITableActionsOption {
   onClick: React.MouseEventHandler<HTMLDivElement>
@@ -50,17 +52,19 @@ const Icons: IIcon[] = [
   { id: 'info', icon: FiInfo, color: '#4074e5' },
   { id: 'repeat', icon: FiRepeat, color: '#5058b2' },
   { id: 'users', icon: FiUsers, color: '#00b2a6' },
+  { id: 'book', icon: FiBook, color: '#7267CB' },
 ]
 
 export const TableActions = ({ options }: ITableActionsProps) => {
   return (
     <Container>
-      {options.map((item) => {
+      {options.map((item, i) => {
         const Icon = Icons.find((icon: IIcon) => icon.id === item.id)
 
         return (
           <Tooltip
             key={item.id}
+            placement={options?.length - 1 === i ? 'left' : 'top'}
             overlay={
               item.disabled ? item.disabledTitle || '' : item.overlay || ''
             }>

@@ -10,7 +10,6 @@ import {
   FiUsers,
   FiSettings,
   FiCreditCard,
-  FiBook,
 } from 'react-icons/fi'
 
 import { Pages } from '../../pages'
@@ -154,25 +153,6 @@ export const PrivateRoutes: IPrivateRoute[] = [
         element={
           <PrivateRouteWrapper>
             <Pages.Patients />
-          </PrivateRouteWrapper>
-        }
-      />
-    ),
-  },
-  {
-    name: 'Meus Atendimentos',
-    permissions: ['doctor'],
-    path: '/my-appointments',
-    title: 'Clique para ver informações das suas consultas',
-    show: true,
-    icon: <FiBook />,
-    route: (
-      <Route
-        key="my-appointments"
-        path="/my-appointments"
-        element={
-          <PrivateRouteWrapper>
-            <Pages.MyAppointments />
           </PrivateRouteWrapper>
         }
       />

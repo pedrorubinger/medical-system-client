@@ -1,10 +1,10 @@
 import { Col, Collapse, Modal, Row, Typography } from 'antd'
 
 import { CollapseInfoContainer } from './styles'
-import { IMyAppointment } from '../../interfaces/appointment'
-import { getDrawerWidth } from '../../utils/helpers/formatters'
-import { ReadOnly } from '../../components/UI/ReadOnly'
-import { AppointmentDetailsDocument } from '../../components/UI/AppointmentDetailsDocument'
+import { IMyAppointment } from '../../../interfaces/appointment'
+import { getDrawerWidth } from '../../../utils/helpers/formatters'
+import { ReadOnly } from '../../../components/UI/ReadOnly'
+import { AppointmentDetailsDocument } from '../../../components/UI/AppointmentDetailsDocument'
 
 interface IMyAppointmentDetailModalProps {
   /** @default false */
