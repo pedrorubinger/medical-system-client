@@ -28,11 +28,18 @@ import { PageContent } from '../../components/UI/PageContent'
 import { TableActions } from '../../components/UI/TableActions'
 import { TableHeader } from '../../components/UI/TableHeader'
 import { Input } from '../../components/UI/Input'
-import { AppointmentDrawer, IAppointmentDrawerData } from './Drawer'
+import {
+  AppointmentDrawer,
+  IAppointmentDrawerData,
+} from './Drawer/CreateAppointmentDrawer'
 import { AppointmentDetailsModal } from './AppointmentDetailsModal'
 import { DeleteAppointmentModal } from './DeleteAppointmentModal'
 import { ConfirmAppointmentModal } from './ConfirmAppointmentModal'
 import { getAppointmentColor } from '../../utils/helpers/elements'
+import {
+  EditAppointmentDrawer,
+  IEditAppointmentFormValues,
+} from './Drawer/EditAppointmentDrawer'
 
 interface IScheduleDoctorOption {
   insurances?: IInsurance[] | undefined
@@ -54,7 +61,12 @@ interface IRecord {
   patient_name?: string | undefined
   insurance_id?: number | undefined | null
   insurance_name?: string | undefined
+  specialty_id?: number | undefined | null
+  specialty_name?: string | undefined
+  payment_method_id?: number | undefined | null
+  payment_method_name?: string | undefined
   is_private?: boolean | undefined
+  is_follow_up?: boolean | undefined
   status?: TAppointmentStatus
 }
 
@@ -66,7 +78,6 @@ interface ISelectScheduleDataValues {
 interface IAppointmentDrawerProps {
   isVisible?: boolean | undefined
   data?: IAppointmentDrawerData
-  type?: 'create' | 'update' | undefined
 }
 
 interface IAppointmentDetailsModalProps {
@@ -114,6 +125,13 @@ export const Schedule = (): JSX.Element => {
   const [isFetching, setIsFetching] = useState(false)
   const [appointmentDrawer, setAppointmentDrawer] =
     useState<IAppointmentDrawerProps | null>(null)
+  const [editAppointmentDrawer, setEditAppointmentDrawer] = useState<
+    | (IAppointmentDrawerProps & {
+        appointmentId?: number
+        initialData: IEditAppointmentFormValues
+      })
+    | null
+  >(null)
   const [appointmentDetailsModal, setAppointmentDetailsModal] =
     useState<IAppointmentDetailsModalProps | null>(null)
   const [deleteAppointmentModal, setDeleteAppointmentModal] =
@@ -169,6 +187,59 @@ export const Schedule = (): JSX.Element => {
                   setAppointmentDrawer({
                     isVisible: true,
                     data: {
+                      appointment_follow_up_limit:
+                        watchedDoctor.appointment_follow_up_limit,
+                      private_appointment_price:
+                        watchedDoctor.private_appointment_price,
+                      datetime: `${watchedDate} ${appointment.time}`,
+                      doctor: watchedDoctor,
+                      insurance: watchedDoctor.insurances,
+                      specialty: watchedDoctor.specialties,
+                      payment_method: watchedDoctor.payment_methods,
+                    },
+                  }),
+              },
+              {
+                id: 'edit',
+                overlay: 'Editar consulta',
+                disabledTitle: !appointment.status
+                  ? 'Ainda não há uma consulta agendada para este horário'
+                  : 'Não é possível editar esta consulta',
+                disabled: !watchedDate || appointment.status !== 'pending',
+                onClick: () =>
+                  setEditAppointmentDrawer({
+                    isVisible: true,
+                    appointmentId: appointment?.id,
+                    initialData: {
+                      is_follow_up: appointment.is_follow_up || false,
+                      insurance:
+                        appointment?.insurance_id && appointment?.insurance_name
+                          ? {
+                              value: appointment.insurance_id,
+                              label: appointment.insurance_name,
+                            }
+                          : undefined,
+                      specialty:
+                        appointment?.specialty_id && appointment?.specialty_name
+                          ? {
+                              value: appointment.specialty_id,
+                              label: appointment.specialty_name,
+                            }
+                          : undefined,
+                      payment_method:
+                        appointment?.payment_method_id &&
+                        appointment?.payment_method_name
+                          ? {
+                              value: appointment.payment_method_id,
+                              label: appointment.payment_method_name,
+                            }
+                          : undefined,
+                    },
+                    data: {
+                      patient: {
+                        value: appointment.patient_id || 0,
+                        label: appointment.patient_name || '',
+                      },
                       appointment_follow_up_limit:
                         watchedDoctor.appointment_follow_up_limit,
                       private_appointment_price:
@@ -386,54 +457,12 @@ export const Schedule = (): JSX.Element => {
   return (
     <PageContent>
       <TableHeader title="Agenda" />
-
       <InfoMessage>
         Selecione um médico e uma data para gerenciar as suas consultas. Quando
         o paciente for atendido, não se esqueça de confirmar sua consulta na
         agenda para que os dados das consultas e dos pacientes estejam
         consistentes no sistema.
       </InfoMessage>
-
-      <AppointmentDrawer
-        type={appointmentDrawer?.type || 'create'}
-        isVisible={appointmentDrawer?.isVisible || false}
-        data={appointmentDrawer?.data}
-        onClose={() => setAppointmentDrawer(null)}
-        refetchData={() =>
-          fetchAppointmentsAsync({
-            date: watchedDate,
-            doctor: watchedDoctor.value,
-          })
-        }
-      />
-
-      <DeleteAppointmentModal
-        datetime={deleteAppointmentModal?.datetime || ''}
-        isVisible={deleteAppointmentModal?.isVisible || false}
-        onCancel={() => setDeleteAppointmentModal(null)}
-        refetchAppointments={() =>
-          fetchAppointmentsAsync({
-            date: watchedDate,
-            doctor: watchedDoctor.value,
-          })
-        }
-        id={deleteAppointmentModal?.id}
-        patientName={deleteAppointmentModal?.patientName}
-      />
-
-      <ConfirmAppointmentModal
-        datetime={confirmAppointmentModal?.datetime || ''}
-        isVisible={confirmAppointmentModal?.isVisible || false}
-        onCancel={() => setConfirmAppointmentModal(null)}
-        refetchAppointments={() =>
-          fetchAppointmentsAsync({
-            date: watchedDate,
-            doctor: watchedDoctor.value,
-          })
-        }
-        id={confirmAppointmentModal?.id}
-        patientName={confirmAppointmentModal?.patientName}
-      />
 
       <Form>
         <Row gutter={12}>
@@ -479,11 +508,62 @@ export const Schedule = (): JSX.Element => {
         </Row>
       </Form>
 
+      {/* MODALS AND DRAWERS */}
+      <AppointmentDrawer
+        isVisible={appointmentDrawer?.isVisible || false}
+        data={appointmentDrawer?.data}
+        onClose={() => setAppointmentDrawer(null)}
+        refetchData={() =>
+          fetchAppointmentsAsync({
+            date: watchedDate,
+            doctor: watchedDoctor.value,
+          })
+        }
+      />
+      <EditAppointmentDrawer
+        isVisible={editAppointmentDrawer?.isVisible || false}
+        data={editAppointmentDrawer?.data}
+        appointmentId={editAppointmentDrawer?.appointmentId}
+        appointmentInitialData={editAppointmentDrawer?.initialData}
+        onClose={() => setEditAppointmentDrawer(null)}
+        refetchData={() =>
+          fetchAppointmentsAsync({
+            date: watchedDate,
+            doctor: watchedDoctor.value,
+          })
+        }
+      />
       <AppointmentDetailsModal
         date={watchedDate?.split('-')?.reverse()?.join('/')}
         isVisible={appointmentDetailsModal?.isVisible || false}
         data={appointmentDetailsModal?.data}
         onCancel={() => setAppointmentDetailsModal(null)}
+      />
+      <DeleteAppointmentModal
+        datetime={deleteAppointmentModal?.datetime || ''}
+        isVisible={deleteAppointmentModal?.isVisible || false}
+        onCancel={() => setDeleteAppointmentModal(null)}
+        refetchAppointments={() =>
+          fetchAppointmentsAsync({
+            date: watchedDate,
+            doctor: watchedDoctor.value,
+          })
+        }
+        id={deleteAppointmentModal?.id}
+        patientName={deleteAppointmentModal?.patientName}
+      />
+      <ConfirmAppointmentModal
+        datetime={confirmAppointmentModal?.datetime || ''}
+        isVisible={confirmAppointmentModal?.isVisible || false}
+        onCancel={() => setConfirmAppointmentModal(null)}
+        refetchAppointments={() =>
+          fetchAppointmentsAsync({
+            date: watchedDate,
+            doctor: watchedDoctor.value,
+          })
+        }
+        id={confirmAppointmentModal?.id}
+        patientName={confirmAppointmentModal?.patientName}
       />
 
       <Table
