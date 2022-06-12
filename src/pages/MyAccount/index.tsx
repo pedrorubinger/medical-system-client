@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Checkbox, Col, notification, Row } from 'antd'
 import { Controller, useForm } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
@@ -100,6 +101,10 @@ export const MyAccount = (): JSX.Element => {
     setValue('new_password', '')
     setValue('change_password', false)
   }
+
+  useEffect(() => {
+    dispatch(Creators.getUserData({ id: user?.data?.id }))
+  }, [])
 
   return (
     <>
@@ -245,7 +250,7 @@ export const MyAccount = (): JSX.Element => {
 
       {user.data.role === 'doctor' && (
         <>
-          <ProfessionalData user={user.data} />
+          <ProfessionalData />
           <InsurancesSection />
         </>
       )}

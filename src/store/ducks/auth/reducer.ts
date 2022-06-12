@@ -25,6 +25,9 @@ export const AuthTypes = {
   AUTH_VALIDATE_TOKEN_REQUEST: 'auth/AUTH_VALIDATE_TOKEN_REQUEST',
   AUTH_VALIDATE_TOKEN_SUCCESS: 'auth/AUTH_VALIDATE_TOKEN_SUCCESS',
   AUTH_VALIDATE_TOKEN_FAILURE: 'auth/AUTH_VALIDATE_TOKEN_FAILURE',
+  AUTH_GET_USER_DATA_REQUEST: 'auth/AUTH_GET_USER_DATA_REQUEST',
+  AUTH_GET_USER_DATA_SUCCESS: 'auth/AUTH_GET_USER_DATA_SUCCESS',
+  AUTH_GET_USER_DATA_FAILURE: 'auth/AUTH_GET_USER_DATA_FAILURE',
 }
 
 const initialState: IState = {
@@ -92,6 +95,24 @@ export default function reducer(
         isAuthorized: false,
         error: action.payload,
       }
+    case AuthTypes.AUTH_GET_USER_DATA_REQUEST:
+      return { ...state, loading: true }
+    case AuthTypes.AUTH_GET_USER_DATA_SUCCESS:
+      return {
+        ...state,
+        data: action.payload,
+        loading: false,
+        error: null,
+        isAuthorized: true,
+      }
+    case AuthTypes.AUTH_GET_USER_DATA_FAILURE:
+      return {
+        ...state,
+        data: null,
+        loading: false,
+        isAuthorized: false,
+        error: action.payload,
+      }
     case AuthTypes.AUTH_SIGN_IN_CLEAR:
       return { ...initialState }
     default:
@@ -108,9 +129,6 @@ export const Creators = {
     type: AuthTypes.AUTH_SIGN_IN_REQUEST,
     payload,
   }),
-  validateToken: (): AnyAction => ({
-    type: AuthTypes.AUTH_VALIDATE_TOKEN_REQUEST,
-  }),
   signInSuccess: (payload: IUser): AnyAction => ({
     type: AuthTypes.AUTH_SIGN_IN_SUCCESS,
     payload,
@@ -119,12 +137,27 @@ export const Creators = {
     type: AuthTypes.AUTH_SIGN_IN_FAILURE,
     payload,
   }),
+  validateToken: (): AnyAction => ({
+    type: AuthTypes.AUTH_VALIDATE_TOKEN_REQUEST,
+  }),
   validateTokenSuccess: (payload: IUser): AnyAction => ({
     type: AuthTypes.AUTH_VALIDATE_TOKEN_SUCCESS,
     payload,
   }),
   validateTokenFailure: (payload: IError): AnyAction => ({
     type: AuthTypes.AUTH_VALIDATE_TOKEN_FAILURE,
+    payload,
+  }),
+  getUserData: (payload: { id: number }): AnyAction => ({
+    type: AuthTypes.AUTH_GET_USER_DATA_REQUEST,
+    payload,
+  }),
+  getUserDataSuccess: (payload: IUser): AnyAction => ({
+    type: AuthTypes.AUTH_GET_USER_DATA_SUCCESS,
+    payload,
+  }),
+  getUserDataFailure: (payload: IError): AnyAction => ({
+    type: AuthTypes.AUTH_GET_USER_DATA_FAILURE,
     payload,
   }),
   clearSignIn: (): AnyAction => ({

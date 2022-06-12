@@ -2,14 +2,15 @@
 import { useEffect, useState } from 'react'
 import { Col, notification, Row, Spin, Typography } from 'antd'
 import { Controller, useForm } from 'react-hook-form'
+import { useSelector } from 'react-redux'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
 
 import { Button, ButtonContainer, Form } from '../styles'
+import { RootState } from '../../../store'
 import { fetchSpecialties } from '../../../services/requests/specialty'
 import { updateDoctor } from '../../../services/requests/doctor'
 import { setFieldErrors } from '../../../utils/helpers/errors'
-import { IUser } from '../../../interfaces/user'
 import { IInsurance } from '../../../interfaces/insurance'
 import { ISpecialty } from '../../../interfaces/specialty'
 import { IError } from '../../../interfaces/error'
@@ -23,10 +24,6 @@ import { convertBrCurrencyToNumber } from '../../../utils/helpers/formatters'
 interface ISelectOption {
   label: string
   value: number
-}
-
-interface IProfessionalDataProps {
-  user: IUser
 }
 
 interface IProfessionalDataFormValues {
@@ -64,7 +61,9 @@ const formatSelectOption = (
     ? [...arr].map((item) => ({ value: item.id, label: item.name }))
     : undefined
 
-export const ProfessionalData = ({ user }: IProfessionalDataProps) => {
+export const ProfessionalData = () => {
+  const auth = useSelector((state: RootState) => state.AuthReducer)
+  const user = auth.data
   const initialValues: IProfessionalDataFormValues = {
     crm_document: user?.doctor?.crm_document || '',
     insurances: formatSelectOption(user?.doctor?.insurance),
@@ -77,6 +76,7 @@ export const ProfessionalData = ({ user }: IProfessionalDataProps) => {
   const {
     control,
     handleSubmit,
+    reset,
     setError,
     setValue,
     formState: { errors, isSubmitting },
@@ -127,33 +127,6 @@ export const ProfessionalData = ({ user }: IProfessionalDataProps) => {
       setFieldErrors(setError, response.error)
     }
   }
-
-  useEffect(() => {
-    ;(async () => {
-      setIsFetching(true)
-
-      const specialtiesResponse = await fetchSpecialties()
-      const paymentMethodsResponse = await fetchPaymentMethods()
-
-      if (specialtiesResponse?.data) {
-        setSpecialtiesOptions(formatOptions(specialtiesResponse.data))
-      }
-
-      if (paymentMethodsResponse?.data) {
-        setPaymentMethodsOptions(formatOptions(paymentMethodsResponse.data))
-      }
-
-      if (specialtiesResponse.error) {
-        setHttpErrors([specialtiesResponse.error])
-      }
-
-      if (paymentMethodsResponse.error) {
-        setHttpErrors([paymentMethodsResponse.error])
-      }
-
-      setIsFetching(false)
-    })()
-  }, [])
 
   const ErrorOnLoadData = (
     <>
@@ -291,16 +264,47 @@ export const ProfessionalData = ({ user }: IProfessionalDataProps) => {
       return ErrorOnLoadData
     }
 
-    if (isFetching) {
+    if (isFetching || auth.loading) {
       return FetchingData
     }
 
     return FormContent
   }
 
+  useEffect(() => {
+    ;(async () => {
+      setIsFetching(true)
+
+      const specialtiesResponse = await fetchSpecialties()
+      const paymentMethodsResponse = await fetchPaymentMethods()
+
+      if (specialtiesResponse?.data) {
+        setSpecialtiesOptions(formatOptions(specialtiesResponse.data))
+      }
+
+      if (paymentMethodsResponse?.data) {
+        setPaymentMethodsOptions(formatOptions(paymentMethodsResponse.data))
+      }
+
+      if (specialtiesResponse.error) {
+        setHttpErrors([specialtiesResponse.error])
+      }
+
+      if (paymentMethodsResponse.error) {
+        setHttpErrors([paymentMethodsResponse.error])
+      }
+
+      setIsFetching(false)
+    })()
+  }, [])
+
+  useEffect(() => {
+    reset(initialValues)
+  }, [user])
+
   return (
     <PageContent margin="30px 0">
-      <TableHeader title="Dados Profissionais - Médico" margin="0 0 20px 0" />
+      <TableHeader title="Informações de Consultas" margin="0 0 20px 0" />
       {renderContent()}
     </PageContent>
   )

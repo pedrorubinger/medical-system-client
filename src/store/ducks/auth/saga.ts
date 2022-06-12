@@ -55,6 +55,19 @@ function* validateToken() {
   }
 }
 
+function* getUserData(action: AnyAction) {
+  try {
+    const response: AxiosResponse<IUser> = yield call(
+      api.get,
+      `/user/${action.payload.id}`
+    )
+
+    yield put(Creators.getUserDataSuccess(response.data))
+  } catch (err: any) {
+    yield put(Creators.getUserDataFailure(handleError(err)))
+  }
+}
+
 export function* watchSignInUser() {
   yield takeLatest(AuthTypes.AUTH_SIGN_IN_REQUEST, userSignIn)
 }
@@ -63,8 +76,16 @@ export function* watchValidateToken() {
   yield takeLatest(AuthTypes.AUTH_VALIDATE_TOKEN_REQUEST, validateToken)
 }
 
+export function* watchGetUserData() {
+  yield takeLatest(AuthTypes.AUTH_GET_USER_DATA_REQUEST, getUserData)
+}
+
 function* AuthSaga() {
-  yield all([fork(watchSignInUser), fork(watchValidateToken)])
+  yield all([
+    fork(watchSignInUser),
+    fork(watchValidateToken),
+    fork(watchGetUserData),
+  ])
 }
 
 export default AuthSaga

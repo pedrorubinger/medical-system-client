@@ -112,49 +112,6 @@ export const InsurancesSection = () => {
     },
   ]
 
-  useEffect(() => {
-    ;(async () => {
-      setRecords(user?.data?.doctor?.insurance || [])
-      setIsFetching(true)
-
-      const response = await fetchInsurances()
-
-      if (response?.data) {
-        const userInsurances: number[] =
-          user?.data?.doctor?.insurance.map(
-            (insurance: IDoctorInsurance) => insurance.id
-          ) || []
-        const availableOptions = response.data.filter(
-          (insurance) => !userInsurances.includes(insurance.id)
-        )
-
-        setInsurances(response.data)
-        setOptions(formatOptions(availableOptions))
-        setRecords(user?.data?.doctor?.insurance)
-      }
-
-      if (response.error) {
-        setErrorOnFetchData(response.error.message)
-        setRecords([])
-      }
-
-      setIsFetching(false)
-    })()
-  }, [])
-
-  useEffect(() => {
-    if (records?.length) {
-      const doctorInsurances = records?.map((record) => record.id.toString())
-      const formatted = formatOptions([...insurances])
-
-      setOptions(
-        [...formatted].filter(
-          (insurance) => !doctorInsurances.includes(insurance.value.toString())
-        )
-      )
-    }
-  }, [records])
-
   const ErrorOnFetchData = (
     <>
       <h2>
@@ -201,6 +158,49 @@ export const InsurancesSection = () => {
 
     return Content
   }
+
+  useEffect(() => {
+    ;(async () => {
+      setRecords(user?.data?.doctor?.insurance || [])
+      setIsFetching(true)
+
+      const response = await fetchInsurances()
+
+      if (response?.data) {
+        const userInsurances: number[] =
+          user?.data?.doctor?.insurance.map(
+            (insurance: IDoctorInsurance) => insurance.id
+          ) || []
+        const availableOptions = response.data.filter(
+          (insurance) => !userInsurances.includes(insurance.id)
+        )
+
+        setInsurances(response.data)
+        setOptions(formatOptions(availableOptions))
+        setRecords(user?.data?.doctor?.insurance)
+      }
+
+      if (response.error) {
+        setErrorOnFetchData(response.error.message)
+        setRecords([])
+      }
+
+      setIsFetching(false)
+    })()
+  }, [user?.data?.doctor?.insurance])
+
+  useEffect(() => {
+    if (records?.length) {
+      const doctorInsurances = records?.map((record) => record.id.toString())
+      const formatted = formatOptions([...insurances])
+
+      setOptions(
+        [...formatted].filter(
+          (insurance) => !doctorInsurances.includes(insurance.value.toString())
+        )
+      )
+    }
+  }, [records])
 
   return (
     <PageContent margin="30px 0">
