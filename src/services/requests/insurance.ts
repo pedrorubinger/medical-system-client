@@ -22,6 +22,10 @@ interface IFetchInsurancesResponse {
   error: IError | null
 }
 
+type StoreInsuranceData = Omit<IInsuranceFormValues, 'price'> & {
+  price?: number
+}
+
 interface IStoreOrUpdateInsuranceResponse {
   insurance: IInsurance | null
   error: IError | null
@@ -60,13 +64,14 @@ export const fetchInsurances = async (
 }
 
 export const storeInsurance = async (
-  data: IInsuranceFormValues
+  data: StoreInsuranceData,
+  doctorId?: number | undefined
 ): Promise<IStoreOrUpdateInsuranceResponse> => {
   try {
-    const response: AxiosResponse<IInsurance> = await api.post(
-      '/insurance',
-      data
-    )
+    const response: AxiosResponse<IInsurance> = await api.post('/insurance', {
+      ...data,
+      doctorId,
+    })
 
     return { insurance: response.data, error: null }
   } catch (err) {

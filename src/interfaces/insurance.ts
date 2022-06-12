@@ -7,4 +7,6 @@ export interface IInsurance {
 
 export interface IInsuranceFormValues {
   name: string
+  price?: string | undefined
+  include?: boolean | undefined
 }

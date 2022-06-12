@@ -188,6 +188,7 @@ export const InsurancesSection = () => {
         scroll={{ x: !records?.length ? undefined : true }}
         columns={columns}
         dataSource={records}
+        pagination={false}
         loading={isFetching}
       />
     </>

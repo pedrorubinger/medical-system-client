@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { notification, Table, TablePaginationConfig } from 'antd'
 import { useSelector } from 'react-redux'
-import { FilterValue } from 'antd/lib/table/interface'
+import { FilterValue, SortOrder } from 'antd/lib/table/interface'
 
 import { RootState } from '../../store'
 import {
@@ -12,7 +12,7 @@ import {
 import { IUser } from '../../interfaces/user'
 import { TRole } from '../../interfaces/roles'
 import { getTranslatedRole } from '../../utils/helpers/roles'
-import { formatCPF } from '../../utils/helpers/formatters'
+import { formatCPF, getSortOrder } from '../../utils/helpers/formatters'
 import { getFilterProps } from '../../components/UI/FilterBox/Filter'
 import { PageContent } from '../../components/UI/PageContent'
 import { TableHeader } from '../../components/UI/TableHeader'
@@ -143,6 +143,12 @@ export const Users = (): JSX.Element => {
         inputOptions: { placeholder: 'Nome' },
       }),
       filteredValue: searchFilters.name as unknown as FilterValue,
+      defaultSortOrder: getSortOrder(),
+      sortDirections: [
+        'ascend' as SortOrder,
+        'descend' as SortOrder,
+        'ascend' as SortOrder,
+      ],
     },
     {
       title: 'CPF',
@@ -210,9 +216,9 @@ export const Users = (): JSX.Element => {
             },
             {
               id: 'delete',
-              overlay: !canDeleteUser(user)
-                ? 'Não é possível excluir este usuário pois ele também é um administrador'
-                : 'Excluir este usuário',
+              overlay: 'Excluir este usuário',
+              disabledTitle:
+                'Não é possível excluir este usuário pois ele também é um administrador',
               disabled: !canDeleteUser(user),
               onClick: () =>
                 setDeletionModal({

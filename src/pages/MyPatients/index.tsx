@@ -14,7 +14,7 @@ import { PageContent } from '../../components/UI/PageContent'
 import { TableActions } from '../../components/UI/TableActions'
 import { TableHeader } from '../../components/UI/TableHeader'
 import { EditMyPatientDrawer } from './Drawer'
-import { getTimePassed } from '../../utils/helpers/formatters'
+import { getSortOrder, getTimePassed } from '../../utils/helpers/formatters'
 import { MyAppointmentsDrawer } from './MyAppointmentsDrawer'
 import { RefreshButton } from '../../components/UI/RefreshButton'
 
@@ -103,6 +103,7 @@ export const MyPatients = (): JSX.Element => {
         dataIndex: 'name',
         inputOptions: { placeholder: 'Nome' },
       }),
+      defaultSortOrder: getSortOrder(),
       filteredValue: searchFilters.name as unknown as FilterValue,
     },
     {

@@ -11,6 +11,7 @@ import {
   getDateInText,
   getDisabledStatusTitle,
   getDrawerWidth,
+  getSortOrder,
   getTimeDifference,
 } from '../../../utils/helpers/formatters'
 import {
@@ -134,6 +135,7 @@ export const MyAppointmentsDrawer = ({
         dataIndex: 'datetime',
         inputOptions: { placeholder: 'Data', inputType: 'date' },
       }),
+      defaultSortOrder: getSortOrder(),
       filteredValue: searchFilters.date as unknown as FilterValue,
     },
     {

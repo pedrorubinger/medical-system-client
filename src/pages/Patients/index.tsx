@@ -14,6 +14,7 @@ import { TableHeader } from '../../components/UI/TableHeader'
 import { PatientDrawer } from './Drawer'
 import { DeletePatientModal as DeletionModal } from './DeletionModal'
 import { PatientDetailsModal } from '../../components/Forms/Patient/PatientDetailsModal'
+import { getSortOrder } from '../../utils/helpers/formatters'
 
 interface IFilter {
   name: string | null
@@ -101,6 +102,7 @@ export const Patients = (): JSX.Element => {
         dataIndex: 'name',
         inputOptions: { placeholder: 'Nome' },
       }),
+      defaultSortOrder: getSortOrder(),
       filteredValue: searchFilters.name as unknown as FilterValue,
     },
     {

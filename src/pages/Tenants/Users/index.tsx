@@ -7,7 +7,7 @@ import { RootState } from '../../../store'
 import { IUser } from '../../../interfaces/user'
 import { TRole } from '../../../interfaces/roles'
 import { getTranslatedRole } from '../../../utils/helpers/roles'
-import { getDrawerWidth } from '../../../utils/helpers/formatters'
+import { getDrawerWidth, getSortOrder } from '../../../utils/helpers/formatters'
 import { getFilterProps } from '../../../components/UI/FilterBox/Filter'
 import { TableHeader } from '../../../components/UI/TableHeader'
 import { UserDetailsModal } from '../../../components/Forms/User/UserDetailsModal'
@@ -159,6 +159,7 @@ export const ListTenantUsers = ({
         dataIndex: 'name',
         inputOptions: { placeholder: 'Nome' },
       }),
+      defaultSortOrder: getSortOrder(),
       filteredValue: searchFilters.name as unknown as FilterValue,
     },
     {

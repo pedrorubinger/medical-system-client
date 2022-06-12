@@ -6,7 +6,7 @@ import { FilterValue } from 'antd/lib/table/interface'
 import { RootState } from '../../store'
 import { AdminsDrawer } from './Drawer'
 import { IUser } from '../../interfaces/user'
-import { formatCPF } from '../../utils/helpers/formatters'
+import { formatCPF, getSortOrder } from '../../utils/helpers/formatters'
 import { PageContent } from '../../components/UI/PageContent'
 import { TableHeader } from '../../components/UI/TableHeader'
 import { TableActions } from '../../components/UI/TableActions'
@@ -101,6 +101,7 @@ export const Admins = () => {
         dataIndex: 'name',
         inputOptions: { placeholder: 'Nome' },
       }),
+      defaultSortOrder: getSortOrder(),
       filteredValue: searchFilters.name as unknown as FilterValue,
     },
     {

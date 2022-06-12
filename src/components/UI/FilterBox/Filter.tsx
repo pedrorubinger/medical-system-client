@@ -1,4 +1,4 @@
-import { FilterConfirmProps } from 'antd/lib/table/interface'
+import { FilterConfirmProps, SortOrder } from 'antd/lib/table/interface'
 
 import { FilterBox, IInputOptions } from '.'
 import FilterBoxIcon from './Icon'
@@ -40,6 +40,11 @@ export const getFilterProps = ({
   onReset,
   onSearch,
 }: IGetFilterProps) => ({
+  sortDirections: [
+    'ascend' as SortOrder,
+    'descend' as SortOrder,
+    'ascend' as SortOrder,
+  ],
   filterDropdown: ({
     clearFilters,
     confirm,

@@ -3,6 +3,8 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 
 dayjs.extend(relativeTime)
 
+type SortOrder = 'descend' | 'ascend' | null
+
 interface IFormatDecimalSeparatorOptions {
   /** @default '.' */
   currentSeparator?: ',' | '.'
@@ -258,3 +260,5 @@ export const getDisabledStatusTitle = (
 
   return 'Ainda não é possível confirmar esta consulta'
 }
+
+export const getSortOrder = (order: SortOrder = 'ascend'): SortOrder => order

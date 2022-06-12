@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { notification, Table, TablePaginationConfig } from 'antd'
-import { FilterValue } from 'antd/lib/table/interface'
+import { FilterValue, SortOrder } from 'antd/lib/table/interface'
 
 import { getFilterProps } from '../../components/UI/FilterBox/Filter'
 import { IInsurance } from '../../interfaces/insurance'
@@ -14,6 +14,7 @@ import {
 } from '../../services/requests/insurance'
 import { InsuranceDrawer } from './Drawer'
 import { DeletionModal } from './DeletionModal'
+import { getSortOrder } from '../../utils/helpers/formatters'
 
 interface IFilter {
   name: string | null
@@ -100,18 +101,29 @@ export const Insurances = (): JSX.Element => {
         dataIndex: 'name',
         inputOptions: { placeholder: 'Nome' },
       }),
+      defaultSortOrder: getSortOrder(),
       filteredValue: searchFilters.name as unknown as FilterValue,
     },
     {
       title: 'Data de Cadastro',
       dataIndex: 'created_at',
       key: 'created_at',
+      sortDirections: [
+        'ascend' as SortOrder,
+        'descend' as SortOrder,
+        'ascend' as SortOrder,
+      ],
       render: (date: string) => new Date(date).toLocaleString(),
     },
     {
       title: 'Última Atualização',
       dataIndex: 'updated_at',
       key: 'updated_at',
+      sortDirections: [
+        'ascend' as SortOrder,
+        'descend' as SortOrder,
+        'ascend' as SortOrder,
+      ],
       render: (date: string) => new Date(date).toLocaleString(),
     },
     {

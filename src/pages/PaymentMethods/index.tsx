@@ -14,6 +14,7 @@ import {
 } from '../../services/requests/paymentMethod'
 import { PaymentMethodDrawer } from './Drawer'
 import { DeletionModal } from './DeletionModal'
+import { getSortOrder } from '../../utils/helpers/formatters'
 
 interface IFilter {
   name: string | null
@@ -103,6 +104,7 @@ export const PaymentMethods = (): JSX.Element => {
         dataIndex: 'name',
         inputOptions: { placeholder: 'Nome' },
       }),
+      defaultSortOrder: getSortOrder(),
       filteredValue: searchFilters.name as unknown as FilterValue,
     },
     {

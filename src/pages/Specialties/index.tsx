@@ -14,6 +14,7 @@ import {
 } from '../../services/requests/specialty'
 import { SpecialtyDrawer } from './Drawer'
 import { DeletionModal } from './DeletionModal'
+import { getSortOrder } from '../../utils/helpers/formatters'
 
 interface IFilter {
   name: string | null
@@ -101,6 +102,7 @@ export const Specialties = (): JSX.Element => {
         dataIndex: 'name',
         inputOptions: { placeholder: 'Nome' },
       }),
+      defaultSortOrder: getSortOrder(),
       filteredValue: searchFilters.name as unknown as FilterValue,
     },
     {

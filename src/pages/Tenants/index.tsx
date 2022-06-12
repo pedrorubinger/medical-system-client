@@ -14,6 +14,7 @@ import {
 import { TenantModal } from './Modal'
 import { CreateTenantDrawer } from './Drawer'
 import { ListTenantUsers } from './Users'
+import { getSortOrder } from '../../utils/helpers/formatters'
 
 type TModalType = 'delete' | 'toggle'
 
@@ -70,6 +71,7 @@ export const Tenants = (): JSX.Element => {
         dataIndex: 'name',
         inputOptions: { placeholder: 'Nome' },
       }),
+      defaultSortOrder: getSortOrder(),
       filteredValue: searchFilters.name as unknown as FilterValue,
     },
     {
