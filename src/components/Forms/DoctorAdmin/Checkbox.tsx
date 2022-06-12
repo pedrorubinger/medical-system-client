@@ -7,7 +7,7 @@ import { InfoTooltip } from '../../UI/InfoTooltip'
 
 interface IDoctorAdminCheckboxProps {
   field: ControllerRenderProps<any, 'include'>
-  /** @default 'Incluir na minha lista' */
+  /** @default 'Incluir à minha lista' */
   label?: string
   /** @default 'Você incluirá este item à sua lista' */
   tooltipText?: string
@@ -15,7 +15,7 @@ interface IDoctorAdminCheckboxProps {
 
 export const DoctorAdminCheckbox = ({
   field,
-  label = 'Incluir na minha lista',
+  label = 'Incluir à minha lista',
   tooltipText = 'Você incluirá este item à sua lista',
 }: IDoctorAdminCheckboxProps) => {
   return (

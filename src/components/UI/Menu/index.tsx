@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom'
 import { GiHamburgerMenu } from 'react-icons/gi'
+import { FiXCircle } from 'react-icons/fi'
 
+import MedAppLogo from '../../../assets/images/medical-app-logo.svg'
 import { useWindowDimensions } from '../../../hooks/useWindowDimensions'
 import { useHasPermission } from '../../../hooks/useHasPermissions'
 import {
@@ -16,8 +18,8 @@ import {
   MenuItemsContainer,
   MenuItem,
   Backdrop,
+  LogoContainer,
 } from './styles'
-import { FiXCircle } from 'react-icons/fi'
 
 interface IMenuProps {
   mobileMenuIsOpened: boolean
@@ -62,7 +64,10 @@ export const Menu = ({
   if (!width || width >= mobileLimitWidth) {
     return (
       <Container>
-        <LogoText>MedApp</LogoText>
+        <LogoContainer>
+          <LogoText>MedApp</LogoText>
+          <img src={MedAppLogo} alt="Logo" height={27} width={27} />
+        </LogoContainer>
         {MenuList}
       </Container>
     )

@@ -12,6 +12,7 @@ interface IContainerProps {
 }
 
 export const Container = styled.div<IContainerProps>`
+  // #212121
   background-color: #3d405b;
   width: 20%;
   min-width: 270px;
@@ -31,15 +32,32 @@ export const TopBar = styled.div`
   overflow-x: auto;
 `
 
+export const LogoContainer = styled.div`
+  display: flex;
+  border-bottom: 1px solid #565977;
+  padding-bottom: 13px;
+  align-items: flex-end;
+
+  & h1 {
+    padding-right: 7px;
+  }
+
+  & svg,
+  img {
+    margin-bottom: -3px;
+  }
+`
+
 export const LogoText = styled.h1`
   color: #fff;
   font-size: 25px;
   align-self: center;
-  text-align: center;
+  text-align: left;
   transition: 0.8s;
   font-family: 'Antic Slab', serif;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #6b6c6d;
+  font-weight: bold;
+  padding: 0 15px;
+  margin-top: 15px;
   cursor: default;
 
   &:hover {

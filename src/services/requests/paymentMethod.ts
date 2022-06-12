@@ -66,12 +66,13 @@ export const fetchPaymentMethods = async (
 }
 
 export const storePaymentMethod = async (
-  data: IPaymentMethodFormValues
+  data: IPaymentMethodFormValues,
+  doctorId?: number | undefined
 ): Promise<IStoreOrUpdatePaymentMethodResponse> => {
   try {
     const response: AxiosResponse<IPaymentMethod> = await api.post(
       '/payment_method',
-      data
+      { ...data, doctorId }
     )
 
     return { insurance: response.data, error: null }

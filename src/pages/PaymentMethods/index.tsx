@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { notification, Table, TablePaginationConfig } from 'antd'
+import { notification, Table, TablePaginationConfig, Typography } from 'antd'
 import { FilterValue } from 'antd/lib/table/interface'
 
 import { getFilterProps } from '../../components/UI/FilterBox/Filter'
@@ -15,6 +15,7 @@ import {
 import { PaymentMethodDrawer } from './Drawer'
 import { DeletionModal } from './DeletionModal'
 import { getSortOrder } from '../../utils/helpers/formatters'
+import { InfoMessage } from './styles'
 
 interface IFilter {
   name: string | null
@@ -179,6 +180,12 @@ export const PaymentMethods = (): JSX.Element => {
           onClick: () => setDrawer({ isVisible: true, type: 'create' }),
         }}
       />
+      <InfoMessage>
+        Abaixo estão listados todos os métodos de pagamento atendidos pela
+        clínica. Cada médico poderá, na página de{' '}
+        <Typography.Text strong>Meus Dados</Typography.Text>, gerenciar os
+        métodos de pagamento aceitos em suas consultas.
+      </InfoMessage>
       <Table
         rowKey="id"
         dataSource={records}

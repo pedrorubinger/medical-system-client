@@ -166,7 +166,7 @@ export const InsuranceDrawer = ({
           administrador. Para adicionar um convênio à sua lista de convênios
           atendidos, você precisa acessar a página de{' '}
           <Typography.Text strong>Meus Dados</Typography.Text>. Para incluir
-          este convênio à sua lista, basta marcar a caixa de seleção no
+          este novo convênio à sua lista, basta marcar a caixa de seleção no
           formulário abaixo.
         </InfoMessage>
       )

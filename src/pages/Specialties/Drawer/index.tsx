@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
-import { Col, Drawer, notification, Row } from 'antd'
+import { useSelector } from 'react-redux'
+import { Col, Drawer, notification, Row, Typography } from 'antd'
 import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
 
-import { Button, Form } from './styles'
+import { Button, Form, InfoMessage } from './styles'
 import { Input } from '../../../components/UI/Input'
 import { ISpecialty, ISpecialtyFormValues } from '../../../interfaces/specialty'
 import {
@@ -13,6 +14,8 @@ import {
 } from '../../../services/requests/specialty'
 import { setFieldErrors } from '../../../utils/helpers/errors'
 import { getDrawerWidth } from '../../../utils/helpers/formatters'
+import { RootState } from '../../../store'
+import { DoctorAdminCheckbox } from '../../../components/Forms/DoctorAdmin/Checkbox'
 
 interface ISpecialtyDrawerProps {
   isVisible: boolean
@@ -24,6 +27,7 @@ interface ISpecialtyDrawerProps {
 
 const specialtySchema = Yup.object().shape({
   name: Yup.string().required('Por favor, insira o nome da especialidade!'),
+  include: Yup.boolean(),
 })
 
 export const SpecialtyDrawer = ({
@@ -45,6 +49,10 @@ export const SpecialtyDrawer = ({
     shouldUnregister: true,
     mode: 'onBlur',
   })
+  const user = useSelector((state: RootState) => state.AuthReducer)
+  const isDoctor = !!user?.data?.doctor
+  const isCreating = type === 'create'
+  const isEditing = type === 'update'
   const watchedName = watch('name', data?.name || '')
   const [currentName, setCurrentName] = useState(data?.name || '')
 
@@ -64,8 +72,13 @@ export const SpecialtyDrawer = ({
   const onSubmit = async (values: ISpecialtyFormValues): Promise<void> => {
     const response =
       type === 'create'
-        ? await storeSpecialty({ ...values })
-        : await updateSpecialty(data?.id || 0, { ...values })
+        ? await storeSpecialty(
+            { name: values.name },
+            values.include && user?.data?.doctor?.id
+              ? user.data.doctor.id
+              : undefined
+          )
+        : await updateSpecialty(data?.id || 0, { name: values.name })
 
     if (response.error) {
       setFieldErrors(setError, response.error)
@@ -81,6 +94,35 @@ export const SpecialtyDrawer = ({
     setCurrentName(values.name)
     closeDrawer()
     fetchSpecialties()
+  }
+
+  const getInfoMessage = () => {
+    if (isEditing) {
+      return null
+    }
+
+    if (isDoctor) {
+      return (
+        <InfoMessage>
+          Você está cadastrando as especialidades da clínica na qual você é
+          administrador. Para adicionar uma especialidade à sua lista de
+          especialidades atendidas, você precisa acessar a página de{' '}
+          <Typography.Text strong>Meus Dados</Typography.Text>. Para incluir
+          esta nova especialidade à sua lista, basta marcar a caixa de seleção
+          no formulário abaixo.
+        </InfoMessage>
+      )
+    }
+
+    return (
+      <InfoMessage>
+        Você está cadastrando as especialidades da clínica na qual você é
+        administrador. Elas ficarão disponíveis para que cada médico, ao acesar
+        a página{' '}
+        <Typography.Text strong>&apos;Meus Dados&apos;</Typography.Text>, possa
+        selecionar as especialidades com que trabalham.
+      </InfoMessage>
+    )
   }
 
   const getButtonTitle = () => {
@@ -112,7 +154,7 @@ export const SpecialtyDrawer = ({
   }
 
   useEffect(() => {
-    reset({ name: data?.name || '' })
+    reset({ name: data?.name || '', include: !!isDoctor })
     setCurrentName(data?.name || '')
   }, [data])
 
@@ -126,6 +168,7 @@ export const SpecialtyDrawer = ({
       }
       width={getDrawerWidth(450)}
       onClose={closeDrawer}>
+      {getInfoMessage()}
       <Form onSubmit={handleSubmit(onSubmit)}>
         <Row>
           <Col span={24}>
@@ -144,6 +187,26 @@ export const SpecialtyDrawer = ({
             />
           </Col>
         </Row>
+
+        {!!isCreating && !!isDoctor && (
+          <>
+            <Row>
+              <Col span={24}>
+                <Controller
+                  name="include"
+                  control={control}
+                  defaultValue={!!isDoctor}
+                  render={({ field }) => (
+                    <DoctorAdminCheckbox
+                      field={field}
+                      tooltipText="Esta especialidade não somente será cadastrada na clínica mas também será incluída à sua lista de especialidades atendidas"
+                    />
+                  )}
+                />
+              </Col>
+            </Row>
+          </>
+        )}
 
         <Row>
           <Col span={24}>

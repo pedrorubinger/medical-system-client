@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { notification, Table, TablePaginationConfig } from 'antd'
+import { notification, Table, TablePaginationConfig, Typography } from 'antd'
 import { FilterValue, SortOrder } from 'antd/lib/table/interface'
 
 import { getFilterProps } from '../../components/UI/FilterBox/Filter'
@@ -12,9 +12,10 @@ import {
   fetchInsurances,
   IFetchInsurancesParams,
 } from '../../services/requests/insurance'
+import { getSortOrder } from '../../utils/helpers/formatters'
 import { InsuranceDrawer } from './Drawer'
 import { DeletionModal } from './DeletionModal'
-import { getSortOrder } from '../../utils/helpers/formatters'
+import { InfoMessage } from './styles'
 
 interface IFilter {
   name: string | null
@@ -182,6 +183,12 @@ export const Insurances = (): JSX.Element => {
           onClick: () => setDrawer({ isVisible: true, type: 'create' }),
         }}
       />
+      <InfoMessage>
+        Abaixo estão listados todos os convênios atendidos pela clínica. Cada
+        médico deverá, na página de{' '}
+        <Typography.Text strong>Meus Dados</Typography.Text>, gerenciar os
+        convênios que aceita em suas consultas.
+      </InfoMessage>
       <Table
         rowKey="id"
         dataSource={records}

@@ -121,7 +121,7 @@ export const ScheduleDaysOff = () => {
         onClose={() => setDrawer(null)}
       />
       <TableHeader
-        title="Férias e Ausências"
+        title="Férias, Folgas e Ausências"
         margin="0 0 5px 0"
         newRecordButton={{
           onClick: () => setDrawer({ isVisible: true, type: 'create' }),

@@ -1,21 +1,24 @@
 import { useEffect, useState } from 'react'
-import { Col, Drawer, notification, Row } from 'antd'
+import { useSelector } from 'react-redux'
+import { Col, Drawer, notification, Row, Typography } from 'antd'
 import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
 
+import { RootState } from '../../../store'
 import {
   storePaymentMethod,
   updatePaymentMethod,
 } from '../../../services/requests/paymentMethod'
 import { setFieldErrors } from '../../../utils/helpers/errors'
-import { Button, Form } from './styles'
+import { Button, Form, InfoMessage } from './styles'
 import { Input } from '../../../components/UI/Input'
 import {
   IPaymentMethod,
   IPaymentMethodFormValues,
 } from '../../../interfaces/paymentMethod'
 import { getDrawerWidth } from '../../../utils/helpers/formatters'
+import { DoctorAdminCheckbox } from '../../../components/Forms/DoctorAdmin/Checkbox'
 
 interface IPaymentMethodDrawerProps {
   isVisible: boolean
@@ -38,6 +41,10 @@ export const PaymentMethodDrawer = ({
   onClose,
   fetchPaymentMethods,
 }: IPaymentMethodDrawerProps) => {
+  const user = useSelector((state: RootState) => state.AuthReducer)
+  const isDoctor = !!user?.data?.doctor
+  const isCreating = type === 'create'
+  const isEditing = type === 'update'
   const {
     control,
     handleSubmit,
@@ -66,11 +73,17 @@ export const PaymentMethodDrawer = ({
     onClose()
   }
 
-  const onSubmit = async (values: IPaymentMethodFormValues): Promise<void> => {
+  const onSubmit = async ({
+    name,
+    include,
+  }: IPaymentMethodFormValues): Promise<void> => {
     const response =
       type === 'create'
-        ? await storePaymentMethod({ ...values })
-        : await updatePaymentMethod(data?.id || 0, { ...values })
+        ? await storePaymentMethod(
+            { name },
+            include && user?.data?.doctor?.id ? user.data.doctor.id : undefined
+          )
+        : await updatePaymentMethod(data?.id || 0, { name })
 
     if (response.error) {
       setFieldErrors(setError, response.error)
@@ -115,8 +128,37 @@ export const PaymentMethodDrawer = ({
     return 'Atualizar Método'
   }
 
+  const getInfoMessage = () => {
+    if (isEditing) {
+      return null
+    }
+
+    if (isDoctor) {
+      return (
+        <InfoMessage>
+          Você está cadastrando os métodos de pagamento aceitos em consultas da
+          clínica na qual você é administrador. Para adicionar um método de
+          pagamento à sua lista de métodos de pagamento, você precisa acessar a
+          página de <Typography.Text strong>Meus Dados</Typography.Text>. Para
+          incluir este novo método de pagamento à sua lista, basta marcar a
+          caixa de seleção no formulário abaixo.
+        </InfoMessage>
+      )
+    }
+
+    return (
+      <InfoMessage>
+        Você está cadastrando os métodos de pagamento aceitos em consultas da
+        clínica na qual você é administrador. Eles ficarão disponíveis para que
+        cada médico, ao acesar a página{' '}
+        <Typography.Text strong>&apos;Meus Dados&apos;</Typography.Text>, possa
+        selecionar os métodos de pagamento aceitos.
+      </InfoMessage>
+    )
+  }
+
   useEffect(() => {
-    reset({ name: data?.name || '' })
+    reset({ name: data?.name || '', include: !!isDoctor })
     setCurrentName(data?.name || '')
   }, [data])
 
@@ -130,6 +172,7 @@ export const PaymentMethodDrawer = ({
       }
       width={getDrawerWidth(450)}
       onClose={closeDrawer}>
+      {getInfoMessage()}
       <Form onSubmit={handleSubmit(onSubmit)}>
         <Row>
           <Col span={24}>
@@ -148,6 +191,26 @@ export const PaymentMethodDrawer = ({
             />
           </Col>
         </Row>
+
+        {!!isCreating && !!isDoctor && (
+          <>
+            <Row>
+              <Col span={24}>
+                <Controller
+                  name="include"
+                  control={control}
+                  defaultValue={!!isDoctor}
+                  render={({ field }) => (
+                    <DoctorAdminCheckbox
+                      field={field}
+                      tooltipText="Este método de pagamento não somente será cadastrado na clínica mas também será incluído à sua lista de métodos pagamento aceitos nas consultas"
+                    />
+                  )}
+                />
+              </Col>
+            </Row>
+          </>
+        )}
 
         <Row>
           <Col span={24}>

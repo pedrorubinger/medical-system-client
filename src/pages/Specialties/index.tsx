@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { notification, Table, TablePaginationConfig } from 'antd'
+import { notification, Table, TablePaginationConfig, Typography } from 'antd'
 import { FilterValue } from 'antd/lib/table/interface'
 
 import { getFilterProps } from '../../components/UI/FilterBox/Filter'
@@ -12,9 +12,10 @@ import {
   fetchSpecialties,
   IFetchSpecialtiesParams,
 } from '../../services/requests/specialty'
+import { getSortOrder } from '../../utils/helpers/formatters'
 import { SpecialtyDrawer } from './Drawer'
 import { DeletionModal } from './DeletionModal'
-import { getSortOrder } from '../../utils/helpers/formatters'
+import { InfoMessage } from './styles'
 
 interface IFilter {
   name: string | null
@@ -173,6 +174,12 @@ export const Specialties = (): JSX.Element => {
           onClick: () => setDrawer({ isVisible: true, type: 'create' }),
         }}
       />
+      <InfoMessage>
+        Abaixo estão listadas todas as especialidades atendidas pela clínica.
+        Cada médico poderá, na página de{' '}
+        <Typography.Text strong>Meus Dados</Typography.Text>, gerenciar as
+        especialidades que atende.
+      </InfoMessage>
       <Table
         rowKey="id"
         dataSource={records}

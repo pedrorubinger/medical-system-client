@@ -7,4 +7,5 @@ export interface IPaymentMethod {
 
 export interface IPaymentMethodFormValues {
   name: string
+  include?: boolean
 }

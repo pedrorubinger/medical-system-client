@@ -62,13 +62,14 @@ export const fetchSpecialties = async (
 }
 
 export const storeSpecialty = async (
-  data: ISpecialtyFormValues
+  data: ISpecialtyFormValues,
+  doctorId?: number | undefined
 ): Promise<IStoreOrUpdateSpecialtyResponse> => {
   try {
-    const response: AxiosResponse<ISpecialty> = await api.post(
-      '/specialty',
-      data
-    )
+    const response: AxiosResponse<ISpecialty> = await api.post('/specialty', {
+      ...data,
+      doctorId,
+    })
 
     return { specialty: response.data, error: null }
   } catch (err) {

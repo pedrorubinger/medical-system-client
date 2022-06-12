@@ -7,4 +7,5 @@ export interface ISpecialty {
 
 export interface ISpecialtyFormValues {
   name: string
+  include?: boolean
 }
