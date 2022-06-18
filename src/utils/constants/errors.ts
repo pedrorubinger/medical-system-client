@@ -29,6 +29,9 @@ export const ERROR_MESSAGES: { [key: string]: string } = {
   ADDRESS_NOT_FOUND: 'Este endereço não foi encontrado!',
   PATIENT_NOT_FOUND: 'Este paciente não foi encontrado!',
   APPOINTMENT_NOT_FOUND: 'Esta consulta não foi encontrada!',
+  APPOINTMENT_FILE_NOT_FOUND: 'O arquivo não existe ou foi excluído!',
+  STORE_APPOINTMENT_FILE_FAILED:
+    'Ocorreu um erro ao salvar o(s) arquivo(s) da consulta! Por favor, tente novamente mais tarde!',
 }
 
 export const BAD_REQUEST_MESSAGES: { [key: string]: string } = {
@@ -145,4 +148,10 @@ export const BAD_REQUEST_MESSAGES: { [key: string]: string } = {
     'Você deve informar se a consulta é retorno!',
   APPOINTMENT_IS_PRIVATE_IS_REQUIRED:
     'Você deve informar se a consulta é particular!',
+  APPOINTMENT_FILE_IS_REQUIRED: 'Você deve inserir um arquivo!',
+  APPOINTMENT_FILE_MAXIMUM_SIZE_12MB: 'O arquivo não pode ser maior que 12mb!',
+  APPOINTMENT_FILE_EXTNAME: 'O formato de arquivo não é aceito!',
+  MISSING_OR_INVALID_FILE:
+    'O arquivo é inválido ou não foi enviado corretamente!',
+  APPOINTMENT_IS_REQUIRED: 'Você deve informar uma consulta!',
 }
