@@ -36,6 +36,7 @@ export const getAppointmentDetailsDocumentTemplate = (
     {
       text: '_______________________________________________________________________________________________',
       bold: false,
+      margin: [0, 0, 0, 20],
     },
   ]
 
@@ -45,7 +46,7 @@ export const getAppointmentDetailsDocumentTemplate = (
         { text: 'Nome do Paciente: ', bold: true },
         { text: `${data.patient_name}`, bold: false },
       ],
-      margin: [0, 20, 0, 8],
+      margin: [0, 0, 0, 8],
     })
   }
 
@@ -106,7 +107,7 @@ export const getAppointmentDetailsDocumentTemplate = (
       text: [
         { text: 'Data da Consulta: ', bold: true },
         {
-          text: getDateInText(data.datetime),
+          text: data.datetime,
           bold: false,
         },
       ],
