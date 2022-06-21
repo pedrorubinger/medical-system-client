@@ -13,6 +13,7 @@ interface IFormatDecimalSeparatorOptions {
 }
 
 import { TAppointmentStatus } from '../../interfaces/appointment'
+import { MIMEType, MIMETypes } from '../../interfaces/MIMEType'
 import {
   IParsedDaysScheduleSettings,
   IScheduleSettings,
@@ -261,4 +262,22 @@ export const getDisabledStatusTitle = (
   return 'Ainda não é possível confirmar esta consulta'
 }
 
+/**
+ * Gets Ant Design table sort order.
+ * @param {SortOrder} order sort order. It uses 'ascend' as default value.
+ * @returns the sort order.
+ */
 export const getSortOrder = (order: SortOrder = 'ascend'): SortOrder => order
+
+/**
+ * Gets the file extension based in a provided MIME type.
+ * @param {MIMEType} contentType - HTTP content-type.
+ * @returns a formatted string with the plain file extension.
+ */
+export const getFileExtBasedInContentType = (contentType: MIMEType) => {
+  if (!MIMETypes.includes(contentType)) {
+    return null
+  }
+
+  return contentType.split('/')[1]
+}

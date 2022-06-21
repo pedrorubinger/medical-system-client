@@ -10,11 +10,3 @@ export const FakeInput = styled.div`
   background: #e8e8e8;
   color: #7c7c7c;
 `
-
-export const Text = styled.span`
-  font-weight: 300;
-  font-size: 15px;
-  display: block;
-  margin-top: 4px;
-  margin-bottom: 20px;
-`

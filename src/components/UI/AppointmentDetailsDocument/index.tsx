@@ -127,6 +127,7 @@ export const AppointmentDetailsDocument = ({
 
     try {
       setIsLoading(true)
+
       const linkEl = document.createElement('a')
       const now = new Date()
       const fileName = `Consulta_${

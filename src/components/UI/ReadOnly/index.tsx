@@ -1,8 +1,9 @@
 import { Label } from '../Label'
-import { FakeInput, Text } from './styles'
+import { Text } from '../Text'
+import { FakeInput } from './styles'
 
 interface IReadOnlyProps {
-  value: string | number
+  value: string | number | JSX.Element
   label?: string
   /** @default false */
   paperMode?: boolean
@@ -24,7 +25,7 @@ export const ReadOnly = ({
             {label}
           </Label>
         )}
-        <Text>{value}</Text>
+        <Text value={value} />
       </>
     )
   }
