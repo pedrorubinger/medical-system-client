@@ -1,15 +1,31 @@
-import { useEffect } from 'react'
-import { Col, Drawer, notification, Row, Typography } from 'antd'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useCallback, useEffect, useState } from 'react'
+import { Col, Divider, Drawer, notification, Row, Spin, Typography } from 'antd'
+import { UploadChangeParam, UploadFile } from 'antd/lib/upload/interface'
+import { LoadingOutlined } from '@ant-design/icons'
 import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
 
+import { Button, Form, InfoMessage, UploadFileLabelBox } from './styles'
 import { IMyAppointment } from '../../../../interfaces/appointment'
+import { updateAppointment } from '../../../../services/requests/appointment'
 import { setFieldErrors } from '../../../../utils/helpers/errors'
 import { getDrawerWidth } from '../../../../utils/helpers/formatters'
-import { Button, Form, InfoMessage } from './styles'
+import {
+  ALLOWED_FILE_EXTS,
+  FILE_MAX_SIZE,
+} from '../../../../utils/constants/files'
 import { Input } from '../../../../components/UI/Input'
-import { updateAppointment } from '../../../../services/requests/appointment'
+import { UploadComponent } from '../../../../components/UI/UploadComponent'
+import { Label } from '../../../../components/UI/Label'
+import { InfoTooltip } from '../../../../components/UI/InfoTooltip'
+import { ErrorMessage } from '../../../../components/UI/ErrorMessage'
+import { fetchAppointmentFiles } from '../../../../services/requests/appointmentFile'
+
+const LoadingIcon = (
+  <LoadingOutlined style={{ marginLeft: 6, fontSize: 14 }} spin />
+)
 
 interface IEditAppointmentDrawerProps {
   isVisible: boolean
@@ -50,10 +66,12 @@ export const EditAppointmentDrawer = ({
     shouldUnregister: true,
     mode: 'onBlur',
   })
+  const [isFetchingFiles, setIsFetchingFiles] = useState(false)
+  const [fileError, setFileError] = useState('')
+  const [fileList, setFileList] = useState<UploadFile[]>([])
   const formattedDate = data?.datetime
     ? `${new Date(data?.datetime)?.toLocaleDateString()?.split(' ')?.[0]}`
     : ''
-
   const watchedFields = watch()
   const allFieldsAreEmpty =
     !Object.values(watchedFields)?.filter(Boolean)?.length
@@ -105,13 +123,68 @@ export const EditAppointmentDrawer = ({
     return 'Salvar Dados'
   }
 
+  const onChangeUpload = (info: UploadChangeParam<any>) => {
+    const fileSize = Number(info.file.size)
+
+    if (info.file.status === 'removed') {
+      setFileError('')
+      setFileList(info.fileList)
+      return
+    }
+
+    const totalSizeMB = fileSize / Math.pow(1024, 2)
+
+    if (totalSizeMB > FILE_MAX_SIZE) {
+      setFileError(
+        `O tamanho do arquivo não pode ultrapassar ${FILE_MAX_SIZE} mb!`
+      )
+      setTimeout(() => {
+        setFileError('')
+      }, 3000)
+      return
+    }
+
+    setFileList(info.fileList)
+  }
+
+  const fetchAppointmentFilesAsync = useCallback(async (id: number) => {
+    setIsFetchingFiles(true)
+
+    const { data: files, error } = await fetchAppointmentFiles(id)
+
+    if (error) {
+      notification.error({
+        message:
+          'Desculpe, mas ocorreu uma falha ao trazer os arquivos. Por favor, tente novamente mais tarde!',
+      })
+      setFileList([])
+    }
+
+    if (files) {
+      setFileList(
+        [...files].map((url, i) => ({
+          uid: `${i + 1}`,
+          name: `Arquivo de consulta ${i + 1}`,
+          status: 'done',
+          url,
+        }))
+      )
+    }
+
+    setIsFetchingFiles(false)
+  }, [])
+
   useEffect(() => {
     reset({
       notes: data?.notes || '',
       exam_request: data?.exam_request || '',
       prescription: data?.prescription || '',
     })
-  }, [data])
+
+    if (isVisible && data?.id) {
+      fetchAppointmentFilesAsync(data.id)
+    }
+  }, [data, isVisible])
 
   if (!data) {
     return null
@@ -194,6 +267,44 @@ export const EditAppointmentDrawer = ({
             />
           </Col>
         </Row>
+
+        <Row>
+          <Col span={24}>
+            <UploadFileLabelBox>
+              <Label>Arquivos da Consulta/Paciente</Label>
+              <InfoTooltip
+                iconSize={16}
+                text={`Insira até 10 arquivos de até ${FILE_MAX_SIZE}mb cada. Os formatos permitidos são: ${ALLOWED_FILE_EXTS.map(
+                  (ext) => `.${ext}`
+                ).join(', ')}`}
+              />
+            </UploadFileLabelBox>
+            <UploadComponent
+              fileList={fileList}
+              text={
+                isFetchingFiles ? 'Buscando arquivos...' : 'Upload de Arquivos'
+              }
+              buttonProps={{
+                type: 'button',
+                color: 'white',
+                disabled: isFetchingFiles,
+                icon: isFetchingFiles ? (
+                  <Spin indicator={LoadingIcon} style={{ marginTop: -6 }} />
+                ) : undefined,
+              }}
+              uploadProps={{
+                multiple: true,
+                maxCount: 10,
+                accept: ALLOWED_FILE_EXTS.map((ext) => `.${ext}`).join(),
+                beforeUpload: () => false,
+                onChange: onChangeUpload,
+              }}
+            />
+            {!!fileError && <ErrorMessage msg={fileError} />}
+          </Col>
+        </Row>
+
+        <Divider />
 
         <Row>
           <Col span={24}>

@@ -5,12 +5,12 @@ import CurrencyFormat from 'react-currency-format'
 import { ActionMeta } from 'react-select'
 import { LoadingOutlined } from '@ant-design/icons'
 
+import { ErrorMessage } from '../ErrorMessage'
 import { Label } from '../Label'
 import { CurrencyInput } from './CurrencyInput'
 import {
   AsyncSelect,
   Container,
-  ErrorMessage,
   Select,
   StyledInput,
   StyledTextArea,
@@ -158,7 +158,7 @@ export const Input = React.forwardRef(
             // onInputChange={onAsyncInputChange}
             {...rest}
           />
-          {!!error && <ErrorMessage>{error}</ErrorMessage>}
+          {!!error && <ErrorMessage msg={error} />}
         </Container>
       )
     }
@@ -202,7 +202,7 @@ export const Input = React.forwardRef(
             onChange={selectOnChange}
             {...rest}
           />
-          {!!error && <ErrorMessage>{error}</ErrorMessage>}
+          {!!error && <ErrorMessage msg={error} />}
         </Container>
       )
     }
@@ -226,7 +226,7 @@ export const Input = React.forwardRef(
             customInput={CurrencyInput}
             {...rest}
           />
-          {!!error && <ErrorMessage>{error}</ErrorMessage>}
+          {!!error && <ErrorMessage msg={error} />}
         </Container>
       )
     }
@@ -248,7 +248,7 @@ export const Input = React.forwardRef(
             cols={textAreaCols}
             {...rest}
           />
-          {!!error && !!showError && <ErrorMessage>{error}</ErrorMessage>}
+          {!!error && !!showError && <ErrorMessage msg={error} />}
         </Container>
       )
     }
@@ -269,7 +269,7 @@ export const Input = React.forwardRef(
           onChange={onChange}
           {...rest}
         />
-        {!!error && !!showError && <ErrorMessage>{error}</ErrorMessage>}
+        {!!error && !!showError && <ErrorMessage msg={error} />}
       </Container>
     )
   }

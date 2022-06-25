@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 
-export const FakeInput = styled.div`
+export const StyledFakeInput = styled.div`
   margin: 9px 0;
   padding: 9px;
   padding-left: 10px;

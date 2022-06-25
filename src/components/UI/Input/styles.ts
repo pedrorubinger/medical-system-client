@@ -77,11 +77,5 @@ export const StyledTextArea = styled.textarea<IStyledInputProps>`
   }
 `
 
-export const ErrorMessage = styled.span`
-  font-size: 13px;
-  color: red;
-  margin: 8px 0;
-`
-
 export const Select = styled(ReactSelect)``
 export const AsyncSelect = styled(AsyncReactSelect)``

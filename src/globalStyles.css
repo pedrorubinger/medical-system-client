@@ -155,3 +155,7 @@ body {
 .table-row-light-green {
   background-color: #effff2;
 }
+
+.ant-upload-list-item-name {
+  font-size: 12px;
+}

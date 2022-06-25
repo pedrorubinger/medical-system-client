@@ -16,3 +16,7 @@ export const InfoMessage = styled.h3`
   font-size: 14px;
   font-weight: 300;
 `
+
+export const UploadFileLabelBox = styled.div`
+  margin-bottom: 9px;
+`
