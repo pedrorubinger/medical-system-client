@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AxiosResponse } from 'axios'
+import { UploadFile } from 'antd/lib/upload/interface'
 
 import { api } from '../api'
 import { handleError } from '../../utils/helpers/errors'
@@ -74,6 +75,10 @@ interface IDeleteAppointmentAPIResponse {
 interface IConfirmAppointmentResponse {
   appointment: IAppointment | null
   error?: IError | null | undefined
+}
+
+interface IUpdateAppointmentData extends Partial<TAppointmentData> {
+  files?: UploadFile<any>[]
 }
 
 const isInstance = (
@@ -158,7 +163,7 @@ export const storeAppointment = async (
 
 export const updateAppointment = async (
   id: number,
-  data: Partial<TAppointmentData>
+  data: IUpdateAppointmentData | FormData
 ): Promise<IStoreOrUpdateAppointmentResponse> => {
   try {
     const response: AxiosResponse<IAppointment> = await api.put(

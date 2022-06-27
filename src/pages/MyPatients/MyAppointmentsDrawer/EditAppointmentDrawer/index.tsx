@@ -89,7 +89,27 @@ export const EditAppointmentDrawer = ({
       })
     }
 
-    const response = await updateAppointment(data.id, values)
+    const files = fileList?.filter(
+      (file) => !file?.status || !['done', 'removed'].includes(file?.status)
+    )
+    const formData = new FormData()
+
+    if (files?.length) {
+      formData.append('notes', values?.notes || '')
+      formData.append('exam_request', values?.exam_request || '')
+      formData.append('prescription', values?.prescription || '')
+
+      files?.forEach((file, i) => {
+        if (file.originFileObj) {
+          formData.append(`files[${i}]`, file?.originFileObj)
+        }
+      })
+    }
+
+    const response = await updateAppointment(
+      data.id,
+      files?.length ? formData : values
+    )
 
     if (response.error) {
       setFieldErrors(setError, response.error)
