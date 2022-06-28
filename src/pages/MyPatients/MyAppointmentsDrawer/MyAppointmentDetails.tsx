@@ -52,7 +52,7 @@ export const MyAppointmentDetailModal = ({
 
     if (files) {
       setFilesError('')
-      setFileUrls(files)
+      setFileUrls(files.map((file) => file.file_url))
     }
 
     setIsFetching(false)

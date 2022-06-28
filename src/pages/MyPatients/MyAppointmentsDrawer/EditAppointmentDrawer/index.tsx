@@ -22,6 +22,7 @@ import { Label } from '../../../../components/UI/Label'
 import { InfoTooltip } from '../../../../components/UI/InfoTooltip'
 import { ErrorMessage } from '../../../../components/UI/ErrorMessage'
 import { fetchAppointmentFiles } from '../../../../services/requests/appointmentFile'
+import { DeleteAppointmentFileModal } from './DeleteAppointmentFileModal'
 
 const LoadingIcon = (
   <LoadingOutlined style={{ marginLeft: 6, fontSize: 14 }} spin />
@@ -33,6 +34,15 @@ interface IEditAppointmentDrawerProps {
   onClose: () => void
   fetchMyAppointments: () => void
   setPatientDetailsModal: () => void
+}
+
+interface IDeleteAppointmentFileModalProps {
+  isVisible: boolean
+  data: {
+    name: string
+    id: number
+  }
+  removeFileFromList: () => void
 }
 
 interface IEditAppointmentValues {
@@ -69,6 +79,8 @@ export const EditAppointmentDrawer = ({
   const [isFetchingFiles, setIsFetchingFiles] = useState(false)
   const [fileError, setFileError] = useState('')
   const [fileList, setFileList] = useState<UploadFile[]>([])
+  const [deleteFileModal, setDeleteFileModal] =
+    useState<IDeleteAppointmentFileModalProps | null>(null)
   const formattedDate = data?.datetime
     ? `${new Date(data?.datetime)?.toLocaleDateString()?.split(' ')?.[0]}`
     : ''
@@ -144,14 +156,11 @@ export const EditAppointmentDrawer = ({
   }
 
   const onChangeUpload = (info: UploadChangeParam<any>) => {
-    const fileSize = Number(info.file.size)
-
     if (info.file.status === 'removed') {
-      setFileError('')
-      setFileList(info.fileList)
       return
     }
 
+    const fileSize = Number(info.file.size)
     const totalSizeMB = fileSize / Math.pow(1024, 2)
 
     if (totalSizeMB > FILE_MAX_SIZE) {
@@ -165,6 +174,24 @@ export const EditAppointmentDrawer = ({
     }
 
     setFileList(info.fileList)
+  }
+
+  const onRemoveFile = (info: UploadFile<any>) => {
+    setDeleteFileModal({
+      isVisible: true,
+      data: {
+        id: Number(info.uid),
+        name: info.name,
+      },
+      removeFileFromList: () => {
+        setFileError('')
+        setFileList(
+          [...fileList].filter(
+            (file) => file.uid.toString() !== info.uid.toString()
+          )
+        )
+      },
+    })
   }
 
   const fetchAppointmentFilesAsync = useCallback(async (id: number) => {
@@ -182,11 +209,11 @@ export const EditAppointmentDrawer = ({
 
     if (files) {
       setFileList(
-        [...files].map((url, i) => ({
-          uid: `${i + 1}`,
+        [...files].map((file, i) => ({
+          uid: file.id.toString(),
           name: `Arquivo de consulta ${i + 1}`,
           status: 'done',
-          url,
+          url: file.file_url,
         }))
       )
     }
@@ -216,6 +243,12 @@ export const EditAppointmentDrawer = ({
       title="Preencher Informações da Consulta"
       width={getDrawerWidth(650)}
       onClose={closeDrawer}>
+      <DeleteAppointmentFileModal
+        isVisible={deleteFileModal?.isVisible || false}
+        data={deleteFileModal?.data}
+        removeFileFromList={deleteFileModal?.removeFileFromList}
+        onCancel={() => setDeleteFileModal(null)}
+      />
       <InfoMessage>
         Você está preenchendo informações da consulta do dia{' '}
         <Typography.Text strong>{formattedDate}</Typography.Text> para o
@@ -318,6 +351,7 @@ export const EditAppointmentDrawer = ({
                 accept: ALLOWED_FILE_EXTS.map((ext) => `.${ext}`).join(),
                 beforeUpload: () => false,
                 onChange: onChangeUpload,
+                onRemove: onRemoveFile,
               }}
             />
             {!!fileError && <ErrorMessage msg={fileError} />}
