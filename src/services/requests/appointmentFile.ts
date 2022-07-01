@@ -15,11 +15,6 @@ interface IDeleteAppointmentFileResponse {
   error: IError | null
 }
 
-// interface IDeleteAppointmentFileAPIResponse {
-//   total: number
-//   deleted: number
-// }
-
 export const fetchAppointmentFiles = async (
   appointmentId: number
 ): Promise<IFetchAppointmentFilesResponse> => {
@@ -43,7 +38,6 @@ export const deleteAppointmentFile = async (
       params: { all },
     }
 
-    // const response: AxiosResponse<IDeleteAppointmentFileAPIResponse> =
     await api.delete(`/appointment-file/${fileId}`, config)
     return { data: true, error: null }
   } catch (err) {

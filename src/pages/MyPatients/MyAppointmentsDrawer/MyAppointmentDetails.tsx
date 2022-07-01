@@ -10,11 +10,9 @@ import {
   LinkButton,
 } from './styles'
 import { IMyAppointment } from '../../../interfaces/appointment'
+import { IAppointmentFile } from '../../../interfaces/appointmentFile'
 import { fetchAppointmentFiles } from '../../../services/requests/appointmentFile'
-import {
-  getDrawerWidth,
-  getFileExtBasedInContentType,
-} from '../../../utils/helpers/formatters'
+import { getDrawerWidth } from '../../../utils/helpers/formatters'
 import { AppointmentDetailsDocument } from '../../../components/UI/AppointmentDetailsDocument'
 import { ReadOnly } from '../../../components/UI/ReadOnly'
 import { Text } from '../../../components/UI/Text'
@@ -37,8 +35,8 @@ export const MyAppointmentDetailModal = ({
   const [isFetching, setIsFetching] = useState(false)
   const [isDownloading, setIsDownloading] = useState(false)
   const [filesError, setFilesError] = useState('')
-  const [fileUrls, setFileUrls] = useState<string[]>([])
-  const onlyOne = fileUrls.length === 1
+  const [files, setFiles] = useState<IAppointmentFile[]>([])
+  const onlyOne = files.length === 1
 
   const fetchAppointmentFilesAsync = useCallback(async (id: number) => {
     setIsFetching(true)
@@ -47,19 +45,19 @@ export const MyAppointmentDetailModal = ({
 
     if (error) {
       setFilesError('Falha ao encontrar os arquivos.')
-      setFileUrls([])
+      setFiles([])
     }
 
     if (files) {
       setFilesError('')
-      setFileUrls(files.map((file) => file.file_url))
+      setFiles(files)
     }
 
     setIsFetching(false)
   }, [])
 
   const downloadFiles = async () => {
-    if (!fileUrls?.length) {
+    if (!files?.length) {
       return
     }
 
@@ -68,26 +66,18 @@ export const MyAppointmentDetailModal = ({
 
       const links: { el: HTMLAnchorElement; fileName: string }[] = []
 
-      for (const url of fileUrls) {
-        const response = await Axios.get(url, { responseType: 'arraybuffer' })
+      for (const file of files) {
+        const response = await Axios.get(file.file_url, {
+          responseType: 'arraybuffer',
+        })
         const linkEl = document.createElement('a')
-        const fileExt = getFileExtBasedInContentType(
-          response?.headers?.['content-type'] as unknown as any
-        )
-
-        if (!fileExt) {
-          throw new Error()
-        }
-
         const objectURL = URL.createObjectURL(
           new Blob([response.data], {
             type: response?.headers?.['content-type'],
           })
         )
-        const now = new Date()
-        const fileName = `Arquivo_Consulta_${
-          data?.patient_name?.split(' ')?.[0]
-        }_${now.toISOString().split('T')[0]}_${now.getTime()}.${fileExt}`
+        const patientFirstName = data?.patient_name?.split(' ')?.[0]
+        const fileName = `${patientFirstName}_${file.file_name}`
 
         linkEl.setAttribute('href', objectURL)
         linkEl.setAttribute('id', fileName)
@@ -147,10 +137,10 @@ export const MyAppointmentDetailModal = ({
       )
     }
 
-    if (fileUrls.length) {
+    if (files.length) {
       const Message = (
         <>
-          {`Há ${fileUrls.length} ${onlyOne ? 'arquivo' : 'arquivos'} ${
+          {`Há ${files.length} ${onlyOne ? 'arquivo' : 'arquivos'} ${
             onlyOne ? 'registrado' : 'registrados'
           } para esta consulta.`}
           <LinkButton

@@ -86,7 +86,7 @@ export const EditAppointmentDrawer = ({
     : ''
   const watchedFields = watch()
   const allFieldsAreEmpty =
-    !Object.values(watchedFields)?.filter(Boolean)?.length
+    !Object.values(watchedFields)?.filter(Boolean)?.length && !fileList?.length
 
   const closeDrawer = () => {
     reset()
@@ -211,7 +211,7 @@ export const EditAppointmentDrawer = ({
       setFileList(
         [...files].map((file, i) => ({
           uid: file.id.toString(),
-          name: `Arquivo de consulta ${i + 1}`,
+          name: file.file_name || `Arquivo de consulta ${i + 1}`,
           status: 'done',
           url: file.file_url,
         }))
