@@ -183,7 +183,10 @@ export const AppointmentDrawer = ({
     const response = await fetchPatients({ name: inputValue })
 
     if (response.data) {
-      return response.data?.map(({ id, name }) => ({ value: id, label: name }))
+      return response.data?.map(({ id, name, cpf }) => ({
+        value: id,
+        label: `${name} - ${cpf}`,
+      }))
     }
 
     return []

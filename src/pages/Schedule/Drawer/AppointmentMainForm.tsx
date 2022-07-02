@@ -135,7 +135,9 @@ export const AppointmentMainForm = ({
         <Col span={24}>
           <ReadOnly
             label="Paciente"
-            value={selectedPatient?.label || 'Não identificado'}
+            value={
+              selectedPatient?.label?.split(' - ')?.[0] || 'Não identificado'
+            }
             required
           />
         </Col>
