@@ -1,15 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useCallback, useEffect, useState } from 'react'
-import { Col, Row, Table } from 'antd'
+import { Col, Row, Table, Typography } from 'antd'
 import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
+import { useSelector } from 'react-redux'
 import * as Yup from 'yup'
 
+import { Form, InfoMessage, RefreshButton } from './styles'
+import { RootState } from '../../store'
 import {
   fetchAppointments,
   IFetchAppointmentsParams,
 } from '../../services/requests/appointment'
-import { fetchUsersDoctors } from '../../services/requests/user'
+import { fetchUsersDoctors, IUserDoctor } from '../../services/requests/user'
 import {
   getDisabledStatusTitle,
   getFormattedDoctorSchedule,
@@ -23,7 +26,6 @@ import { IPaymentMethod } from '../../interfaces/paymentMethod'
 import { ISpecialty } from '../../interfaces/specialty'
 import { IScheduleDaysOff } from '../../interfaces/scheduleDaysOff'
 import { IParsedDaysScheduleSettings } from '../../interfaces/scheduleSettings'
-import { Form, InfoMessage, RefreshButton } from './styles'
 import { PageContent } from '../../components/UI/PageContent'
 import { TableActions } from '../../components/UI/TableActions'
 import { TableHeader } from '../../components/UI/TableHeader'
@@ -92,17 +94,40 @@ interface IDeleteAppointmentModalProps {
   patientName: string
 }
 
+interface IGetActionStatusResponse {
+  disabledTitle: string
+  disabled: boolean
+}
+
 type IConfirmAppointmentModalProps = IDeleteAppointmentModalProps
 
 const scheduleSchema = Yup.object().shape({
   date: Yup.string().required('Por favor, insira a data para ver a agenda!'),
 })
 
+const getFormattedDoctorsList = (doctors: IUserDoctor[]) =>
+  doctors.map((userDoctor) => ({
+    payment_methods: userDoctor.doctor?.payment_method,
+    insurances: userDoctor.doctor?.insurance,
+    specialties: userDoctor.doctor?.specialty,
+    label: userDoctor.name,
+    value: userDoctor.doctor.id,
+    appointment_follow_up_limit: userDoctor.doctor.appointment_follow_up_limit,
+    private_appointment_price: userDoctor.doctor.private_appointment_price,
+    scheduleSettings: getFormattedDoctorSchedule(
+      userDoctor.doctor.schedule_settings
+    ),
+    schedule_days_off: userDoctor.doctor.schedule_days_off,
+  }))
+
 export const Schedule = (): JSX.Element => {
   const defaultValues = {
     date: new Date().toLocaleDateString('pt-BR').split('/').reverse().join('-'),
     doctor: undefined,
   }
+  const user = useSelector((state: RootState) => state.AuthReducer)
+  const isDoctor = !!user?.data?.doctor
+  const isManager = user?.data?.role === 'manager'
   const {
     control,
     setValue,
@@ -110,9 +135,9 @@ export const Schedule = (): JSX.Element => {
     formState: { errors },
   } = useForm<ISelectScheduleDataValues>({
     defaultValues,
-    resolver: yupResolver(scheduleSchema),
-    shouldUnregister: true,
     mode: 'onBlur',
+    shouldUnregister: true,
+    resolver: yupResolver(scheduleSchema),
   })
   const watchedDoctor = watch('doctor')
   const watchedDate = watch('date')
@@ -169,20 +194,85 @@ export const Schedule = (): JSX.Element => {
       dataIndex: 'actions',
       key: 'actions',
       render: (_: undefined, appointment: IRecord) => {
+        const getActionStatus = (id: string): IGetActionStatusResponse => {
+          const status = appointment?.status
+
+          if (id === 'add') {
+            if (isDoctor) {
+              return {
+                disabled: true,
+                disabledTitle: 'Você não pode agendar uma consulta',
+              }
+            }
+
+            return {
+              disabled: !watchedDate || !!status || status === 'cancelled',
+              disabledTitle: getDisabledStatusTitle(status),
+            }
+          }
+
+          if (id === 'edit') {
+            if (isDoctor) {
+              return {
+                disabled: true,
+                disabledTitle: 'Você não pode editar esta consulta',
+              }
+            }
+
+            return {
+              disabled: !watchedDate || status !== 'pending',
+              disabledTitle: getDisabledStatusTitle(status),
+            }
+          }
+
+          if (id === 'info') {
+            return {
+              disabled: !status || status === 'off',
+              disabledTitle: getDisabledStatusTitle(status),
+            }
+          }
+
+          if (id === 'check') {
+            return {
+              disabled: status !== 'pending' || timeDiffInDays < 0,
+              disabledTitle: getDisabledStatusTitle(status, timeDiffInDays),
+            }
+          }
+
+          if (id === 'delete') {
+            if (isDoctor) {
+              return {
+                disabled: true,
+                disabledTitle: 'Você não pode excluir esta consulta',
+              }
+            }
+
+            return {
+              disabled: !status || ['confirmed', 'off'].includes(status),
+              disabledTitle: getDisabledStatusTitle(status),
+            }
+          }
+
+          return {
+            disabled: false,
+            disabledTitle: '',
+          }
+        }
+
+        const addAppointmentActionSts = getActionStatus('add')
+        const editAppointmentActionSts = getActionStatus('edit')
+        const infoAppointmentActionSts = getActionStatus('info')
+        const confirmAppointmentActionSts = getActionStatus('check')
+        const deleteAppointmentActionSts = getActionStatus('delete')
+
         return (
           <TableActions
             options={[
               {
                 id: 'add',
                 overlay: 'Marcar consulta neste horário',
-                disabledTitle:
-                  appointment.status === 'off'
-                    ? 'Ainda não há uma consulta agendada para este horário'
-                    : 'Este horário já está ocupado',
-                disabled:
-                  !watchedDate ||
-                  !!appointment.status ||
-                  appointment.status === 'cancelled',
+                disabledTitle: addAppointmentActionSts?.disabledTitle,
+                disabled: addAppointmentActionSts?.disabled,
                 onClick: () =>
                   setAppointmentDrawer({
                     isVisible: true,
@@ -202,10 +292,8 @@ export const Schedule = (): JSX.Element => {
               {
                 id: 'edit',
                 overlay: 'Editar consulta',
-                disabledTitle: !appointment.status
-                  ? 'Ainda não há uma consulta agendada para este horário'
-                  : 'Não é possível editar esta consulta',
-                disabled: !watchedDate || appointment.status !== 'pending',
+                disabledTitle: editAppointmentActionSts?.disabledTitle,
+                disabled: editAppointmentActionSts?.disabled,
                 onClick: () =>
                   setEditAppointmentDrawer({
                     isVisible: true,
@@ -255,9 +343,8 @@ export const Schedule = (): JSX.Element => {
               {
                 id: 'info',
                 overlay: 'Detalhes da consulta',
-                disabledTitle:
-                  'Ainda não há uma consulta agendada para este horário',
-                disabled: !appointment.status || appointment.status === 'off',
+                disabledTitle: infoAppointmentActionSts?.disabledTitle,
+                disabled: infoAppointmentActionSts?.disabled,
                 onClick: () =>
                   setAppointmentDetailsModal({
                     isVisible: true,
@@ -267,12 +354,8 @@ export const Schedule = (): JSX.Element => {
               {
                 id: 'check',
                 overlay: 'Confirmar consulta',
-                disabledTitle: getDisabledStatusTitle(
-                  appointment.status,
-                  timeDiffInDays
-                ),
-                disabled:
-                  appointment.status !== 'pending' || timeDiffInDays < 0,
+                disabledTitle: confirmAppointmentActionSts?.disabledTitle,
+                disabled: confirmAppointmentActionSts?.disabled,
                 onClick: () =>
                   setConfirmAppointmentModal({
                     isVisible: true,
@@ -287,13 +370,8 @@ export const Schedule = (): JSX.Element => {
               {
                 id: 'delete',
                 overlay: 'Cancelar e excluir consulta',
-                disabledTitle:
-                  !appointment.status || appointment.status === 'off'
-                    ? 'Ainda não há uma consulta agendada para este horário'
-                    : 'Esta consulta já está confirmada e não pode ser excluída',
-                disabled:
-                  !appointment.status ||
-                  ['confirmed', 'off'].includes(appointment.status),
+                disabledTitle: deleteAppointmentActionSts?.disabledTitle,
+                disabled: deleteAppointmentActionSts?.disabled,
                 onClick: () =>
                   setDeleteAppointmentModal({
                     isVisible: true,
@@ -408,23 +486,8 @@ export const Schedule = (): JSX.Element => {
 
     if (response.data) {
       const doctors = response.data
-      const formattedDoctorsList: IScheduleDoctorOption[] = doctors.map(
-        (userDoctor) => ({
-          payment_methods: userDoctor.doctor?.payment_method,
-          insurances: userDoctor.doctor?.insurance,
-          specialties: userDoctor.doctor?.specialty,
-          label: userDoctor.name,
-          value: userDoctor.doctor.id,
-          appointment_follow_up_limit:
-            userDoctor.doctor.appointment_follow_up_limit,
-          private_appointment_price:
-            userDoctor.doctor.private_appointment_price,
-          scheduleSettings: getFormattedDoctorSchedule(
-            userDoctor.doctor.schedule_settings
-          ),
-          schedule_days_off: userDoctor.doctor.schedule_days_off,
-        })
-      )
+      const formattedDoctorsList: IScheduleDoctorOption[] =
+        getFormattedDoctorsList(doctors)
 
       setValue('doctor', formattedDoctorsList?.[0])
       setDoctorsList(formattedDoctorsList)
@@ -434,12 +497,21 @@ export const Schedule = (): JSX.Element => {
   }, [])
 
   useEffect(() => {
-    fetchDoctorsListAsync()
+    if (isManager) {
+      fetchDoctorsListAsync()
+    }
+
+    if (isDoctor) {
+      const formattedDoctorsList: IScheduleDoctorOption[] =
+        getFormattedDoctorsList([user.data])
+
+      setValue('doctor', formattedDoctorsList?.[0])
+    }
 
     return () => {
       setIsMounted(false)
     }
-  }, [])
+  }, [isManager, isDoctor])
 
   useEffect(() => {
     if (!watchedDate) {
@@ -456,14 +528,28 @@ export const Schedule = (): JSX.Element => {
 
   return (
     <PageContent>
-      <TableHeader title="Agenda" />
-      <InfoMessage>
-        Selecione um médico e uma data para gerenciar as suas consultas. Quando
-        o paciente for atendido, não se esqueça de confirmar sua consulta na
-        agenda para que os dados das consultas e dos pacientes estejam
-        consistentes no sistema.
-      </InfoMessage>
+      <TableHeader title={isDoctor ? 'Minha Agenda' : 'Agenda de Consultas'} />
+      {!!isManager && (
+        <InfoMessage>
+          Selecione um médico e uma data para gerenciar as suas consultas.
+          Quando o paciente for atendido, não se esqueça de confirmar sua
+          consulta na agenda para que os dados das consultas e dos pacientes
+          permaneçam sempre consistentes no sistema.
+        </InfoMessage>
+      )}
 
+      {!!isDoctor && (
+        <InfoMessage>
+          Selecione uma data para gerenciar as suas consultas. Quando o paciente
+          for atendido, não se esqueça de confirmar sua consulta na agenda para
+          que os dados das consultas e dos pacientes permaneçam sempre
+          consistentes no sistema. Você também pode confirmar uma consulta na
+          página&nbsp;
+          <Typography.Text strong>Meus Pacientes</Typography.Text>.
+        </InfoMessage>
+      )}
+
+      {/* SELECTORS */}
       <Form>
         <Row gutter={12}>
           <Col span={4} sm={12} md={12} xs={12} lg={6}>
@@ -483,28 +569,30 @@ export const Schedule = (): JSX.Element => {
             />
           </Col>
 
-          <Col span={6} lg={8} sm={12} xs={12}>
-            <Controller
-              name="doctor"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  label="Médico"
-                  placeholder="Selecionar Médico"
-                  error={errors?.doctor?.value?.message}
-                  options={doctorsList}
-                  showError={false}
-                  disabled={isFetching}
-                  selectOnChange={(newValue: any) =>
-                    setValue('doctor', newValue)
-                  }
-                  required
-                  isSelect
-                  {...field}
-                />
-              )}
-            />
-          </Col>
+          {!!isManager && (
+            <Col span={6} lg={8} sm={12} xs={12}>
+              <Controller
+                name="doctor"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    label="Médico"
+                    placeholder="Selecionar Médico"
+                    error={errors?.doctor?.value?.message}
+                    options={doctorsList}
+                    showError={false}
+                    disabled={isFetching}
+                    selectOnChange={(newValue: any) =>
+                      setValue('doctor', newValue)
+                    }
+                    required
+                    isSelect
+                    {...field}
+                  />
+                )}
+              />
+            </Col>
+          )}
         </Row>
       </Form>
 
@@ -566,6 +654,7 @@ export const Schedule = (): JSX.Element => {
         patientName={confirmAppointmentModal?.patientName}
       />
 
+      {/* SCHEDULE */}
       <Table
         rowKey="time"
         rowClassName={(record, index) =>
@@ -586,7 +675,11 @@ export const Schedule = (): JSX.Element => {
       <RefreshButton
         isFetching={isFetching}
         disabled={isFetching}
-        title="Clique para atualizar a lista de médicos e suas respectivas agendas"
+        title={
+          isManager
+            ? 'Clique para atualizar a lista de médicos e suas respectivas agendas'
+            : 'Clique para atualizar sua agenda de consultas'
+        }
         onFetch={() => fetchDoctorsListAsync()}
       />
     </PageContent>

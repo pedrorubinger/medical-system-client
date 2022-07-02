@@ -12,9 +12,9 @@ import {
   FiCreditCard,
 } from 'react-icons/fi'
 
-import { Pages } from '../../pages'
 import { PrivateRouteWrapper } from './'
 import { TRole } from '../../interfaces/roles'
+import { Pages } from '../../pages'
 
 export type TPermission = TRole | '*'
 
@@ -105,7 +105,7 @@ export const PrivateRoutes: IPrivateRoute[] = [
     name: 'Minha Agenda',
     permissions: ['doctor'],
     path: '/my-schedule',
-    title: 'Clique para gerenciar sua agenda e visualizar suas consultas',
+    title: 'Clique para acessar sua agenda e visualizar suas consultas',
     show: true,
     icon: <FiCalendar />,
     route: (
@@ -114,7 +114,7 @@ export const PrivateRoutes: IPrivateRoute[] = [
         path="/my-schedule"
         element={
           <PrivateRouteWrapper>
-            <Pages.MySchedule />
+            <Pages.Schedule />
           </PrivateRouteWrapper>
         }
       />

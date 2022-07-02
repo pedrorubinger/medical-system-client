@@ -8,7 +8,7 @@ import { TRole } from '../../interfaces/roles'
 import { IUser } from '../../interfaces/user'
 import { handleError } from '../../utils/helpers/errors'
 
-interface IUserDoctor {
+export interface IUserDoctor {
   user_id: number
   name: string
   doctor: IDoctor
