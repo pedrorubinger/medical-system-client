@@ -25,10 +25,12 @@ import {
 import { RootState } from '../../../store'
 import { IMyAppointment } from '../../../interfaces/appointment'
 import { getTimePassed } from '../../../utils/helpers/formatters'
+import { TSex } from '../../../interfaces/patient'
 
 type TPDFDataListProps =
   | 'name'
   | 'birthdate'
+  | 'sex'
   | 'age'
   | 'email'
   | 'primary_phone'
@@ -65,6 +67,7 @@ const LoadingIcon = (
 const initialPDFDataList: TPDFDataListProps[] = [
   'name',
   'birthdate',
+  'sex',
   'age',
   'datetime',
   'insurance_name',
@@ -76,6 +79,7 @@ const initialPDFDataList: TPDFDataListProps[] = [
 const checkboxOptions: ICheckboxOption[] = [
   { label: 'Nome do Paciente', value: 'name' },
   { label: 'Data de Nascimento', value: 'birthdate' },
+  { label: 'Sexo', value: 'sex' },
   { label: 'Idade', value: 'age' },
   { label: 'Email', value: 'email' },
   { label: 'Telefone', value: 'primary_phone' },
@@ -170,6 +174,9 @@ export const AppointmentDetailsDocument = ({
         ? appointment?.patient?.birthdate
           ? new Date(appointment?.patient?.birthdate).toLocaleDateString()
           : 'Não identificado'
+        : undefined,
+      sex: list?.includes('sex')
+        ? (appointment?.patient?.sex as unknown as TSex)
         : undefined,
       age: list?.includes('age')
         ? appointment?.patient?.birthdate

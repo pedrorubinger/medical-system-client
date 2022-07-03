@@ -204,8 +204,12 @@ export const MyAppointmentDetailModal = ({
 
         <Col span={12} sm={12} xs={24}>
           <ReadOnly
-            label="Data de Nascimento"
-            value={new Date(data.patient.birthdate).toLocaleDateString()}
+            label="Data de Nascimento e Sexo"
+            value={`${new Date(
+              data.patient?.birthdate
+            )?.toLocaleDateString()} - ${
+              data.patient?.sex === 'female' ? 'Feminino' : 'Masculino'
+            }`}
             paperMode
           />
         </Col>

@@ -5,7 +5,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup'
 
 import { storePatient, updatePatient } from '../../../services/requests/patient'
-import { IPatient, TPatientData } from '../../../interfaces/patient'
+import { IPatient, TPatientData, TSex } from '../../../interfaces/patient'
 import { IAddress } from '../../../interfaces/address'
 import { setFieldErrors } from '../../../utils/helpers/errors'
 import { Button, Form } from './styles'
@@ -119,6 +119,7 @@ export const PatientDrawer = ({
 }: IPatientDrawerProps) => {
   const defaultValues = {
     include_address: !!data?.address,
+    sex: data?.sex || 'female',
     name: data?.name || '',
     cpf: data?.cpf || '',
     birthdate: data?.birthdate?.split('T')?.[0] || '',
@@ -151,6 +152,7 @@ export const PatientDrawer = ({
   const watchedAddressCheckbox = watch('include_address', !!data?.address)
   const watchedLocation = watch('location', '')
   const watchedPostalCode = watch('postal_code', '')
+  const watchedSex = watch('sex', data?.sex || ('female' as TSex))
   const isEditing = type === 'update'
   const isCreating = type === 'create'
   const [isFetchingPostalCode, setIsFetchingPostalCode] = useState(false)
@@ -167,6 +169,7 @@ export const PatientDrawer = ({
 
     const payload: TPatientData = {
       name: values.name,
+      sex: values.sex,
       birthdate: values.birthdate,
       cpf: values.cpf,
       primary_phone: values.primary_phone,
@@ -258,6 +261,7 @@ export const PatientDrawer = ({
           watchedLocation={watchedLocation}
           isFetchingPostalCode={isFetchingPostalCode}
           watchedPostalCode={watchedPostalCode}
+          watchedSex={watchedSex}
           resetDefaultValues={resetDefaultValues}
           getValues={getValues}
           setIsFetchingPostalCode={setIsFetchingPostalCode}

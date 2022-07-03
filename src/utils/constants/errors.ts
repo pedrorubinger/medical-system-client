@@ -154,4 +154,5 @@ export const BAD_REQUEST_MESSAGES: { [key: string]: string } = {
   MISSING_OR_INVALID_FILE:
     'O arquivo é inválido ou não foi enviado corretamente!',
   APPOINTMENT_IS_REQUIRED: 'Você deve informar uma consulta!',
+  PATIENT_SEX_IS_REQUIRED: 'Você deve informar o sexo do paciente!',
 }

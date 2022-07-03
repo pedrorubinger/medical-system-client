@@ -76,6 +76,19 @@ export const getAppointmentDetailsDocumentTemplate = (
     })
   }
 
+  if (data.sex) {
+    content.push({
+      text: [
+        { text: 'Sexo: ', bold: true },
+        {
+          text: data.sex === 'female' ? 'Feminino' : 'Masculino',
+          bold: false,
+        },
+      ],
+      margin: [0, 0, 0, 8],
+    })
+  }
+
   if (data.email) {
     content.push({
       text: [

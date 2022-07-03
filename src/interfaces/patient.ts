@@ -1,10 +1,13 @@
 import { IAddress } from './address'
 
+export type TSex = 'male' | 'female'
+
 export interface IPatient {
   id: number
   name: string
   cpf: string
   birthdate: string
+  sex: TSex
   mother_name: string
   primary_phone: string
   address_id?: number | undefined

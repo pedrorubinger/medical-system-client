@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Checkbox, Col, Row } from 'antd'
+import { Checkbox, Col, Radio, Row } from 'antd'
 import Axios from 'axios'
 import {
   Control,
@@ -12,10 +12,11 @@ import {
 
 import { Input } from '../../UI/Input'
 import { ReadOnly } from '../../UI/ReadOnly'
-import { IPatient, TPatientData } from '../../../interfaces/patient'
+import { IPatient, TPatientData, TSex } from '../../../interfaces/patient'
 import { IAddress } from '../../../interfaces/address'
 import { formatCEP, formatCPF } from '../../../utils/helpers/formatters'
-import { CheckboxRow } from './styles'
+import { CheckboxRow, RadioGroupRow, RadioLabelBox } from './styles'
+import { Label } from '../../UI/Label'
 
 interface IPatientAndAddressFormErrors {
   name?: FieldError | undefined
@@ -48,6 +49,7 @@ interface IPatientFormFieldsProps {
   watchedAddressCheckbox: boolean
   watchedPostalCode: string
   watchedLocation?: string | undefined
+  watchedSex?: TSex | undefined
   isFetchingPostalCode: boolean
   setError: UseFormSetError<IPatientFormValues>
   getValues: UseFormGetValues<IPatientFormValues>
@@ -65,6 +67,7 @@ export const PatientFormFields = ({
   watchedAddressCheckbox,
   watchedPostalCode,
   watchedLocation,
+  watchedSex,
   resetDefaultValues,
   getValues,
   setValue,
@@ -108,6 +111,26 @@ export const PatientFormFields = ({
           />
         </Col>
       </Row>
+
+      <RadioGroupRow>
+        <Col span={24}>
+          <RadioLabelBox>
+            <Label htmlFor="sex" required>
+              Sexo
+            </Label>
+          </RadioLabelBox>
+          <Controller
+            name="sex"
+            control={control}
+            render={({ field }) => (
+              <Radio.Group defaultValue={watchedSex || 'female'} {...field}>
+                <Radio value="female">Feminino</Radio>
+                <Radio value="male">Masculino</Radio>
+              </Radio.Group>
+            )}
+          />
+        </Col>
+      </RadioGroupRow>
 
       <Row>
         <Col span={24}>

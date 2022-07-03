@@ -85,8 +85,10 @@ export const PatientDetailsModal = ({
 
         <Col span={12} sm={12} xs={24}>
           <ReadOnly
-            label="Data de Nascimento"
-            value={new Date(data.birthdate)?.toLocaleDateString()}
+            label="Data de Nascimento e Sexo"
+            value={`${new Date(data.birthdate)?.toLocaleDateString()} - ${
+              data.sex === 'female' ? 'Feminino' : 'Masculino'
+            }`}
             paperMode
           />
         </Col>
