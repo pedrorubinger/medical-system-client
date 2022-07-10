@@ -43,6 +43,7 @@ export interface IStoreUserData {
   cpf: string
   phone: string
   is_admin: boolean
+  is_clinic_owner: boolean
   role: TRole
   tenant_name?: string
 }
@@ -85,6 +86,7 @@ interface IUpdateUserData {
   cpf?: string
   phone?: string
   is_admin?: boolean
+  is_clinic_owner?: boolean
   role?: TRole
 }
 

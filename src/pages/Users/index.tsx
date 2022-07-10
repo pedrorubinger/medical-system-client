@@ -79,7 +79,11 @@ export const Users = (): JSX.Element => {
       return true
     }
 
-    if (loggedUser.data.role !== 'developer' && userToBeDeleted.is_admin) {
+    if (userToBeDeleted.role === 'developer') {
+      return false
+    }
+
+    if (!loggedUser.data.is_clinic_owner && userToBeDeleted.is_admin) {
       return false
     }
 

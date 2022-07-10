@@ -41,6 +41,7 @@ export interface IUserFormValues {
   cpf: string
   phone: string
   is_admin: boolean
+  is_clinic_owner: boolean
   role: ISelectOption
   crm_document?: string
 }
@@ -52,10 +53,13 @@ interface IUserForm {
   blockedRole?: ISelectOption | undefined
   /** @default true */
   showIsAdmin?: boolean | undefined
+  /** @default false */
+  showIsClinicOwner?: boolean | undefined
   control: Control<IUserFormValues, object>
   errors: IFormErrors
   isSubmitting: boolean
   watchedRole?: ISelectOption | undefined
+  watchedIsClinicOwner?: boolean | undefined
   /** @default [] */
   rolesOptions?: ISelectOption[] | undefined
   /** @default 'Clique para cadastrar este novo usuário' */
@@ -92,15 +96,31 @@ export const UserForm = ({
   buttonLoadingText = 'Cadastrando...',
   buttonText = 'Cadastrar',
   showIsAdmin = true,
+  showIsClinicOwner = false,
   blockedRole,
   control,
   errors,
   isSubmitting,
   rolesOptions = [],
   watchedRole,
+  watchedIsClinicOwner,
   onSubmit,
   setValue,
 }: IUserForm) => {
+  const mustShowIsAdminField = () => {
+    if (showIsAdmin) {
+      if (!showIsClinicOwner) {
+        return true
+      }
+
+      if (showIsClinicOwner && !watchedIsClinicOwner) {
+        return true
+      }
+    }
+
+    return false
+  }
+
   return (
     <Form onSubmit={onSubmit}>
       <Row>
@@ -242,7 +262,27 @@ export const UserForm = ({
         </Row>
       )}
 
-      {!!showIsAdmin && (
+      {!!showIsClinicOwner && (
+        <CheckboxRow>
+          <Col>
+            <Controller
+              name="is_clinic_owner"
+              control={control}
+              render={({ field }) => (
+                <Checkbox
+                  onChange={field.onChange}
+                  value={field.value}
+                  checked={field.value}>
+                  É o responsável pela clínica{' '}
+                  <InfoTooltip text="O responsável pela clínica é o único que poderá excluir usuários administradores da clínica. Este usuário sempre será um usuário administrador." />
+                </Checkbox>
+              )}
+            />
+          </Col>
+        </CheckboxRow>
+      )}
+
+      {mustShowIsAdminField() && (
         <CheckboxRow>
           <Col>
             <Controller
@@ -254,7 +294,7 @@ export const UserForm = ({
                   value={field.value}
                   checked={field.value}>
                   É administrador{' '}
-                  <InfoTooltip text="Um usuário administrador não poderá ser excluído. Além disso, este usuário terá acesso aos relatórios da empresa, gestão de usuários, convênios e especialidades." />
+                  <InfoTooltip text="Este usuário terá acesso aos relatórios da empresa, gestão de usuários, convênios e especialidades." />
                 </Checkbox>
               )}
             />

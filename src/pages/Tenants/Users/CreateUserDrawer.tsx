@@ -21,6 +21,17 @@ interface ICreateTenantUserDrawerProps {
   fetchUsers: () => void
 }
 
+const defaultValues = {
+  cpf: '',
+  email: '',
+  is_admin: false,
+  is_clinic_owner: true,
+  name: '',
+  phone: '',
+  role: rolesOptions[0],
+  crm_document: '',
+}
+
 export const CreateTenantUserDrawer = ({
   tenantId,
   tenantName,
@@ -38,16 +49,7 @@ export const CreateTenantUserDrawer = ({
     formState: { errors, isSubmitting },
   } = useForm<IUserFormValues>({
     resolver: yupResolver(userSchema),
-    shouldUnregister: true,
-    defaultValues: {
-      cpf: '',
-      email: '',
-      is_admin: false,
-      name: '',
-      phone: '',
-      role: rolesOptions[0],
-      crm_document: '',
-    },
+    defaultValues,
     mode: 'onBlur',
   })
 
@@ -59,6 +61,7 @@ export const CreateTenantUserDrawer = ({
   const onSubmit = async (values: IUserFormValues) => {
     const response = await storeTenantUser({
       ...values,
+      is_admin: values.is_clinic_owner ? true : values.is_admin,
       cpf: values.cpf.replaceAll(/\D/g, ''),
       role: values.role.value,
       tenant_name: tenantName,
@@ -76,6 +79,10 @@ export const CreateTenantUserDrawer = ({
     fetchUsers()
   }
 
+  if (!isVisible) {
+    return null
+  }
+
   return (
     <Drawer
       visible={isVisible}
@@ -89,9 +96,14 @@ export const CreateTenantUserDrawer = ({
         errors={errors}
         isSubmitting={isSubmitting}
         rolesOptions={rolesOptions}
+        showIsClinicOwner={true}
+        watchedIsClinicOwner={watch(
+          'is_clinic_owner',
+          defaultValues.is_clinic_owner
+        )}
+        watchedRole={watch('role')}
         setValue={setValue}
         onSubmit={handleSubmit(onSubmit)}
-        watchedRole={watch('role')}
       />
     </Drawer>
   )

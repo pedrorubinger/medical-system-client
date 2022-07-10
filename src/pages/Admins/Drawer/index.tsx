@@ -59,6 +59,7 @@ export const AdminsDrawer = ({
       cpf: values.cpf.replaceAll(/\D/g, ''),
       role: 'developer',
       is_admin: false,
+      is_clinic_owner: false,
       owner_tenant: true,
     })
 
@@ -89,6 +90,7 @@ export const AdminsDrawer = ({
         errors={errors}
         isSubmitting={isSubmitting}
         showIsAdmin={false}
+        showIsClinicOwner={false}
         setValue={setValue}
         onSubmit={handleSubmit(onSubmit)}
       />

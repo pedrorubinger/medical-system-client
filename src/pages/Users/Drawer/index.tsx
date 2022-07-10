@@ -39,6 +39,7 @@ export const UsersDrawer = ({
       cpf: '',
       email: '',
       is_admin: false,
+      is_clinic_owner: false,
       name: '',
       phone: '',
       role: rolesOptions[0],
@@ -82,6 +83,7 @@ export const UsersDrawer = ({
         errors={errors}
         isSubmitting={isSubmitting}
         rolesOptions={rolesOptions}
+        showIsClinicOwner={false}
         setValue={setValue}
         onSubmit={handleSubmit(onSubmit)}
         watchedRole={watch('role')}
