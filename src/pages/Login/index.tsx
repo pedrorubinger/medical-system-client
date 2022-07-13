@@ -117,11 +117,11 @@ export const Login = (): JSX.Element => {
           <Row>
             <Col span={24}>
               <LoginExtraInfoContainer>
-                <StyledLink
+                {/* <StyledLink
                   title="Clique para solicitar uma conta"
                   to="/get-account">
                   Solicitar uma conta
-                </StyledLink>
+                </StyledLink> */}
 
                 <StyledLink
                   title="Clique para recuperar sua senha"
