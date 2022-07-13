@@ -4,6 +4,7 @@ export const ERROR_MESSAGES: { [key: string]: string } = {
   INVALID_CREDENTIALS: 'Email ou senha inválidos!',
   MUST_PROVIDE_VALID_CREDENTIALS: 'Você deve fornecer credenciais válidas!',
   DOCTOR_NOT_FOUND: 'Este médico não foi encontrado!',
+  USER_NOT_FOUND: 'O usuário não foi encontrado!',
   INSURANCE_NOT_FOUND: 'Este convênio não foi encontrado!',
   SPECIALTY_NOT_FOUND: 'Esta especialidade não foi encontrada!',
   TOKEN_DOES_NOT_EXIST: 'O token não existe!',
