@@ -111,7 +111,7 @@ export const ScheduleAvailableTimes = (): JSX.Element => {
 
   return (
     <PageContent>
-      <TableHeader title="Horários Disponíveis" margin="0 0 5px 0" />
+      <TableHeader title="Horários Disponíveis" />
       <InfoMessage>
         Selecione os horários de sua agenda que estarão disponíveis para o
         agendamento de consultas para cada dia da semana. Basta clicar nos
