@@ -19,6 +19,7 @@ import {
   fetchTenantUsers,
   IFetchTenantUserParams,
 } from '../../../services/requests/tenantUser'
+import { InfoMessage } from './styles'
 
 interface IListTenantUsersProps {
   tenantId: number
@@ -261,6 +262,7 @@ export const ListTenantUsers = ({
           onClick: () => setDrawer(true),
         }}
       />
+      <InfoMessage>Abaixo estão listados os usuários do sistema.</InfoMessage>
       <Table
         rowKey="id"
         dataSource={records}

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { Col, Divider, Row } from 'antd'
+import { Col, Divider, Row, Typography } from 'antd'
 import { useSelector } from 'react-redux'
 import { yupResolver } from '@hookform/resolvers/yup'
 import Skeleton from 'react-loading-skeleton'
@@ -38,9 +38,15 @@ interface IRangeOption {
   label: string
 }
 
+interface IDoctorOption {
+  value: number
+  label: string
+}
+
 interface ISearchValues {
   role: IRoleOption
   range: IRangeOption
+  doctor?: IDoctorOption
   initial_date?: string
   final_date?: string
 }
@@ -49,12 +55,16 @@ interface ISearchValues {
 const searchValuesSchema = Yup.object().shape({
   range: Yup.object().required('Selecione um tipo!'),
   role: Yup.object().required('Selecione um papel/função!'),
+  doctor: Yup.object().when('role', {
+    is: ({ value }: IRoleOption) => value === 'doctor',
+    then: Yup.object().required('Selecione um médico!'),
+  }),
   initial_date: Yup.string().when('range', {
-    is: (value: 'all' | 'dates') => value === 'dates',
+    is: ({ value }: IRangeOption) => value === 'dates',
     then: Yup.string().required('Insira a data inicial!'),
   }),
   final_date: Yup.string().when('range', {
-    is: (value: 'all' | 'dates') => value === 'dates',
+    is: ({ value }: IRangeOption) => value === 'dates',
     then: Yup.string().required('Insira a data final!'),
   }),
 })
@@ -66,6 +76,7 @@ const roleOptions: IRoleOption[] = [
   { value: 'admin', label: 'Admin' },
   { value: 'doctor', label: 'Médico(a)' },
 ]
+const defaultDoctorOptions = [{ value: -1, label: 'Todos' }]
 const mockedCardData = [
   {
     id: 1,
@@ -146,10 +157,15 @@ export const Reports = (): JSX.Element => {
   const defaultValues = {
     range: rangeOptions[0] as IRangeOption,
     role: isAdmin ? roleOptions[0] : roleOptions[1],
+    doctor: defaultDoctorOptions[0],
     initial_date: '',
     final_date: '',
   }
-  const [isFetching, setIsFetching] = useState(true)
+  const [hasSearched, setHasSearched] = useState(false)
+  const [isSearching, setIsSearching] = useState(false)
+  const [doctorOptions, setDoctorOptions] =
+    useState<IDoctorOption[]>(defaultDoctorOptions)
+  const [records, setRecords] = useState<any>([])
   const {
     control,
     handleSubmit,
@@ -163,15 +179,145 @@ export const Reports = (): JSX.Element => {
     resolver: yupResolver(searchValuesSchema),
   })
   const watchedRange = watch('range', defaultValues.range)
+  const watchedRole = watch('role', defaultValues.role)
 
   const onSearch = async (values: ISearchValues) => {
+    setIsSearching(true)
     console.log('submitted values:', values)
+
+    setTimeout(() => {
+      setRecords(mockedCardData)
+      setIsSearching(false)
+      setHasSearched(true)
+    }, 3500)
   }
 
+  const FormContent = (
+    <Form onSubmit={handleSubmit(onSearch)}>
+      <SearchValuesRow gutter={12}>
+        {!!isAdmin && !!isDoctor && (
+          <Col span={4} lg={4} sm={12} xs={24}>
+            <Controller
+              name="role"
+              control={control}
+              render={({ field }) => (
+                <CustomInput
+                  label="Função"
+                  placeholder="Selecionar"
+                  error={errors?.role?.value?.message}
+                  options={roleOptions}
+                  showError={false}
+                  disabled={isSearching}
+                  selectOnChange={(newValue: any) => setValue('role', newValue)}
+                  required
+                  isSelect
+                  {...field}
+                />
+              )}
+            />
+          </Col>
+        )}
+
+        {watchedRole?.value === 'admin' && (
+          <Col span={5} lg={5} sm={12} xs={24}>
+            <Controller
+              name="doctor"
+              control={control}
+              render={({ field }) => (
+                <CustomInput
+                  label="Médico(a)"
+                  placeholder="Selecionar"
+                  error={errors?.doctor?.value?.message}
+                  options={doctorOptions}
+                  showError={false}
+                  disabled={isSearching}
+                  selectOnChange={(newValue: any) =>
+                    setValue('doctor', newValue)
+                  }
+                  required
+                  isSelect
+                  {...field}
+                />
+              )}
+            />
+          </Col>
+        )}
+
+        <Col span={4} lg={4} sm={12} xs={24}>
+          <Controller
+            name="range"
+            control={control}
+            render={({ field }) => (
+              <CustomInput
+                label="Período"
+                placeholder="Selecionar"
+                error={errors?.range?.value?.message}
+                options={rangeOptions}
+                showError={false}
+                disabled={isSearching}
+                selectOnChange={(newValue: any) => setValue('range', newValue)}
+                required
+                isSelect
+                {...field}
+              />
+            )}
+          />
+        </Col>
+
+        {watchedRange?.value === 'dates' && (
+          <>
+            <Col span={4} lg={4} sm={12} xs={24}>
+              <Controller
+                name="initial_date"
+                control={control}
+                render={({ field }) => (
+                  <CustomInput
+                    type="date"
+                    label="Data Inicial"
+                    error={errors?.initial_date?.message}
+                    disabled={isSearching}
+                    required
+                    {...field}
+                  />
+                )}
+              />
+            </Col>
+
+            <Col span={4} lg={4} sm={12} xs={24}>
+              <Controller
+                name="final_date"
+                control={control}
+                render={({ field }) => (
+                  <CustomInput
+                    type="date"
+                    label="Data Final"
+                    error={errors?.final_date?.message}
+                    disabled={isSearching}
+                    required
+                    {...field}
+                  />
+                )}
+              />
+            </Col>
+          </>
+        )}
+      </SearchValuesRow>
+
+      <Row>
+        <Col>
+          <CustomButton
+            disabled={isSearching}
+            type="submit"
+            title="Clique para buscar relatórios baseados nos filtros que você definiu">
+            {isSearching ? 'Buscando...' : 'Buscar'}
+          </CustomButton>
+        </Col>
+      </Row>
+    </Form>
+  )
+
   useEffect(() => {
-    setTimeout(() => {
-      setIsFetching(false)
-    }, 3500)
+    //
   }, [])
 
   return (
@@ -181,116 +327,35 @@ export const Reports = (): JSX.Element => {
         Utilize os filtros abaixo para refinar os resultados da sua busca.
       </InfoMessage>
 
-      <Form onSubmit={handleSubmit(onSearch)}>
-        <SearchValuesRow gutter={12}>
-          {!!isAdmin && !!isDoctor && (
-            <Col span={5} lg={5} sm={12} xs={24}>
-              <Controller
-                name="role"
-                control={control}
-                render={({ field }) => (
-                  <CustomInput
-                    label="Função"
-                    placeholder="Selecionar"
-                    error={errors?.role?.value?.message}
-                    options={roleOptions}
-                    showError={false}
-                    disabled={isFetching}
-                    selectOnChange={(newValue: any) =>
-                      setValue('role', newValue)
-                    }
-                    required
-                    isSelect
-                    {...field}
-                  />
-                )}
-              />
-            </Col>
+      {FormContent}
+
+      {!!isSearching && (
+        <>
+          <Divider />
+          <CardsContainer>{SkeletonLoaderStructure}</CardsContainer>
+        </>
+      )}
+
+      {!isSearching && !!hasSearched && (
+        <>
+          <Divider />
+
+          {records?.length ? (
+            <CardsContainer>
+              {mockedCardData?.map((card) => (
+                <ReportCard key={card.id}>
+                  <ReportCardTitle>{card.title}</ReportCardTitle>
+                  <ReportCardContent>{card.content}</ReportCardContent>
+                </ReportCard>
+              ))}
+            </CardsContainer>
+          ) : (
+            <Typography.Text type="secondary">
+              Não encontramos nenhum resultado para sua busca.
+            </Typography.Text>
           )}
-
-          <Col span={5} lg={5} sm={12} xs={24}>
-            <Controller
-              name="range"
-              control={control}
-              render={({ field }) => (
-                <CustomInput
-                  label="Período"
-                  placeholder="Selecionar"
-                  error={errors?.range?.value?.message}
-                  options={rangeOptions}
-                  showError={false}
-                  disabled={isFetching}
-                  selectOnChange={(newValue: any) =>
-                    setValue('range', newValue)
-                  }
-                  required
-                  isSelect
-                  {...field}
-                />
-              )}
-            />
-          </Col>
-
-          {watchedRange?.value === 'dates' && (
-            <>
-              <Col span={5} lg={5} sm={12} xs={24}>
-                <Controller
-                  name="initial_date"
-                  control={control}
-                  render={({ field }) => (
-                    <CustomInput
-                      type="date"
-                      label="Data Inicial"
-                      error={errors?.initial_date?.message}
-                      disabled={isFetching}
-                      required
-                      {...field}
-                    />
-                  )}
-                />
-              </Col>
-
-              <Col span={5} lg={5} sm={12} xs={24}>
-                <Controller
-                  name="final_date"
-                  control={control}
-                  render={({ field }) => (
-                    <CustomInput
-                      type="date"
-                      label="Data Final"
-                      error={errors?.final_date?.message}
-                      disabled={isFetching}
-                      required
-                      {...field}
-                    />
-                  )}
-                />
-              </Col>
-            </>
-          )}
-        </SearchValuesRow>
-
-        <Row>
-          <Col>
-            <CustomButton disabled={isFetching} type="submit">
-              {isFetching ? 'Buscando...' : 'Buscar'}
-            </CustomButton>
-          </Col>
-        </Row>
-      </Form>
-
-      <Divider />
-
-      <CardsContainer>
-        {isFetching
-          ? SkeletonLoaderStructure
-          : mockedCardData?.map((card) => (
-              <ReportCard key={card.id}>
-                <ReportCardTitle>{card.title}</ReportCardTitle>
-                <ReportCardContent>{card.content}</ReportCardContent>
-              </ReportCard>
-            ))}
-      </CardsContainer>
+        </>
+      )}
     </PageContent>
   )
 }

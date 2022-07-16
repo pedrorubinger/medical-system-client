@@ -75,4 +75,6 @@ export const CustomInput = styled(Input)`
 export const CustomButton = styled(Button)`
   font-size: 15px;
   margin-top: 4px;
+  padding-left: 16px;
+  padding-right: 16px;
 `

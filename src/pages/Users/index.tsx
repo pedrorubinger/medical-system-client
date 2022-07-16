@@ -20,6 +20,7 @@ import { UserDetailsModal } from '../../components/Forms/User/UserDetailsModal'
 import { TableActions } from '../../components/UI/TableActions'
 import { UsersDrawer } from './Drawer'
 import { DeletionModal } from './DeletionModal'
+import { InfoMessage } from './styles'
 
 interface IDeletionModalProps {
   isVisible: boolean
@@ -267,6 +268,7 @@ export const Users = (): JSX.Element => {
           onClick: () => setDrawer(true),
         }}
       />
+      <InfoMessage>Abaixo estão listados os usuários do sistema.</InfoMessage>
       <Table
         rowKey="id"
         dataSource={records}
