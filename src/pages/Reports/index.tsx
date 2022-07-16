@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Col, Divider, Row, Typography } from 'antd'
 import { useSelector } from 'react-redux'
@@ -9,6 +9,7 @@ import * as Yup from 'yup'
 import 'react-loading-skeleton/dist/skeleton.css'
 
 import { RootState } from '../../store'
+import { fetchUsersDoctors } from '../../services/requests/user'
 import { PageContent } from '../../components/UI/PageContent'
 import { TableHeader } from '../../components/UI/TableHeader'
 import {
@@ -51,23 +52,6 @@ interface ISearchValues {
   final_date?: string
 }
 
-/** TO DO: Validate date intervals... (initial and final) */
-const searchValuesSchema = Yup.object().shape({
-  range: Yup.object().required('Selecione um tipo!'),
-  role: Yup.object().required('Selecione um papel/função!'),
-  doctor: Yup.object().when('role', {
-    is: ({ value }: IRoleOption) => value === 'doctor',
-    then: Yup.object().required('Selecione um médico!'),
-  }),
-  initial_date: Yup.string().when('range', {
-    is: ({ value }: IRangeOption) => value === 'dates',
-    then: Yup.string().required('Insira a data inicial!'),
-  }),
-  final_date: Yup.string().when('range', {
-    is: ({ value }: IRangeOption) => value === 'dates',
-    then: Yup.string().required('Insira a data final!'),
-  }),
-})
 const rangeOptions: IRangeOption[] = [
   { value: 'all', label: 'Todo o período' },
   { value: 'dates', label: 'Selecionar datas' },
@@ -140,7 +124,7 @@ const mockedCardData = [
   },
 ]
 
-const SkeletonLoaderStructure = Array.from(Array(12).keys()).map((_, i) => (
+const SkeletonLoaderCards = Array.from(Array(12).keys()).map((_, i) => (
   <SkeletonReportCard key={i}>
     <Skeleton borderRadius={3} width="65%" height={14} />
     <SkeletonReportCardContent>
@@ -152,6 +136,25 @@ const SkeletonLoaderStructure = Array.from(Array(12).keys()).map((_, i) => (
 
 export const Reports = (): JSX.Element => {
   const user = useSelector((state: RootState) => state.AuthReducer)
+  /** TO DO: Validate date intervals... (initial and final) */
+  const searchValuesSchema = Yup.object().shape({
+    range: Yup.object().required('Selecione um tipo!'),
+    role: Yup.object().required('Selecione um papel/função!'),
+    doctor: Yup.object().when(['role', 'user'], {
+      is: (role: any, user: any) =>
+        role?.value === 'doctor' ||
+        (user?.data?.is_admin && user?.data?.role !== 'doctor'),
+      then: Yup.object().required('Selecione um médico!'),
+    }),
+    initial_date: Yup.string().when('range', {
+      is: ({ value }: IRangeOption) => value === 'dates',
+      then: Yup.string().required('Insira a data inicial!'),
+    }),
+    final_date: Yup.string().when('range', {
+      is: ({ value }: IRangeOption) => value === 'dates',
+      then: Yup.string().required('Insira a data final!'),
+    }),
+  })
   const isAdmin = user?.data?.is_admin
   const isDoctor = user?.data?.role === 'doctor'
   const defaultValues = {
@@ -161,7 +164,9 @@ export const Reports = (): JSX.Element => {
     initial_date: '',
     final_date: '',
   }
+  const [isMounted, setIsMounted] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
+  const [isFetchingDoctors, setIsFetchingDoctors] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
   const [doctorOptions, setDoctorOptions] =
     useState<IDoctorOption[]>(defaultDoctorOptions)
@@ -175,7 +180,6 @@ export const Reports = (): JSX.Element => {
   } = useForm<ISearchValues>({
     defaultValues,
     mode: 'onBlur',
-    shouldUnregister: true,
     resolver: yupResolver(searchValuesSchema),
   })
   const watchedRange = watch('range', defaultValues.range)
@@ -191,6 +195,25 @@ export const Reports = (): JSX.Element => {
       setHasSearched(true)
     }, 3500)
   }
+
+  const fetchDoctorsAsync = useCallback(async () => {
+    setIsFetchingDoctors(true)
+
+    const response = await fetchUsersDoctors()
+
+    if (response.data) {
+      const doctors = response.data
+      const doctorsList = [...doctors].map(({ name, doctor }) => ({
+        value: doctor.id,
+        label: name,
+      }))
+
+      doctorsList.unshift(defaultDoctorOptions[0])
+      setDoctorOptions(doctorsList)
+    }
+
+    setIsFetchingDoctors(false)
+  }, [])
 
   const FormContent = (
     <Form onSubmit={handleSubmit(onSearch)}>
@@ -218,7 +241,7 @@ export const Reports = (): JSX.Element => {
           </Col>
         )}
 
-        {watchedRole?.value === 'admin' && (
+        {(watchedRole?.value === 'admin' || (isAdmin && !isDoctor)) && (
           <Col span={5} lg={5} sm={12} xs={24}>
             <Controller
               name="doctor"
@@ -316,27 +339,26 @@ export const Reports = (): JSX.Element => {
     </Form>
   )
 
-  useEffect(() => {
-    //
-  }, [])
+  const renderContent = () => {
+    if (isFetchingDoctors || !isMounted) {
+      return (
+        <InfoMessage>
+          Por favor, aguarde. Estamos buscando as informações...
+        </InfoMessage>
+      )
+    }
 
-  return (
-    <PageContent>
-      <TableHeader title="Relatórios" />
-      <InfoMessage>
-        Utilize os filtros abaixo para refinar os resultados da sua busca.
-      </InfoMessage>
-
-      {FormContent}
-
-      {!!isSearching && (
+    if (isSearching) {
+      return (
         <>
           <Divider />
-          <CardsContainer>{SkeletonLoaderStructure}</CardsContainer>
+          <CardsContainer>{SkeletonLoaderCards}</CardsContainer>
         </>
-      )}
+      )
+    }
 
-      {!isSearching && !!hasSearched && (
+    if (hasSearched) {
+      return (
         <>
           <Divider />
 
@@ -355,7 +377,36 @@ export const Reports = (): JSX.Element => {
             </Typography.Text>
           )}
         </>
+      )
+    }
+
+    return null
+  }
+
+  useEffect(() => {
+    setIsMounted(true)
+
+    if (isAdmin) {
+      fetchDoctorsAsync()
+    }
+
+    return () => {
+      setIsMounted(false)
+    }
+  }, [isAdmin])
+
+  return (
+    <PageContent>
+      <TableHeader title="Relatórios" />
+      {!!isMounted && !isFetchingDoctors && (
+        <>
+          <InfoMessage>
+            Utilize os filtros abaixo para refinar os resultados da sua busca.
+          </InfoMessage>
+          {FormContent}
+        </>
       )}
+      {renderContent()}
     </PageContent>
   )
 }
