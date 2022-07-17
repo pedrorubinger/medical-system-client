@@ -9,6 +9,7 @@ export interface IAppointment {
   id: number
   datetime: string
   is_follow_up: boolean
+  price?: number
   notes?: string | undefined | null
   exam_request?: string | undefined | null
   status: TAppointmentStatus
@@ -36,6 +37,7 @@ export interface IScheduledAppointment {
   insurance_name?: string | undefined
   is_private: boolean
   is_follow_up: boolean
+  price?: number
   patient_id: number
   patient_name: string
   status: TAppointmentStatus

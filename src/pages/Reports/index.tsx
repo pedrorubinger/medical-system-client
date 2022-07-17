@@ -356,7 +356,7 @@ export const Reports = (): JSX.Element => {
           </Col>
         )}
 
-        {(watchedRole?.value === 'admin' || (isAdmin && !isDoctor)) && (
+        {!!(watchedRole?.value === 'admin' || (isAdmin && !isDoctor)) && (
           <Col span={5} lg={5} sm={12} xs={24}>
             <Controller
               name="doctor"

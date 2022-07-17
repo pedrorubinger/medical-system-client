@@ -105,6 +105,7 @@ export const EditAppointmentDrawer = ({
     }
 
     const payload = {
+      doctor_id: data?.doctor?.value,
       is_follow_up: !!values.is_follow_up,
       is_private: !values.insurance?.value || values.insurance?.value === -1,
       insurance_id:
