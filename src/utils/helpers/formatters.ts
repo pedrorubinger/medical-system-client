@@ -1,7 +1,13 @@
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 
-dayjs.extend(relativeTime)
+import { TAppointmentStatus } from '../../interfaces/appointment'
+import { MIMEType, MIMETypes } from '../../interfaces/MIMEType'
+import {
+  IParsedDaysScheduleSettings,
+  IScheduleSettings,
+} from '../../interfaces/scheduleSettings'
+import { isISODate } from './validators'
 
 type SortOrder = 'descend' | 'ascend' | null
 
@@ -12,13 +18,7 @@ interface IFormatDecimalSeparatorOptions {
   newSeparator?: ',' | '.'
 }
 
-import { TAppointmentStatus } from '../../interfaces/appointment'
-import { MIMEType, MIMETypes } from '../../interfaces/MIMEType'
-import {
-  IParsedDaysScheduleSettings,
-  IScheduleSettings,
-} from '../../interfaces/scheduleSettings'
-import { isISODate } from './validators'
+dayjs.extend(relativeTime)
 
 /**
  * Transforms a plain string into a formatted CPF

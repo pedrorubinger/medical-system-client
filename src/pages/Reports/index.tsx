@@ -9,6 +9,8 @@ import * as Yup from 'yup'
 import 'react-loading-skeleton/dist/skeleton.css'
 
 import { RootState } from '../../store'
+import { IReportEntities, IReportPermission } from '../../interfaces/report'
+import { fetchReports } from '../../services/requests/report'
 import { fetchUsersDoctors } from '../../services/requests/user'
 import { PageContent } from '../../components/UI/PageContent'
 import { TableHeader } from '../../components/UI/TableHeader'
@@ -26,11 +28,19 @@ import {
   SkeletonReportCardContent,
 } from './styles'
 
-type Role = 'admin' | 'doctor'
 type Range = 'all' | 'dates'
+type CardVisibility = IReportPermission | 'all_doctors'
+
+interface IRecord {
+  id: string
+  title: string
+  data: IReportEntities
+  text: JSX.Element
+  visible: CardVisibility[]
+}
 
 interface IRoleOption {
-  value: Role
+  value: IReportPermission
   label: string
 }
 
@@ -52,6 +62,12 @@ interface ISearchValues {
   final_date?: string
 }
 
+interface IFormatReportCardTextOptions {
+  gender: 'f' | 'm' | 'both'
+  plural: string
+  singular: string
+}
+
 const rangeOptions: IRangeOption[] = [
   { value: 'all', label: 'Todo o período' },
   { value: 'dates', label: 'Selecionar datas' },
@@ -61,68 +77,6 @@ const roleOptions: IRoleOption[] = [
   { value: 'doctor', label: 'Médico(a)' },
 ]
 const defaultDoctorOptions = [{ value: -1, label: 'Todos' }]
-const mockedCardData = [
-  {
-    id: 1,
-    title: 'Consultas atendidas',
-    content: 'Neste mês você atendeu um total de 9 consultas',
-  },
-  {
-    id: 2,
-    title: 'Pacientes atendidos',
-    content: 'Neste mês você atendeu um total de 6 pacientes',
-  },
-  {
-    id: 3,
-    title: 'Novos convênios',
-    content: 'Neste mês você não cadastrou nenhum novo convênio',
-  },
-  {
-    id: 4,
-    title: 'Novos pacientes',
-    content: 'Neste mês você teve 3 novos pacientes',
-  },
-  {
-    id: 5,
-    title: 'Consultas atendidas',
-    content: 'Neste mês você atendeu um total de 9 consultas',
-  },
-  {
-    id: 6,
-    title: 'Pacientes atendidos',
-    content: 'Neste mês você atendeu um total de 6 pacientes',
-  },
-  {
-    id: 7,
-    title: 'Novos convênios',
-    content: 'Neste mês você não cadastrou nenhum novo convênio',
-  },
-  {
-    id: 8,
-    title: 'Novos pacientes',
-    content: 'Neste mês você teve 3 novos pacientes',
-  },
-  {
-    id: 9,
-    title: 'Consultas atendidas',
-    content: 'Neste mês você atendeu um total de 9 consultas',
-  },
-  {
-    id: 10,
-    title: 'Pacientes atendidos',
-    content: 'Neste mês você atendeu um total de 6 pacientes',
-  },
-  {
-    id: 11,
-    title: 'Novos convênios',
-    content: 'Neste mês você não cadastrou nenhum novo convênio',
-  },
-  {
-    id: 12,
-    title: 'Novos pacientes',
-    content: 'Neste mês você teve 3 novos pacientes',
-  },
-]
 
 const SkeletonLoaderCards = Array.from(Array(12).keys()).map((_, i) => (
   <SkeletonReportCard key={i}>
@@ -133,6 +87,56 @@ const SkeletonLoaderCards = Array.from(Array(12).keys()).map((_, i) => (
     </SkeletonReportCardContent>
   </SkeletonReportCard>
 ))
+
+export const getFormattedReportCardText = (
+  data: IReportEntities = [],
+  options: IFormatReportCardTextOptions
+): JSX.Element => {
+  const length = data?.length
+  const { singular, plural, gender } = options
+  const femaleSingular = 'cadastrada'
+  const femalePlural = 'cadastradas'
+  const maleSingular = 'cadastrado'
+  const malePlural = 'cadastrados'
+  const bothSingular = 'cadastrado(a)'
+  const bothPlural = 'cadastrados(as)'
+
+  const getGender = () => {
+    if (gender === 'f') {
+      return [femaleSingular, femalePlural]
+    }
+
+    if (gender === 'm') {
+      return [maleSingular, malePlural]
+    }
+
+    return [bothSingular, bothPlural]
+  }
+
+  if (!length) {
+    return (
+      <Typography.Text>
+        Não haviam {plural} {getGender()[1]} neste período.
+      </Typography.Text>
+    )
+  }
+
+  if (length === 1) {
+    return (
+      <Typography.Text>
+        Havia <Typography.Text strong>1</Typography.Text> {singular}{' '}
+        {getGender()[0]} neste período.
+      </Typography.Text>
+    )
+  }
+
+  return (
+    <Typography.Text>
+      Haviam <Typography.Text strong>{length}</Typography.Text> {plural}{' '}
+      {getGender()[1]} neste período.
+    </Typography.Text>
+  )
+}
 
 export const Reports = (): JSX.Element => {
   const user = useSelector((state: RootState) => state.AuthReducer)
@@ -165,12 +169,13 @@ export const Reports = (): JSX.Element => {
     final_date: '',
   }
   const [isMounted, setIsMounted] = useState(false)
-  const [hasSearched, setHasSearched] = useState(false)
+  const [searchedPermission, setSearchedPermission] =
+    useState<IReportPermission | null>(null)
   const [isFetchingDoctors, setIsFetchingDoctors] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
   const [doctorOptions, setDoctorOptions] =
     useState<IDoctorOption[]>(defaultDoctorOptions)
-  const [records, setRecords] = useState<any>([])
+  const [records, setRecords] = useState<IRecord[]>([])
   const {
     control,
     handleSubmit,
@@ -184,16 +189,124 @@ export const Reports = (): JSX.Element => {
   })
   const watchedRange = watch('range', defaultValues.range)
   const watchedRole = watch('role', defaultValues.role)
+  const watchedDoctor = watch('doctor', defaultValues.doctor)
 
   const onSearch = async (values: ISearchValues) => {
+    setSearchedPermission(null)
     setIsSearching(true)
-    console.log('submitted values:', values)
 
-    setTimeout(() => {
-      setRecords(mockedCardData)
-      setIsSearching(false)
-      setHasSearched(true)
-    }, 3500)
+    const getDoctorId = (): number | undefined => {
+      if (
+        (isDoctor && !isAdmin) ||
+        (isDoctor && isAdmin && values.role.value === 'doctor')
+      ) {
+        return user?.data?.doctor?.id
+      }
+
+      if (values?.doctor?.value === -1) {
+        return undefined
+      }
+
+      return values?.doctor?.value
+    }
+
+    const payload = {
+      permission: watchedRole.value,
+      initialDate: values?.initial_date,
+      finalDate: values?.final_date,
+      doctorId: getDoctorId(),
+    }
+    const response = await fetchReports(payload)
+
+    if (response.data) {
+      setRecords([
+        {
+          id: 'APPOINTMENTS',
+          title: 'Consultas',
+          visible: ['admin', 'doctor'],
+          text: getFormattedReportCardText(response?.data?.appointments, {
+            gender: 'f',
+            plural: 'consultas',
+            singular: 'consulta',
+          }),
+          data: response.data?.appointments || [],
+        },
+        {
+          id: 'DOCTORS',
+          title: 'Médicos',
+          visible: ['admin', 'all_doctors'],
+          text: getFormattedReportCardText(response.data?.doctors, {
+            gender: 'both',
+            plural: 'médicos(as)',
+            singular: 'médico(a)',
+          }),
+          data: response.data?.doctors || [],
+        },
+        {
+          id: 'PATIENTS',
+          title: 'Pacientes',
+          visible: ['admin', 'doctor'],
+          text: getFormattedReportCardText(response.data?.patients, {
+            gender: 'm',
+            plural: 'pacientes',
+            singular: 'paciente',
+          }),
+          data: response.data?.patients || [],
+        },
+        {
+          id: 'INSURANCES',
+          title: 'Convênios',
+          visible: ['admin', 'doctor'],
+          text: getFormattedReportCardText(response.data?.insurances, {
+            gender: 'm',
+            plural: 'convênios',
+            singular: 'convênio',
+          }),
+          data: response.data?.insurances || [],
+        },
+        {
+          id: 'PAYMENT_METHODS',
+          title: 'Métodos de Pagamento',
+          visible: ['admin', 'doctor'],
+          text: getFormattedReportCardText(response.data?.paymentMethods, {
+            gender: 'm',
+            plural: 'métodos de pagamento',
+            singular: 'método de pagamento',
+          }),
+          data: response.data?.paymentMethods || [],
+        },
+        {
+          id: 'SPECIALTIES',
+          title: 'Especialidades',
+          visible: ['admin', 'doctor'],
+          text: getFormattedReportCardText(
+            response.data?.specialties || undefined,
+            {
+              gender: 'f',
+              plural: 'especialidades médicas',
+              singular: 'especialidade médica',
+            }
+          ),
+          data: response.data?.specialties || [],
+        },
+        {
+          id: 'USERS',
+          title: 'Usuários',
+          visible: ['admin', 'all_doctors'],
+          text: getFormattedReportCardText(response.data?.users, {
+            gender: 'm',
+            plural: 'usuários',
+            singular: 'usuário',
+          }),
+          data: response.data?.users || [],
+        },
+      ])
+    } else {
+      setRecords([])
+    }
+
+    setIsSearching(false)
+    setSearchedPermission(values.role.value)
   }
 
   const fetchDoctorsAsync = useCallback(async () => {
@@ -357,19 +470,31 @@ export const Reports = (): JSX.Element => {
       )
     }
 
-    if (hasSearched) {
+    if (searchedPermission) {
       return (
         <>
           <Divider />
 
           {records?.length ? (
             <CardsContainer>
-              {mockedCardData?.map((card) => (
-                <ReportCard key={card.id}>
-                  <ReportCardTitle>{card.title}</ReportCardTitle>
-                  <ReportCardContent>{card.content}</ReportCardContent>
-                </ReportCard>
-              ))}
+              {records
+                ?.filter(({ visible }) => {
+                  if (
+                    watchedRole?.value === 'admin' &&
+                    watchedDoctor?.value !== -1 &&
+                    visible.includes('all_doctors')
+                  ) {
+                    return false
+                  }
+
+                  return visible.includes(searchedPermission)
+                })
+                ?.map((card) => (
+                  <ReportCard key={card.id}>
+                    <ReportCardTitle>{card.title}</ReportCardTitle>
+                    <ReportCardContent>{card.text}</ReportCardContent>
+                  </ReportCard>
+                ))}
             </CardsContainer>
           ) : (
             <Typography.Text type="secondary">
@@ -394,6 +519,13 @@ export const Reports = (): JSX.Element => {
       setIsMounted(false)
     }
   }, [isAdmin])
+
+  useEffect(() => {
+    if (watchedRole && searchedPermission) {
+      setRecords([])
+      setSearchedPermission(null)
+    }
+  }, [watchedRole])
 
   return (
     <PageContent>
