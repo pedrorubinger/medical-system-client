@@ -89,6 +89,7 @@ interface IAppointmentDetailsModalProps {
 
 interface IDeleteAppointmentModalProps {
   isVisible: boolean
+  doctorId?: number | undefined
   id: number
   datetime: string
   patientName: string
@@ -364,6 +365,7 @@ export const Schedule = (): JSX.Element => {
                       ?.reverse()
                       ?.join('/')} às ${appointment.time}`,
                     id: appointment?.id || -1,
+                    doctorId: watchedDoctor?.value,
                     patientName: appointment.patient_name || '',
                   }),
               },
@@ -641,6 +643,7 @@ export const Schedule = (): JSX.Element => {
         patientName={deleteAppointmentModal?.patientName}
       />
       <ConfirmAppointmentModal
+        doctorId={confirmAppointmentModal?.doctorId}
         datetime={confirmAppointmentModal?.datetime || ''}
         isVisible={confirmAppointmentModal?.isVisible || false}
         onCancel={() => setConfirmAppointmentModal(null)}

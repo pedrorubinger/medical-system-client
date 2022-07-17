@@ -79,7 +79,10 @@ export const EditAppointmentDrawer = ({
     shouldUnregister: true,
     mode: 'onBlur',
   })
-  const watchedIsFollowUp = watch('is_follow_up', defaultValues.is_follow_up)
+  const watchedIsFollowUp = watch(
+    'is_follow_up',
+    !!appointmentInitialData?.is_follow_up
+  )
   const watchedInsurance = watch('insurance', defaultValues.insurance)
 
   const closeDrawer = () => {
@@ -146,7 +149,10 @@ export const EditAppointmentDrawer = ({
           data.doctor.value
         )
 
-        setValue('is_follow_up', response.is_follow_up)
+        if (response.is_follow_up) {
+          setValue('is_follow_up', response.is_follow_up)
+        }
+
         setLastAppointmentDate(response.last_appointment_date)
         setIsFetchingLastAppointment(false)
       })()
@@ -194,6 +200,7 @@ export const EditAppointmentDrawer = ({
         <AppointmentMainForm
           type="update"
           data={data}
+          defaultValues={appointmentInitialData}
           AppointmentInfoFields={getAppointmentInfoFields(data)}
           control={control}
           errors={errors}

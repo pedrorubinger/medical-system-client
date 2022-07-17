@@ -11,6 +11,8 @@ interface IConfirmAppointmentModalProps {
   id?: number | undefined
   /** @default undefined */
   patientName?: string | undefined
+  /** @default undefined */
+  doctorId?: number | undefined
   datetime: string
   refetchAppointments: () => void
   onCancel: (e?: React.MouseEvent<HTMLElement, MouseEvent>) => void
@@ -19,6 +21,7 @@ interface IConfirmAppointmentModalProps {
 export const ConfirmAppointmentModal = ({
   id,
   isVisible = false,
+  doctorId,
   datetime,
   patientName = '',
   onCancel,
@@ -33,7 +36,10 @@ export const ConfirmAppointmentModal = ({
 
     setIsConfirming(true)
 
-    const response = await confirmAppointment(id, { status: 'confirmed' })
+    const response = await confirmAppointment(id, {
+      doctor_id: doctorId,
+      status: 'confirmed',
+    })
 
     setIsConfirming(false)
 

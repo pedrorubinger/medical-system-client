@@ -70,8 +70,9 @@ export const findLastAppointmentDateAsync = async (
 
   if (!response.error) {
     if (response.data && response.data?.datetime) {
-      const diffInDays = getTimeDifference('day', response.data.datetime)
-      const formattedDate = getDateInText(response.data.datetime)
+      const datetime = response.data.datetime
+      const diffInDays = getTimeDifference('day', datetime)
+      const formattedDate = getDateInText(datetime)
 
       const getDiffInDaysLabel = () => {
         if (diffInDays <= 0 || !appointment_follow_up_limit) {

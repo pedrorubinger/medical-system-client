@@ -76,6 +76,7 @@ interface IAppointmentMainFormProps {
   selectedPatient: ISelectOption | undefined
   watchedInsurance: ISelectOption | undefined
   watchedIsFollowUp: boolean
+  defaultValues?: IEditAppointmentFormValues | undefined
   setValue: UseFormSetValue<SupportedFormValues>
   setCurrentStep?: (value: React.SetStateAction<number>) => void
 }
@@ -95,6 +96,7 @@ export const AppointmentMainForm = ({
   type = 'create',
   watchedInsurance,
   watchedIsFollowUp,
+  defaultValues,
   setCurrentStep,
   setValue,
 }: IAppointmentMainFormProps) => {
@@ -257,15 +259,18 @@ export const AppointmentMainForm = ({
         <Col>
           <Controller
             name="is_follow_up"
+            defaultValue={!!defaultValues?.is_follow_up}
             control={control}
-            render={({ field }) => (
-              <Checkbox
-                onChange={field.onChange}
-                value={field.value}
-                checked={field.value}>
-                É consulta de retorno
-              </Checkbox>
-            )}
+            render={({ field }) => {
+              return (
+                <Checkbox
+                  onChange={field.onChange}
+                  value={field.value}
+                  checked={field.value}>
+                  É consulta de retorno
+                </Checkbox>
+              )
+            }}
           />
         </Col>
       </CheckboxRow>

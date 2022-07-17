@@ -51,6 +51,7 @@ interface IAppointmentDetailsModalProps {
 interface IConfirmAppointmentModalProps {
   isVisible: boolean
   id: number
+  doctorId: number
   datetime: string
   patientName: string
 }
@@ -186,6 +187,7 @@ export const MyAppointmentsDrawer = ({
                 onClick: () =>
                   setConfirmAppointmentModal({
                     isVisible: true,
+                    doctorId: appointment.doctor_id,
                     datetime: getDateInText(appointment.datetime),
                     id: appointment?.id || -1,
                     patientName: appointment.patient_name || '',
@@ -281,6 +283,7 @@ export const MyAppointmentsDrawer = ({
         onCancel={() => setAppointmentDetailsModal(null)}
       />
       <ConfirmAppointmentModal
+        doctorId={confirmAppointmentModal?.doctorId}
         datetime={confirmAppointmentModal?.datetime || ''}
         isVisible={confirmAppointmentModal?.isVisible || false}
         id={confirmAppointmentModal?.id}
