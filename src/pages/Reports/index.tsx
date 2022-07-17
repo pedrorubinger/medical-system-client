@@ -316,10 +316,12 @@ export const Reports = (): JSX.Element => {
 
     if (response.data) {
       const doctors = response.data
-      const doctorsList = [...doctors].map(({ name, doctor }) => ({
-        value: doctor.id,
-        label: name,
-      }))
+      const doctorsList = [...doctors]
+        .filter(({ doctor }) => doctor?.id !== user?.data?.doctor?.id)
+        .map(({ name, doctor }) => ({
+          value: doctor.id,
+          label: name,
+        }))
 
       doctorsList.unshift(defaultDoctorOptions[0])
       setDoctorOptions(doctorsList)
