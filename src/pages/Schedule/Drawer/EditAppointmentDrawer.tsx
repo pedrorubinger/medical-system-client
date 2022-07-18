@@ -146,7 +146,8 @@ export const EditAppointmentDrawer = ({
 
         const response = await findLastAppointmentDateAsync(
           data?.patient?.value || -1,
-          data.doctor.value
+          data.doctor.value,
+          data?.appointment_follow_up_limit
         )
 
         if (response.is_follow_up) {
