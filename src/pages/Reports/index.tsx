@@ -116,7 +116,7 @@ export const getFormattedReportCardText = (
   if (!length) {
     return (
       <Typography.Text>
-        Não haviam {plural} {getGender()[1]} neste período.
+        Não encontramos {plural} {getGender()[1]} neste período.
       </Typography.Text>
     )
   }
@@ -124,7 +124,7 @@ export const getFormattedReportCardText = (
   if (length === 1) {
     return (
       <Typography.Text>
-        Havia <Typography.Text strong>1</Typography.Text> {singular}{' '}
+        Encontramos <Typography.Text strong>1</Typography.Text> {singular}{' '}
         {getGender()[0]} neste período.
       </Typography.Text>
     )
@@ -132,7 +132,7 @@ export const getFormattedReportCardText = (
 
   return (
     <Typography.Text>
-      Haviam <Typography.Text strong>{length}</Typography.Text> {plural}{' '}
+      Encontramos <Typography.Text strong>{length}</Typography.Text> {plural}{' '}
       {getGender()[1]} neste período.
     </Typography.Text>
   )
