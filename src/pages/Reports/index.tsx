@@ -4,6 +4,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { Col, Divider, Row, Typography } from 'antd'
 import { useSelector } from 'react-redux'
 import { yupResolver } from '@hookform/resolvers/yup'
+import { AnyObject } from 'yup/lib/types'
 import Skeleton from 'react-loading-skeleton'
 import * as Yup from 'yup'
 import 'react-loading-skeleton/dist/skeleton.css'
@@ -140,7 +141,6 @@ export const getFormattedReportCardText = (
 
 export const Reports = (): JSX.Element => {
   const user = useSelector((state: RootState) => state.AuthReducer)
-  /** TO DO: Validate date intervals... (initial and final) */
   const searchValuesSchema = Yup.object().shape({
     range: Yup.object().required('Selecione um tipo!'),
     role: Yup.object().required('Selecione um papel/função!'),
@@ -152,11 +152,39 @@ export const Reports = (): JSX.Element => {
     }),
     initial_date: Yup.string().when('range', {
       is: ({ value }: IRangeOption) => value === 'dates',
-      then: Yup.string().required('Insira a data inicial!'),
+      then: Yup.string()
+        .required('Insira a data inicial!')
+        .test(
+          'datetime-start-is-less-than-current-datetime',
+          'A data deve ser menor ou igual à data de hoje!',
+          (datetimeStart?: string) => {
+            if (!datetimeStart) {
+              return true
+            }
+
+            return (
+              Date.parse(datetimeStart) <= Date.parse(new Date().toString())
+            )
+          }
+        ),
     }),
     final_date: Yup.string().when('range', {
       is: ({ value }: IRangeOption) => value === 'dates',
-      then: Yup.string().required('Insira a data final!'),
+      then: Yup.string()
+        .required('Insira a data final!')
+        .test(
+          'datetime-end-is-less-than-datetime-start',
+          'A data deve ser maior ou igual à data inicial!',
+          (datetimeEnd?: string, ctx?: Yup.TestContext<AnyObject>) => {
+            const datetimeStart = ctx?.parent?.initial_date
+
+            if (!datetimeEnd || !datetimeStart) {
+              return true
+            }
+
+            return Date.parse(datetimeEnd) >= Date.parse(datetimeStart)
+          }
+        ),
     }),
   })
   const isAdmin = user?.data?.is_admin
