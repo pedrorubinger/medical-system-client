@@ -46,6 +46,19 @@ export const ReportCardContent = styled(Typography)`
   font-size: 13px;
 `
 
+export const ReportCardDetailsText = styled.div`
+  font-size: 12px;
+  margin-top: 10px;
+  color: #59aae0;
+  width: fit-content;
+  transition: 0.6s;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`
+
 export const SkeletonReportCard = styled.div`
   height: 70px;
   background-color: #fff;
@@ -77,4 +90,8 @@ export const CustomButton = styled(Button)`
   margin-top: 4px;
   padding-left: 16px;
   padding-right: 16px;
+`
+
+export const SubtitleContainer = styled.div`
+  margin-bottom: 20px;
 `

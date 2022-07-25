@@ -23,11 +23,13 @@ import {
   InfoMessage,
   ReportCard,
   ReportCardContent,
+  ReportCardDetailsText,
   ReportCardTitle,
   SearchValuesRow,
   SkeletonReportCard,
   SkeletonReportCardContent,
 } from './styles'
+import { ReportDetailsModal } from './ReportDetailsModal'
 
 type Range = 'all' | 'dates'
 type CardVisibility = IReportPermission | 'all_doctors'
@@ -38,6 +40,7 @@ interface IRecord {
   data: IReportEntities
   text: JSX.Element
   visible: CardVisibility[]
+  hasDetails: boolean
 }
 
 interface IRoleOption {
@@ -61,6 +64,12 @@ interface ISearchValues {
   doctor?: IDoctorOption
   initial_date?: string
   final_date?: string
+}
+
+interface IReportDetailsModalProps {
+  isVisible: boolean
+  id: string
+  data: IReportEntities
 }
 
 interface IFormatReportCardTextOptions {
@@ -204,6 +213,8 @@ export const Reports = (): JSX.Element => {
   const [doctorOptions, setDoctorOptions] =
     useState<IDoctorOption[]>(defaultDoctorOptions)
   const [records, setRecords] = useState<IRecord[]>([])
+  const [reportDetailsModal, setReportDetailsModal] =
+    useState<IReportDetailsModalProps | null>(null)
   const {
     control,
     handleSubmit,
@@ -258,17 +269,7 @@ export const Reports = (): JSX.Element => {
             singular: 'consulta',
           }),
           data: response.data?.appointments || [],
-        },
-        {
-          id: 'DOCTORS',
-          title: 'Médicos',
-          visible: ['admin', 'all_doctors'],
-          text: getFormattedReportCardText(response.data?.doctors, {
-            gender: 'both',
-            plural: 'médicos(as)',
-            singular: 'médico(a)',
-          }),
-          data: response.data?.doctors || [],
+          hasDetails: !!response.data?.appointments?.length,
         },
         {
           id: 'PATIENTS',
@@ -280,6 +281,19 @@ export const Reports = (): JSX.Element => {
             singular: 'paciente',
           }),
           data: response.data?.patients || [],
+          hasDetails: !!response.data?.patients?.length,
+        },
+        {
+          id: 'DOCTORS',
+          title: 'Médicos',
+          visible: ['admin', 'all_doctors'],
+          text: getFormattedReportCardText(response.data?.doctors, {
+            gender: 'both',
+            plural: 'médicos(as)',
+            singular: 'médico(a)',
+          }),
+          data: response.data?.doctors || [],
+          hasDetails: false,
         },
         {
           id: 'INSURANCES',
@@ -291,6 +305,7 @@ export const Reports = (): JSX.Element => {
             singular: 'convênio',
           }),
           data: response.data?.insurances || [],
+          hasDetails: false,
         },
         {
           id: 'PAYMENT_METHODS',
@@ -302,6 +317,7 @@ export const Reports = (): JSX.Element => {
             singular: 'método de pagamento',
           }),
           data: response.data?.paymentMethods || [],
+          hasDetails: false,
         },
         {
           id: 'SPECIALTIES',
@@ -316,6 +332,7 @@ export const Reports = (): JSX.Element => {
             }
           ),
           data: response.data?.specialties || [],
+          hasDetails: false,
         },
         {
           id: 'USERS',
@@ -327,6 +344,7 @@ export const Reports = (): JSX.Element => {
             singular: 'usuário',
           }),
           data: response.data?.users || [],
+          hasDetails: false,
         },
       ])
     } else {
@@ -519,10 +537,19 @@ export const Reports = (): JSX.Element => {
 
                   return visible.includes(searchedPermission)
                 })
-                ?.map((card) => (
-                  <ReportCard key={card.id}>
-                    <ReportCardTitle>{card.title}</ReportCardTitle>
-                    <ReportCardContent>{card.text}</ReportCardContent>
+                ?.map(({ id, title, text, data, hasDetails }) => (
+                  <ReportCard key={id}>
+                    <ReportCardTitle>{title}</ReportCardTitle>
+                    <ReportCardContent>{text}</ReportCardContent>
+
+                    {!!hasDetails && (
+                      <ReportCardDetailsText
+                        onClick={() =>
+                          setReportDetailsModal({ isVisible: true, id, data })
+                        }>
+                        Detalhes
+                      </ReportCardDetailsText>
+                    )}
                   </ReportCard>
                 ))}
             </CardsContainer>
@@ -560,6 +587,12 @@ export const Reports = (): JSX.Element => {
   return (
     <PageContent>
       <TableHeader title="Relatórios" />
+      <ReportDetailsModal
+        isVisible={reportDetailsModal?.isVisible || false}
+        data={reportDetailsModal?.data}
+        id={reportDetailsModal?.id}
+        onCancel={() => setReportDetailsModal(null)}
+      />
       {!!isMounted && !isFetchingDoctors && (
         <>
           <InfoMessage>
