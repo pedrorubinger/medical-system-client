@@ -27,9 +27,9 @@ export const getAppointmentReportDetails = (records: IAppointment[] = []) => {
   const pendingAppointments = records?.filter(
     ({ status }) => status === 'pending'
   )?.length
-  const cancelledAppointments = records?.filter(
-    ({ status }) => status === 'cancelled'
-  )?.length
+  // const cancelledAppointments = records?.filter(
+  //   ({ status }) => status === 'cancelled'
+  // )?.length
   const unspecifiedSpecialtyAppointments = records?.filter(
     (item) => !item.specialty?.name
   )?.length
@@ -77,9 +77,9 @@ export const getAppointmentReportDetails = (records: IAppointment[] = []) => {
     <Typography.Text key="pending">
       <strong>{pendingAppointments}</strong> consulta(s) pendente(s).
     </Typography.Text>,
-    <Typography.Text key="cancelled">
-      <strong>{cancelledAppointments}</strong> consulta(s) cancelada(s).
-    </Typography.Text>,
+    // <Typography.Text key="cancelled">
+    //   <strong>{cancelledAppointments}</strong> consulta(s) cancelada(s).
+    // </Typography.Text>,
     ...appointmentsBySpecialties
       ?.map(({ name, amount }) => {
         return (

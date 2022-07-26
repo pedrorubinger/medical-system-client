@@ -260,6 +260,18 @@ export const Reports = (): JSX.Element => {
     if (response.data) {
       setRecords([
         {
+          id: 'USERS',
+          title: 'Usuários',
+          visible: ['admin', 'all_doctors'],
+          text: getFormattedReportCardText(response.data?.users, {
+            gender: 'm',
+            plural: 'usuários',
+            singular: 'usuário',
+          }),
+          data: response.data?.users || [],
+          hasDetails: !!response.data?.users?.length,
+        },
+        {
           id: 'APPOINTMENTS',
           title: 'Consultas',
           visible: ['admin', 'doctor'],
@@ -332,18 +344,6 @@ export const Reports = (): JSX.Element => {
             }
           ),
           data: response.data?.specialties || [],
-          hasDetails: false,
-        },
-        {
-          id: 'USERS',
-          title: 'Usuários',
-          visible: ['admin', 'all_doctors'],
-          text: getFormattedReportCardText(response.data?.users, {
-            gender: 'm',
-            plural: 'usuários',
-            singular: 'usuário',
-          }),
-          data: response.data?.users || [],
           hasDetails: false,
         },
       ])

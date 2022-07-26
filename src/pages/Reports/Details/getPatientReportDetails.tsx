@@ -9,6 +9,14 @@ export const getPatientReportDetails = (records: IPatient[] = []) => {
   const femalePatients = records?.filter(({ sex }) => sex === 'female')?.length
   const malePatients = records?.filter(({ sex }) => sex === 'male')?.length
   const patientsWithAddress = records?.filter(({ address }) => address)?.length
+  const oldestPatient = records?.sort(
+    (a, b) =>
+      (getTimePassed(a?.birthdate) || 0) - (getTimePassed(b?.birthdate) || 0)
+  )?.[records?.length - 1]
+  const youngestPatient = records?.sort(
+    (a, b) =>
+      (getTimePassed(a?.birthdate) || 0) - (getTimePassed(b?.birthdate) || 0)
+  )?.[0]
   const ages = records
     ?.map(({ birthdate }) => getTimePassed(birthdate))
     ?.filter(Boolean)
@@ -30,6 +38,14 @@ export const getPatientReportDetails = (records: IPatient[] = []) => {
     <Typography.Text key="with_address">
       <strong>{patientsWithAddress}</strong> paciente(s) com endereço
       cadastrado.
+    </Typography.Text>,
+    <Typography.Text key="youngest">
+      O(a) paciente mais jovem possui{' '}
+      <strong>{getTimePassed(youngestPatient?.birthdate)}</strong> anos.
+    </Typography.Text>,
+    <Typography.Text key="oldest">
+      O(a) paciente mais velho possui{' '}
+      <strong>{getTimePassed(oldestPatient?.birthdate)}</strong> anos.
     </Typography.Text>,
     <Typography.Text key="age_avg">
       A média de idade dos pacientes é de aproximadamente{' '}
