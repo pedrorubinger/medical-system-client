@@ -1,8 +1,8 @@
 import axios, { AxiosRequestConfig } from 'axios'
 
-import { API_BASE_URL } from '../utils/constants/urls'
 import { getToken } from '../utils/helpers/token'
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL
 export const api = axios.create({ baseURL: API_BASE_URL })
 
 api.interceptors.request.use(async (config: AxiosRequestConfig) => {
@@ -16,7 +16,6 @@ api.interceptors.request.use(async (config: AxiosRequestConfig) => {
   }
 })
 
-/** TO DO: Implement appropriate interceptor to axios response... */
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
