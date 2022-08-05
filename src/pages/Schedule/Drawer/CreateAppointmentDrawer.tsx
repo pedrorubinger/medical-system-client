@@ -132,9 +132,12 @@ export const AppointmentDrawer = ({
       return
     }
 
+    const datetime = new Date(data.datetime)?.toISOString()
+    const hours = datetime?.split('T')[0]
+    const minutes = datetime?.split('T')[1]?.split(':00.000Z')[0]
     const payload = {
       patient_id: selectedPatient.value,
-      datetime: data.datetime,
+      datetime: `${hours} ${minutes}`,
       is_follow_up: !!values.is_follow_up,
       is_private: !values.insurance?.value || values.insurance?.value === -1,
       doctor_id: data?.doctor.value,
