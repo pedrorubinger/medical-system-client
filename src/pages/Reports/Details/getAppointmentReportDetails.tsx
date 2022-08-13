@@ -8,7 +8,7 @@ const sumAppointmentPrices = (arr: IAppointment[] = []) =>
   arr
     ?.map(({ price }) => price)
     ?.filter(Boolean)
-    ?.reduce((acc, curr) => (acc as number) + (curr as number))
+    ?.reduce((acc, curr) => (acc as number) + (curr as number), 0)
 
 export const getAppointmentReportDetails = (records: IAppointment[] = []) => {
   const total = records?.length
