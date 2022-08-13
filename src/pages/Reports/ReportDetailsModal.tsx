@@ -88,8 +88,6 @@ export const ReportDetailsModal = ({
     )
   }
 
-  console.log('REPORT DETAILS MODAL > data', id, data)
-
   return (
     <Modal
       visible={isVisible}
