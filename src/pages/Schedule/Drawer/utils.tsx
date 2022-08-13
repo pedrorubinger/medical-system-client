@@ -60,6 +60,7 @@ const addNoneOpt = (
 export const findLastAppointmentDateAsync = async (
   patientId: number,
   doctorId: number,
+  targetDate: string,
   appointment_follow_up_limit?: number | undefined
 ): Promise<IFindLastAppointmentDateAsyncResponse> => {
   const response = await findLastAppointment(patientId, doctorId)
@@ -71,7 +72,7 @@ export const findLastAppointmentDateAsync = async (
   if (!response.error) {
     if (response.data && response.data?.datetime) {
       const datetime = response.data.datetime
-      const diffInDays = getTimeDifference('day', datetime)
+      const diffInDays = getTimeDifference('day', datetime, targetDate)
       const formattedDate = getDateInText(datetime)
 
       const getDiffInDaysLabel = () => {
