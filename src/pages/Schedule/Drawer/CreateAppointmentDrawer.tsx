@@ -299,6 +299,7 @@ export const AppointmentDrawer = ({
         const response = await findLastAppointmentDateAsync(
           watchedPatient.value,
           data.doctor.value,
+          data.datetime,
           data?.appointment_follow_up_limit
         )
 
